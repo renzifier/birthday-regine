@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────
 //  animate.js
 //  Frame loop: candle flicker, flame scale,
-//  smoke drift, camera breathe.
+//  smoke drift, orbit controls.
 //  Also owns click / touch → card open
 //  via raycasting.
 // ─────────────────────────────────────────
@@ -11,6 +11,17 @@ import { candleLight } from "./lights.js";
 import { sunsetBackLight } from "./background.js";
 import { flameMeshes, perFlameLights, smokeSystems } from "./cake.js";
 import { cardHit, openCard } from "./card.js";
+
+// ── Orbit Controls ────────────────────────
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.target.set(0, 2.0, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = CONFIG.controls.minRadius;
+controls.maxDistance = CONFIG.controls.maxRadius;
+controls.minPolarAngle = CONFIG.controls.minPhi;
+controls.maxPolarAngle = CONFIG.controls.maxPhi;
+controls.update();
 
 // ── Raycaster — card click / tap ──────────
 const raycaster = new THREE.Raycaster();
@@ -26,8 +37,17 @@ function hitTestCard(clientX, clientY) {
   return raycaster.intersectObject(cardHit).length > 0;
 }
 
+// Distinguish a click from a drag — only open card if mouse barely moved
+let pointerDownX = 0;
+let pointerDownY = 0;
+canvas.addEventListener("pointerdown", (e) => {
+  pointerDownX = e.clientX;
+  pointerDownY = e.clientY;
+});
 canvas.addEventListener("click", (e) => {
-  if (hitTestCard(e.clientX, e.clientY)) openCard();
+  const dx = e.clientX - pointerDownX;
+  const dy = e.clientY - pointerDownY;
+  if (Math.hypot(dx, dy) < 5 && hitTestCard(e.clientX, e.clientY)) openCard();
 });
 
 // Only fire openCard on a tap (≤ 8 px travel), not a drag
@@ -61,6 +81,9 @@ export function startAnimation() {
   (function loop() {
     requestAnimationFrame(loop);
     t += clock.getDelta();
+
+    // ── Orbit controls update ────────────
+    controls.update();
 
     // ── Candle flicker ───────────────────
     candleLight.intensity =
@@ -104,10 +127,6 @@ export function startAnimation() {
       ss.geo.attributes.position.needsUpdate = true;
       ss.pts.material.opacity = 0.14 + Math.sin(t * 0.6 + ss.phase) * 0.06;
     }
-
-    // ── Subtle camera breathe ────────────
-    camera.position.y = 7.0 + Math.sin(t * 0.3) * 0.03;
-    camera.lookAt(0, 2.0, 0);
 
     renderer.render(scene, camera);
   })();
