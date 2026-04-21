@@ -1,8 +1,8 @@
 // ─────────────────────────────────────────
 //  background.js  — aerial night city view
-//  Inspired by: looking out from a rooftop
-//  into a sprawling lit city below, milky
-//  way overhead, dark interior vignette.
+//  Cool blue palette, milky way overhead,
+//  bright centre glow behind the doorway,
+//  heavy dark interior vignette on sides.
 // ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 
@@ -14,118 +14,152 @@ function makeAerialNight() {
   gc.height = H;
   const ctx = gc.getContext("2d");
 
-  // ── Deterministic RNG ─────────────────────
   const rng = (s) => {
     let x = Math.sin(s + 1) * 43758.5453;
     return x - Math.floor(x);
   };
 
-  // ── Deep night sky gradient ───────────────
+  // ── Deep blue night sky ───────────────────
   const sky = ctx.createLinearGradient(0, 0, 0, H);
-  sky.addColorStop(0.0, "#01020a");
-  sky.addColorStop(0.25, "#030814");
-  sky.addColorStop(0.5, "#060e22");
-  sky.addColorStop(0.72, "#0b1635");
-  sky.addColorStop(0.85, "#0d1a3a");
-  sky.addColorStop(1.0, "#111f45");
+  sky.addColorStop(0.0, "#01020c");
+  sky.addColorStop(0.2, "#020510");
+  sky.addColorStop(0.45, "#040a1e");
+  sky.addColorStop(0.68, "#06102a");
+  sky.addColorStop(0.85, "#081530");
+  sky.addColorStop(1.0, "#0a1838");
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, W, H);
 
-  // ── Milky Way band ────────────────────────
+  // ── Milky Way — upper centre ──────────────
   const mwCX = W * 0.5;
-  const mwCY = H * 0.22;
+  const mwCY = H * 0.2;
 
-  const mwGlow = ctx.createRadialGradient(mwCX, mwCY, 0, mwCX, mwCY, W * 0.38);
-  mwGlow.addColorStop(0, "rgba(160,180,255,0.07)");
-  mwGlow.addColorStop(0.4, "rgba(120,140,220,0.04)");
+  // Soft outer glow
+  const mwGlow = ctx.createRadialGradient(mwCX, mwCY, 0, mwCX, mwCY, W * 0.36);
+  mwGlow.addColorStop(0, "rgba(120,150,220,0.10)");
+  mwGlow.addColorStop(0.5, "rgba(80,110,190,0.04)");
   mwGlow.addColorStop(1, "rgba(0,0,0,0)");
   ctx.fillStyle = mwGlow;
   ctx.fillRect(0, 0, W, H);
 
-  for (let i = 0; i < 2800; i++) {
+  // Dense star cluster
+  for (let i = 0; i < 3200; i++) {
     const angle = rng(i * 2.3) * Math.PI * 2;
-    const dist = Math.pow(rng(i * 5.7), 0.55) * W * 0.32;
-    const sx = mwCX + Math.cos(angle) * dist * 2.2 + (rng(i * 1.1) - 0.5) * 60;
-    const sy = mwCY + Math.sin(angle) * dist * 0.45 + (rng(i * 3.3) - 0.5) * 30;
-    if (sy > H * 0.6) continue;
-    const sr = 0.3 + rng(i * 4.1) * 1.0;
-    const brt = 0.15 + rng(i * 7.3) * 0.7;
-    const blue = rng(i * 9.1) > 0.6;
+    const dist = Math.pow(rng(i * 5.7), 0.5) * W * 0.3;
+    const sx = mwCX + Math.cos(angle) * dist * 2.4 + (rng(i * 1.1) - 0.5) * 50;
+    const sy = mwCY + Math.sin(angle) * dist * 0.42 + (rng(i * 3.3) - 0.5) * 28;
+    if (sy < 0 || sy > H * 0.58) continue;
+    const sr = 0.25 + rng(i * 4.1) * 0.95;
+    const brt = 0.12 + rng(i * 7.3) * 0.75;
     ctx.beginPath();
     ctx.arc(sx, sy, sr, 0, Math.PI * 2);
-    ctx.fillStyle = blue
-      ? `rgba(180,200,255,${brt})`
-      : `rgba(230,235,255,${brt})`;
+    ctx.fillStyle =
+      rng(i * 9.1) > 0.55
+        ? `rgba(160,185,255,${brt})`
+        : `rgba(220,230,255,${brt})`;
     ctx.fill();
   }
 
-  const streak = ctx.createRadialGradient(mwCX, mwCY, 0, mwCX, mwCY, 180);
-  streak.addColorStop(0, "rgba(200,215,255,0.18)");
-  streak.addColorStop(0.3, "rgba(160,180,240,0.08)");
-  streak.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.fillStyle = streak;
+  // Bright core
+  const core = ctx.createRadialGradient(mwCX, mwCY, 0, mwCX, mwCY, 160);
+  core.addColorStop(0, "rgba(180,200,255,0.22)");
+  core.addColorStop(0.4, "rgba(120,150,230,0.08)");
+  core.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = core;
   ctx.fillRect(0, 0, W, H);
 
-  // ── Regular stars ─────────────────────────
-  for (let i = 0; i < 420; i++) {
+  // ── Scattered stars ───────────────────────
+  for (let i = 0; i < 500; i++) {
     const sx = rng(i * 3.7 + 10) * W;
-    const sy = rng(i * 6.1 + 10) * H * 0.68;
-    const sr = 0.3 + rng(i * 2.3 + 10) * 1.1;
-    const brt = 0.2 + rng(i * 8.9 + 10) * 0.8;
+    const sy = rng(i * 6.1 + 10) * H * 0.65;
+    const sr = 0.25 + rng(i * 2.3 + 10) * 1.0;
+    const brt = 0.15 + rng(i * 8.9 + 10) * 0.85;
     ctx.beginPath();
     ctx.arc(sx, sy, sr, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(220,228,255,${brt})`;
+    ctx.fillStyle = `rgba(200,218,255,${brt})`;
     ctx.fill();
   }
 
-  // ── Aerial city lights ────────────────────
-  const CITY_TOP = H * 0.5;
-  const CITY_BOTTOM = H * 0.84;
-  const CITY_MID = H * 0.64;
+  // ── Doorway glow — bright centre behind where doors will sit ──
+  const doorCX = W * 0.5;
+  const doorCY = H * 0.52;
+  const doorGlow = ctx.createRadialGradient(
+    doorCX,
+    doorCY,
+    0,
+    doorCX,
+    doorCY,
+    W * 0.22,
+  );
+  doorGlow.addColorStop(0, "rgba(140,175,235,0.28)");
+  doorGlow.addColorStop(0.3, "rgba(100,140,210,0.14)");
+  doorGlow.addColorStop(0.7, "rgba(60,90,170,0.05)");
+  doorGlow.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = doorGlow;
+  ctx.fillRect(0, 0, W, H);
 
-  const horizonGlow = ctx.createRadialGradient(
+  // ── Aerial city lights ────────────────────
+  const CITY_TOP = H * 0.47;
+  const CITY_BOTTOM = H * 0.82;
+  const CITY_MID = H * 0.62;
+
+  // Base city ambient glow
+  const cityAmb = ctx.createRadialGradient(
     W * 0.5,
     CITY_MID,
     0,
     W * 0.5,
     CITY_MID,
-    W * 0.55,
+    W * 0.6,
   );
-  horizonGlow.addColorStop(0, "rgba(60,80,160,0.18)");
-  horizonGlow.addColorStop(0.4, "rgba(40,60,130,0.10)");
-  horizonGlow.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.fillStyle = horizonGlow;
+  cityAmb.addColorStop(0, "rgba(40,65,140,0.20)");
+  cityAmb.addColorStop(0.5, "rgba(25,45,110,0.10)");
+  cityAmb.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = cityAmb;
   ctx.fillRect(0, 0, W, H);
 
+  // City light dots — predominantly cool blue-white like the reference
   const LIGHT_COLORS = [
-    [255, 240, 180],
-    [255, 220, 140],
-    [255, 200, 100],
-    [220, 235, 255],
-    [180, 210, 255],
-    [255, 230, 160],
+    [200, 220, 255], // cool blue-white (dominant)
+    [180, 205, 255], // soft blue
+    [215, 230, 255], // near-white blue
+    [255, 240, 200], // warm white (occasional)
+    [160, 195, 255], // mid blue
+    [230, 240, 255], // bright white-blue
   ];
+  const COLOR_WEIGHTS = [0.28, 0.22, 0.2, 0.1, 0.12, 0.08]; // cool dominant
 
-  for (let i = 0; i < 12000; i++) {
+  for (let i = 0; i < 14000; i++) {
     const rawX = rng(i * 2.71 + 1) * W;
     const rawY = CITY_TOP + rng(i * 3.14 + 2) * (CITY_BOTTOM - CITY_TOP);
 
     const yFrac = (rawY - CITY_TOP) / (CITY_BOTTOM - CITY_TOP);
-    const densityY = Math.sin(yFrac * Math.PI) * 0.85 + 0.15;
+    const densityY = Math.sin(yFrac * Math.PI) * 0.8 + 0.2;
     if (rng(i * 7.77 + 3) > densityY) continue;
 
-    const xFrac = rawX / W;
-    const densityX = 0.4 + 0.6 * Math.sin(xFrac * Math.PI);
+    // Slight centre brightness — more lights visible through doorway
+    const xFrac = (rawX / W - 0.5) * 2; // -1 to 1
+    const densityX = 0.5 + 0.5 * Math.exp(-xFrac * xFrac * 1.2);
     if (rng(i * 5.55 + 4) > densityX) continue;
 
-    const col =
-      LIGHT_COLORS[Math.floor(rng(i * 11.1 + 5) * LIGHT_COLORS.length)];
-    const r = 0.4 + rng(i * 4.4 + 6) * 1.8;
-    const a = 0.3 + rng(i * 6.6 + 7) * 0.7;
+    // Pick color weighted toward cool
+    let pick = rng(i * 11.1 + 5);
+    let ci = 0;
+    let acc = 0;
+    for (let w = 0; w < COLOR_WEIGHTS.length; w++) {
+      acc += COLOR_WEIGHTS[w];
+      if (pick < acc) {
+        ci = w;
+        break;
+      }
+    }
+    const col = LIGHT_COLORS[ci];
+    const r = 0.3 + rng(i * 4.4 + 6) * 1.6;
+    const a = 0.25 + rng(i * 6.6 + 7) * 0.65;
 
-    if (r > 1.4) {
-      const halo = ctx.createRadialGradient(rawX, rawY, 0, rawX, rawY, r * 5);
-      halo.addColorStop(0, `rgba(${col[0]},${col[1]},${col[2]},${a * 0.3})`);
+    if (r > 1.2) {
+      const halo = ctx.createRadialGradient(rawX, rawY, 0, rawX, rawY, r * 4.5);
+      halo.addColorStop(0, `rgba(${col[0]},${col[1]},${col[2]},${a * 0.25})`);
       halo.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = halo;
       ctx.fillRect(rawX - r * 5, rawY - r * 5, r * 10, r * 10);
@@ -137,47 +171,54 @@ function makeAerialNight() {
     ctx.fill();
   }
 
-  // Faint street grid suggestion
-  ctx.globalAlpha = 0.025;
-  ctx.strokeStyle = "rgba(255,240,180,1)";
+  // Faint street grid lines
+  ctx.globalAlpha = 0.018;
+  ctx.strokeStyle = "rgba(180,210,255,1)";
   ctx.lineWidth = 1;
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 12; i++) {
     const lx = rng(i * 8.8 + 20) * W;
     ctx.beginPath();
     ctx.moveTo(lx, CITY_TOP);
-    ctx.lineTo(lx + (rng(i * 3.3 + 21) - 0.5) * 80, CITY_BOTTOM);
+    ctx.lineTo(lx + (rng(i * 3.3 + 21) - 0.5) * 60, CITY_BOTTOM);
     ctx.stroke();
   }
   ctx.globalAlpha = 1.0;
 
-  // ── Ground fade ───────────────────────────
-  const groundFade = ctx.createLinearGradient(0, CITY_BOTTOM - 40, 0, H);
+  // ── Lower ground fade ─────────────────────
+  const groundFade = ctx.createLinearGradient(0, CITY_BOTTOM - 50, 0, H);
   groundFade.addColorStop(0, "rgba(0,0,0,0)");
-  groundFade.addColorStop(1, "rgba(1,3,10,1)");
+  groundFade.addColorStop(1, "rgba(2,4,14,1)");
   ctx.fillStyle = groundFade;
-  ctx.fillRect(0, CITY_BOTTOM - 40, W, H - CITY_BOTTOM + 40);
+  ctx.fillRect(0, CITY_BOTTOM - 50, W, H - CITY_BOTTOM + 50);
 
-  // ── Interior vignette — dark sides ────────
-  const leftVig = ctx.createLinearGradient(0, 0, W * 0.28, 0);
-  leftVig.addColorStop(0, "rgba(2,4,14,0.92)");
-  leftVig.addColorStop(0.5, "rgba(2,4,14,0.4)");
+  // ── Interior vignette — heavy dark sides ──
+  const leftVig = ctx.createLinearGradient(0, 0, W * 0.32, 0);
+  leftVig.addColorStop(0, "rgba(3,6,18,0.96)");
+  leftVig.addColorStop(0.4, "rgba(3,6,18,0.55)");
   leftVig.addColorStop(1, "rgba(0,0,0,0)");
   ctx.fillStyle = leftVig;
-  ctx.fillRect(0, 0, W * 0.28, H);
+  ctx.fillRect(0, 0, W * 0.32, H);
 
-  const rightVig = ctx.createLinearGradient(W, 0, W * 0.72, 0);
-  rightVig.addColorStop(0, "rgba(2,4,14,0.92)");
-  rightVig.addColorStop(0.5, "rgba(2,4,14,0.4)");
+  const rightVig = ctx.createLinearGradient(W, 0, W * 0.68, 0);
+  rightVig.addColorStop(0, "rgba(3,6,18,0.96)");
+  rightVig.addColorStop(0.4, "rgba(3,6,18,0.55)");
   rightVig.addColorStop(1, "rgba(0,0,0,0)");
   ctx.fillStyle = rightVig;
-  ctx.fillRect(W * 0.72, 0, W * 0.28, H);
+  ctx.fillRect(W * 0.68, 0, W * 0.32, H);
 
   // Top vignette
-  const topVig = ctx.createLinearGradient(0, 0, 0, H * 0.18);
-  topVig.addColorStop(0, "rgba(1,2,8,0.85)");
+  const topVig = ctx.createLinearGradient(0, 0, 0, H * 0.16);
+  topVig.addColorStop(0, "rgba(1,2,10,0.9)");
   topVig.addColorStop(1, "rgba(0,0,0,0)");
   ctx.fillStyle = topVig;
-  ctx.fillRect(0, 0, W, H * 0.18);
+  ctx.fillRect(0, 0, W, H * 0.16);
+
+  // Bottom vignette (floor area)
+  const botVig = ctx.createLinearGradient(0, H * 0.82, 0, H);
+  botVig.addColorStop(0, "rgba(0,0,0,0)");
+  botVig.addColorStop(1, "rgba(2,5,15,0.95)");
+  ctx.fillStyle = botVig;
+  ctx.fillRect(0, H * 0.82, W, H * 0.18);
 
   return new THREE.CanvasTexture(gc);
 }
@@ -185,21 +226,22 @@ function makeAerialNight() {
 const cityTex = makeAerialNight();
 scene.background = cityTex;
 
-// Soft cool city glow from below
-export const sunsetBackLight = new THREE.PointLight(0x4466bb, 1.2, 80);
-sunsetBackLight.position.set(0, 4, -20);
+// Cool blue city ambient from behind/below
+export const sunsetBackLight = new THREE.PointLight(0x3355aa, 1.4, 90);
+sunsetBackLight.position.set(0, 5, -22);
 scene.add(sunsetBackLight);
 
-// Moonlight / starlight from above
-const moonLight = new THREE.PointLight(0x8899dd, 0.5, 70);
-moonLight.position.set(8, 22, -12);
+// Moonlight / starfield from above
+const moonLight = new THREE.PointLight(0x7799cc, 0.55, 80);
+moonLight.position.set(6, 24, -14);
 scene.add(moonLight);
 
-// Subtle warm city-glow spill from sides
-const leftSpill = new THREE.PointLight(0xffaa44, 0.2, 30);
-leftSpill.position.set(-14, 3, -6);
+// Cool left spill
+const leftSpill = new THREE.PointLight(0x4466bb, 0.22, 32);
+leftSpill.position.set(-16, 4, -6);
 scene.add(leftSpill);
 
-const rightSpill = new THREE.PointLight(0x99bbff, 0.2, 30);
-rightSpill.position.set(14, 3, -6);
+// Cool right spill
+const rightSpill = new THREE.PointLight(0x5577cc, 0.22, 32);
+rightSpill.position.set(16, 4, -6);
 scene.add(rightSpill);

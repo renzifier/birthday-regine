@@ -23,6 +23,7 @@ import "./table.js";
 import "./cake.js";
 import "./card.js";
 import "./decorations.js";
+import "./doors.js";
 
 // 6. Start the render loop (also sets up input)
 import { startAnimation } from "./animate.js";
