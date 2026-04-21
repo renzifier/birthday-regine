@@ -1,7 +1,8 @@
 // ─────────────────────────────────────────
 //  doors.js — double open doors behind
 //  the table, framing the city view.
-//  Cool blue-white beam matching reference.
+//  Darker door panels, strong edge glow,
+//  visible interior wall surfaces.
 // ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 
@@ -14,26 +15,88 @@ const doorGroup = new THREE.Group();
 doorGroup.position.set(0, FLOOR_Y, -19);
 scene.add(doorGroup);
 
-// ── Materials — cool blue-grey to match reference ──
+// ── Materials ─────────────────────────────
+
+// Frame: near-white so the edge glow reads bright
 const frameMat = new THREE.MeshStandardMaterial({
-  color: 0xc8d8e8,
-  roughness: 0.22,
-  metalness: 0.08,
-  emissive: 0x1a2a3a,
-  emissiveIntensity: 0.15,
+  color: 0xddeeff,
+  roughness: 0.18,
+  metalness: 0.04,
+  emissive: 0x8ab8e0,
+  emissiveIntensity: 0.55, // glowing frame edges
 });
+
+// Door panels: very dark — almost black with a faint blue tint
 const doorMat = new THREE.MeshStandardMaterial({
-  color: 0xb0c8d8,
-  roughness: 0.28,
-  metalness: 0.05,
-  emissive: 0x0a1a2a,
+  color: 0x0a1520, // near-black blue
+  roughness: 0.55,
+  metalness: 0.02,
+  emissive: 0x000408,
   emissiveIntensity: 0.1,
 });
+
+// Panel recesses: slightly lighter dark
 const panelRecessMat = new THREE.MeshStandardMaterial({
-  color: 0x8aaabb,
-  roughness: 0.38,
+  color: 0x0d1e2e,
+  roughness: 0.65,
   metalness: 0.0,
 });
+
+// ── Interior wall material ────────────────
+// Dark blue-grey plaster/concrete — the room walls visible beside the door
+const wallMat = new THREE.MeshStandardMaterial({
+  color: 0x060e1c,
+  roughness: 0.88,
+  metalness: 0.0,
+  emissive: 0x050c18,
+  emissiveIntensity: 0.08,
+});
+
+// ── Interior walls flanking the doorway ───
+// Left wall panel
+const leftWall = new THREE.Mesh(new THREE.BoxGeometry(14, 12, 0.35), wallMat);
+leftWall.position.set(-FRAME_W / 2 - 7.2, FRAME_H * 0.5, 0.1);
+leftWall.receiveShadow = true;
+doorGroup.add(leftWall);
+
+// Right wall panel
+const rightWall = new THREE.Mesh(new THREE.BoxGeometry(14, 12, 0.35), wallMat);
+rightWall.position.set(FRAME_W / 2 + 7.2, FRAME_H * 0.5, 0.1);
+rightWall.receiveShadow = true;
+doorGroup.add(rightWall);
+
+// Ceiling strip above the door
+const ceiling = new THREE.Mesh(
+  new THREE.BoxGeometry(FRAME_W * 6, 3.5, 0.35),
+  wallMat,
+);
+ceiling.position.set(0, FRAME_H + 1.8, 0.1);
+ceiling.receiveShadow = true;
+doorGroup.add(ceiling);
+
+// ── Subtle wall surface detail ─────────────
+// Faint vertical panels/lines on the walls for realism
+const wallDetailMat = new THREE.MeshStandardMaterial({
+  color: 0x080f1a,
+  roughness: 0.92,
+  metalness: 0.0,
+});
+for (let i = 0; i < 3; i++) {
+  const px = -FRAME_W / 2 - 2.5 - i * 3.2;
+  const stripe = new THREE.Mesh(
+    new THREE.BoxGeometry(0.06, 10, 0.04),
+    wallDetailMat,
+  );
+  stripe.position.set(px, FRAME_H * 0.45, 0.22);
+  doorGroup.add(stripe);
+
+  const stripe2 = new THREE.Mesh(
+    new THREE.BoxGeometry(0.06, 10, 0.04),
+    wallDetailMat,
+  );
+  stripe2.position.set(-px, FRAME_H * 0.45, 0.22);
+  doorGroup.add(stripe2);
+}
 
 // ── Door frame ────────────────────────────
 const topBar = new THREE.Mesh(
@@ -64,7 +127,7 @@ const centreDiv = new THREE.Mesh(
 centreDiv.position.set(0, FRAME_H / 2, 0);
 doorGroup.add(centreDiv);
 
-// ── Helper: build one door panel ──
+// ── Helper: build one door panel ──────────
 function makeDoorPanel(halfW) {
   const grp = new THREE.Group();
 
@@ -88,12 +151,15 @@ function makeDoorPanel(halfW) {
   loPanel.position.set(0, -FRAME_H * 0.14, 0.07);
   grp.add(loPanel);
 
+  // Door knob — metallic
   const knob = new THREE.Mesh(
     new THREE.SphereGeometry(0.1, 10, 10),
     new THREE.MeshStandardMaterial({
-      color: 0xd0dde8,
-      roughness: 0.1,
-      metalness: 0.8,
+      color: 0xaac8e0,
+      roughness: 0.08,
+      metalness: 0.9,
+      emissive: 0x223344,
+      emissiveIntensity: 0.3,
     }),
   );
   grp.add(knob);
@@ -136,9 +202,11 @@ doorGroup.traverse((obj) => {
   }
 });
 
-// ── Cool blue-white light beam through doorway ──
+// ══════════════════════════════════════════
+//  LIGHTS
+// ══════════════════════════════════════════
 
-// 1. Tight bright core — cool white-blue
+// 1. Tight bright core — cool white-blue beam
 const beamCore = new THREE.SpotLight(
   0xddeeff,
   22.0,
@@ -187,7 +255,7 @@ beamMesh.position.set(0, FLOOR_Y + 5.0, -8.0);
 beamMesh.rotation.x = 0.28;
 scene.add(beamMesh);
 
-// 5. Outer fringe — even softer, wider
+// 5. Outer fringe beam
 const beamGeo2 = new THREE.CylinderGeometry(0.35, 6.0, 24, 16, 1, true);
 const beamMat2 = new THREE.MeshBasicMaterial({
   color: 0xaabbee,
@@ -201,7 +269,26 @@ beamMesh2.position.set(0, FLOOR_Y + 5.0, -8.0);
 beamMesh2.rotation.x = 0.28;
 scene.add(beamMesh2);
 
-// 6. Edge glow on door frame — cool blue emissive light
-const frameGlow = new THREE.PointLight(0x6699cc, 3.5, 10);
-frameGlow.position.set(0, FLOOR_Y + FRAME_H * 0.6, -18.5);
+// 6. Strong door frame edge glow — bright cool-white rim
+const frameGlow = new THREE.PointLight(0xaaddff, 8.0, 14);
+frameGlow.position.set(0, FLOOR_Y + FRAME_H * 0.55, -18.4);
 scene.add(frameGlow);
+
+// 7. Left frame rim light — illuminates the inner edge of left post
+const leftFrameRim = new THREE.PointLight(0x88bbee, 4.5, 8);
+leftFrameRim.position.set(-FRAME_W / 2 - 0.1, FLOOR_Y + FRAME_H * 0.5, -18.6);
+scene.add(leftFrameRim);
+
+// 8. Right frame rim light
+const rightFrameRim = new THREE.PointLight(0x88bbee, 4.5, 8);
+rightFrameRim.position.set(FRAME_W / 2 + 0.1, FLOOR_Y + FRAME_H * 0.5, -18.6);
+scene.add(rightFrameRim);
+
+// 9. Wall wash lights — cool blue touching the interior walls
+const leftWallLight = new THREE.PointLight(0x1a3a6a, 3.5, 22);
+leftWallLight.position.set(-FRAME_W / 2 - 5, FLOOR_Y + FRAME_H * 0.4, -17);
+scene.add(leftWallLight);
+
+const rightWallLight = new THREE.PointLight(0x1a3a6a, 3.5, 22);
+rightWallLight.position.set(FRAME_W / 2 + 5, FLOOR_Y + FRAME_H * 0.4, -17);
+scene.add(rightWallLight);
