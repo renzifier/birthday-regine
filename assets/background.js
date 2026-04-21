@@ -85,14 +85,7 @@ function makeBokehBackground() {
 const bokehTex = makeBokehBackground();
 scene.background = bokehTex;
 
-const bgPlaneMat = new THREE.MeshBasicMaterial({
-  map: bokehTex,
-  depthWrite: false,
-});
-const bgPlane = new THREE.Mesh(new THREE.PlaneGeometry(90, 50), bgPlaneMat);
-bgPlane.position.set(0, 8, -24);
-bgPlane.renderOrder = -1;
-scene.add(bgPlane);
+// background set directly on scene — no plane mesh needed
 
 // Soft warm back-light — simulates the string lights glowing behind the scene
 export const sunsetBackLight = new THREE.PointLight(0xff9944, 0.8, 60);
