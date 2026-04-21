@@ -2,14 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="theme-color" content="#000000" />
     <title>3D Birthday Scene</title>
     <link rel="stylesheet" href="assets/style.css" />
   </head>
   <body>
     <div id="wrap">
       <canvas id="c"></canvas>
-      <div id="hint">drag to orbit · scroll to zoom · click the card 💌</div>
+      <div id="hint">
+        <span class="hint-desktop"
+          >drag to orbit · scroll to zoom · click the card 💌</span
+        ><span class="hint-mobile"
+          >drag to orbit · pinch to zoom · tap the card 💌</span
+        >
+      </div>
     </div>
 
     <!-- ── Terminal intro screen ── -->

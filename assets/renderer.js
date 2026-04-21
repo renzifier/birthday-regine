@@ -30,11 +30,18 @@ camera.position.set(0, 5, 16);
 camera.lookAt(0, 1.5, -4);
 
 function resize() {
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+  // Use visualViewport when available — accounts for mobile browser chrome
+  // (address bar, tab bar) shrinking the visible area
+  const vvp = window.visualViewport;
+  const w = vvp ? Math.round(vvp.width) : window.innerWidth;
+  const h = vvp ? Math.round(vvp.height) : window.innerHeight;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
 }
 resize();
 window.addEventListener("resize", resize);
+// visualViewport fires its own resize event on mobile when chrome shows/hides
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", resize);
+}
