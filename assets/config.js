@@ -10,8 +10,8 @@ export const CARD_MESSAGE =
   "You deserve every beautiful moment of today. 🎂✨";
 
 export const CONFIG = {
-  camera: { fov: 55, near: 0.1, far: 200, initialRadius: 13 },
+  camera: { fov: 62, near: 0.1, far: 200, initialRadius: 16 },
   candle: { minIntensity: 2.2, flickerSpeed: 9.3 },
   cake: { offsetX: -0.5, tableY: 0.37 },
-  controls: { minRadius: 4, maxRadius: 22, minPhi: 0.05, maxPhi: 1.3 },
+  controls: { minRadius: 4, maxRadius: 30, minPhi: 0.05, maxPhi: 1.3 },
 };

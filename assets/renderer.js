@@ -26,8 +26,8 @@ export const camera = new THREE.PerspectiveCamera(
   CONFIG.camera.near,
   CONFIG.camera.far,
 );
-camera.position.set(0, 7, 22);
-camera.lookAt(0, 2.0, 0);
+camera.position.set(0, 5, 16);
+camera.lookAt(0, 1.5, -4);
 
 function resize() {
   const w = window.innerWidth;

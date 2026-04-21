@@ -14,7 +14,7 @@ import { cardHit, openCard } from "./card.js";
 
 // ── Orbit Controls ────────────────────────
 const controls = new THREE.OrbitControls(camera, canvas);
-controls.target.set(0, 2.0, 0);
+controls.target.set(0, 1.5, -4);
 controls.enableDamping = true;
 controls.dampingFactor = 0.06;
 controls.minDistance = CONFIG.controls.minRadius;
