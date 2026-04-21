@@ -5,7 +5,7 @@ import { scene } from "./renderer.js";
 import { makeFloorTex } from "./textures.js";
 
 const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(120, 44),
+  new THREE.PlaneGeometry(120, 40),
   new THREE.MeshStandardMaterial({
     map: makeFloorTex(),
     roughness: 0.25,
