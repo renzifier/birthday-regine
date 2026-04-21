@@ -1,10 +1,12 @@
 // ─────────────────────────────────────────
-//  background.js  — city at night skyline
-//  Rooftop birthday party vibes 🏙️🎂
+//  background.js  — aerial night city view
+//  Inspired by: looking out from a rooftop
+//  into a sprawling lit city below, milky
+//  way overhead, dark interior vignette.
 // ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 
-function makeCityNight() {
+function makeAerialNight() {
   const W = 2048,
     H = 1024;
   const gc = document.createElement("canvas");
@@ -12,273 +14,192 @@ function makeCityNight() {
   gc.height = H;
   const ctx = gc.getContext("2d");
 
-  // ── Sky gradient ─────────────────────────
-  const sky = ctx.createLinearGradient(0, 0, 0, H);
-  sky.addColorStop(0.0, "#02040e");
-  sky.addColorStop(0.3, "#060c1f");
-  sky.addColorStop(0.6, "#0b1530");
-  sky.addColorStop(0.82, "#12234a");
-  sky.addColorStop(1.0, "#1a2f5a");
-  ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, W, H);
-
-  // ── Stars ────────────────────────────────
+  // ── Deterministic RNG ─────────────────────
   const rng = (s) => {
     let x = Math.sin(s + 1) * 43758.5453;
     return x - Math.floor(x);
   };
-  for (let i = 0; i < 280; i++) {
-    const sx = rng(i * 3.7) * W;
-    const sy = rng(i * 6.1) * H * 0.65;
-    const sr = 0.4 + rng(i * 2.3) * 1.2;
-    const brt = 0.3 + rng(i * 8.9) * 0.7;
+
+  // ── Deep night sky gradient ───────────────
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0.0, "#01020a");
+  sky.addColorStop(0.25, "#030814");
+  sky.addColorStop(0.5, "#060e22");
+  sky.addColorStop(0.72, "#0b1635");
+  sky.addColorStop(0.85, "#0d1a3a");
+  sky.addColorStop(1.0, "#111f45");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Milky Way band ────────────────────────
+  const mwCX = W * 0.5;
+  const mwCY = H * 0.22;
+
+  const mwGlow = ctx.createRadialGradient(mwCX, mwCY, 0, mwCX, mwCY, W * 0.38);
+  mwGlow.addColorStop(0, "rgba(160,180,255,0.07)");
+  mwGlow.addColorStop(0.4, "rgba(120,140,220,0.04)");
+  mwGlow.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = mwGlow;
+  ctx.fillRect(0, 0, W, H);
+
+  for (let i = 0; i < 2800; i++) {
+    const angle = rng(i * 2.3) * Math.PI * 2;
+    const dist = Math.pow(rng(i * 5.7), 0.55) * W * 0.32;
+    const sx = mwCX + Math.cos(angle) * dist * 2.2 + (rng(i * 1.1) - 0.5) * 60;
+    const sy = mwCY + Math.sin(angle) * dist * 0.45 + (rng(i * 3.3) - 0.5) * 30;
+    if (sy > H * 0.6) continue;
+    const sr = 0.3 + rng(i * 4.1) * 1.0;
+    const brt = 0.15 + rng(i * 7.3) * 0.7;
+    const blue = rng(i * 9.1) > 0.6;
     ctx.beginPath();
     ctx.arc(sx, sy, sr, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(210,225,255,${brt})`;
+    ctx.fillStyle = blue
+      ? `rgba(180,200,255,${brt})`
+      : `rgba(230,235,255,${brt})`;
     ctx.fill();
   }
 
-  // ── Moon ─────────────────────────────────
-  const moonX = W * 0.78,
-    moonY = H * 0.18;
-  const moon = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, 52);
-  moon.addColorStop(0, "rgba(255,252,230,1.0)");
-  moon.addColorStop(0.5, "rgba(220,235,255,0.9)");
-  moon.addColorStop(1, "rgba(100,140,220,0)");
-  ctx.fillStyle = moon;
-  ctx.beginPath();
-  ctx.arc(moonX, moonY, 52, 0, Math.PI * 2);
-  ctx.fill();
-  // moon halo
-  const halo = ctx.createRadialGradient(moonX, moonY, 48, moonX, moonY, 160);
-  halo.addColorStop(0, "rgba(160,190,255,0.12)");
-  halo.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.fillStyle = halo;
+  const streak = ctx.createRadialGradient(mwCX, mwCY, 0, mwCX, mwCY, 180);
+  streak.addColorStop(0, "rgba(200,215,255,0.18)");
+  streak.addColorStop(0.3, "rgba(160,180,240,0.08)");
+  streak.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = streak;
   ctx.fillRect(0, 0, W, H);
 
-  // ── City glow on horizon ─────────────────
-  const horizonY = H * 0.62;
-  const cityGlow = ctx.createLinearGradient(0, horizonY - 60, 0, horizonY + 80);
-  cityGlow.addColorStop(0, "rgba(0,0,0,0)");
-  cityGlow.addColorStop(0.4, "rgba(255,140,40,0.08)");
-  cityGlow.addColorStop(1, "rgba(255,100,20,0.18)");
-  ctx.fillStyle = cityGlow;
-  ctx.fillRect(0, 0, W, H);
-
-  // ── Draw buildings ───────────────────────
-  // Each building: { x, w, h, windows cols, rows }
-  const GROUND = H * 0.66;
-
-  function drawBuilding(x, w, h, winCols, winRows, roofStyle) {
-    const top = GROUND - h;
-
-    // Building body — dark with slight blue tint
-    const bgrad = ctx.createLinearGradient(x, top, x + w, top);
-    bgrad.addColorStop(0, "#0a0f1a");
-    bgrad.addColorStop(0.5, "#0d1525");
-    bgrad.addColorStop(1, "#080c16");
-    ctx.fillStyle = bgrad;
-    ctx.fillRect(x, top, w, h);
-
-    // Edge highlight (moonlight catching left edge)
-    ctx.fillStyle = "rgba(100,140,220,0.12)";
-    ctx.fillRect(x, top, 3, h);
-
-    // Windows
-    const winW = Math.max(4, w / (winCols * 2.2));
-    const winH = Math.max(5, h / (winRows * 2.5));
-    const padX = (w - winCols * winW * 2) / (winCols + 1);
-    const padY = 18;
-
-    for (let row = 0; row < winRows; row++) {
-      for (let col = 0; col < winCols; col++) {
-        const wx = x + padX + col * (winW + padX);
-        const wy = top + padY + row * (winH + padY * 0.8);
-        if (wy + winH > GROUND - 5) continue;
-
-        // Random lit/unlit, warm/cool
-        const seed = x * 0.01 + row * 100 + col * 7;
-        const lit = rng(seed) > 0.3;
-        if (!lit) {
-          ctx.fillStyle = "rgba(20,25,40,0.8)";
-        } else {
-          const warm = rng(seed * 3) > 0.4;
-          if (warm) {
-            const brightness = 0.5 + rng(seed * 7) * 0.5;
-            ctx.fillStyle = `rgba(255,${Math.floor(180 + rng(seed * 2) * 60)},${Math.floor(60 + rng(seed * 4) * 60)},${brightness})`;
-          } else {
-            ctx.fillStyle = `rgba(${Math.floor(140 + rng(seed * 5) * 80)},${Math.floor(180 + rng(seed * 6) * 60)},255,${0.4 + rng(seed * 8) * 0.4})`;
-          }
-          // Window glow
-          const wglow = ctx.createRadialGradient(
-            wx + winW / 2,
-            wy + winH / 2,
-            0,
-            wx + winW / 2,
-            wy + winH / 2,
-            winW * 2,
-          );
-          wglow.addColorStop(0, ctx.fillStyle.replace(/[\d.]+\)$/, "0.15)"));
-          wglow.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.fillStyle = wglow;
-          ctx.fillRect(wx - winW, wy - winH, winW * 3, winH * 3);
-        }
-        // Window rect
-        ctx.fillStyle = lit
-          ? rng(x * 0.01 + row * 100 + col * 7 + 1) > 0.4
-            ? `rgba(255,${Math.floor(200 + rng(x * 0.01 + row * 100 + col * 7) * 40)},100,0.85)`
-            : `rgba(180,210,255,0.75)`
-          : "rgba(15,20,35,0.9)";
-        ctx.fillRect(wx, wy, winW, winH);
-      }
-    }
-
-    // Roof styles
-    if (roofStyle === "antenna") {
-      ctx.strokeStyle = "rgba(150,170,210,0.7)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x + w / 2, top);
-      ctx.lineTo(x + w / 2, top - 35);
-      ctx.stroke();
-      // Blinking red light
-      ctx.fillStyle = "rgba(255,60,60,0.9)";
-      ctx.beginPath();
-      ctx.arc(x + w / 2, top - 37, 3, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (roofStyle === "stepped") {
-      ctx.fillStyle = "#0a0f1a";
-      ctx.fillRect(x + w * 0.15, top - 18, w * 0.7, 18);
-      ctx.fillRect(x + w * 0.3, top - 32, w * 0.4, 14);
-    } else if (roofStyle === "dome") {
-      ctx.fillStyle = "#0d1525";
-      ctx.beginPath();
-      ctx.ellipse(x + w / 2, top, w * 0.4, 20, 0, Math.PI, 0);
-      ctx.fill();
-    }
+  // ── Regular stars ─────────────────────────
+  for (let i = 0; i < 420; i++) {
+    const sx = rng(i * 3.7 + 10) * W;
+    const sy = rng(i * 6.1 + 10) * H * 0.68;
+    const sr = 0.3 + rng(i * 2.3 + 10) * 1.1;
+    const brt = 0.2 + rng(i * 8.9 + 10) * 0.8;
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(220,228,255,${brt})`;
+    ctx.fill();
   }
 
-  // ── Building layout — varied skyline ─────
-  const buildings = [
-    // far background (shorter, lighter)
-    { x: 0, w: 90, h: 220, wc: 3, wr: 8, roof: "flat" },
-    { x: 80, w: 60, h: 160, wc: 2, wr: 6, roof: "flat" },
-    { x: 130, w: 110, h: 310, wc: 4, wr: 11, roof: "antenna" },
-    { x: 230, w: 75, h: 190, wc: 3, wr: 7, roof: "stepped" },
-    { x: 295, w: 130, h: 380, wc: 5, wr: 14, roof: "antenna" },
-    { x: 415, w: 80, h: 240, wc: 3, wr: 9, roof: "flat" },
-    { x: 485, w: 55, h: 170, wc: 2, wr: 6, roof: "flat" },
-    { x: 530, w: 145, h: 420, wc: 5, wr: 15, roof: "stepped" },
-    { x: 665, w: 70, h: 200, wc: 3, wr: 7, roof: "dome" },
-    { x: 725, w: 100, h: 290, wc: 4, wr: 10, roof: "antenna" },
-    { x: 815, w: 60, h: 155, wc: 2, wr: 6, roof: "flat" },
-    { x: 865, w: 120, h: 350, wc: 4, wr: 13, roof: "antenna" },
-    { x: 975, w: 85, h: 230, wc: 3, wr: 8, roof: "stepped" },
-    { x: 1050, w: 65, h: 175, wc: 2, wr: 6, roof: "flat" },
-    { x: 1105, w: 155, h: 460, wc: 6, wr: 16, roof: "antenna" },
-    { x: 1250, w: 90, h: 260, wc: 3, wr: 9, roof: "dome" },
-    { x: 1330, w: 70, h: 190, wc: 2, wr: 7, roof: "flat" },
-    { x: 1390, w: 125, h: 330, wc: 4, wr: 12, roof: "stepped" },
-    { x: 1505, w: 80, h: 210, wc: 3, wr: 8, roof: "flat" },
-    { x: 1575, w: 110, h: 395, wc: 4, wr: 14, roof: "antenna" },
-    { x: 1675, w: 65, h: 180, wc: 2, wr: 7, roof: "flat" },
-    { x: 1730, w: 140, h: 440, wc: 5, wr: 16, roof: "antenna" },
-    { x: 1860, w: 90, h: 250, wc: 3, wr: 9, roof: "stepped" },
-    { x: 1940, w: 108, h: 310, wc: 4, wr: 11, roof: "dome" },
-  ];
+  // ── Aerial city lights ────────────────────
+  const CITY_TOP = H * 0.5;
+  const CITY_BOTTOM = H * 0.84;
+  const CITY_MID = H * 0.64;
 
-  // Draw back buildings first (slightly faded)
-  ctx.globalAlpha = 0.55;
-  buildings
-    .filter((_, i) => i % 3 === 0)
-    .forEach((b) => {
-      ctx.globalAlpha = 0.4;
-      drawBuilding(
-        b.x * (W / 2048),
-        b.w * (W / 2048),
-        b.h * 0.6,
-        b.wc,
-        Math.floor(b.wr * 0.6),
-        "flat",
-      );
-    });
-
-  // Main buildings
-  ctx.globalAlpha = 1.0;
-  buildings.forEach((b) => {
-    drawBuilding(
-      b.x * (W / 2048),
-      b.w * (W / 2048),
-      b.h * (H / 1024),
-      b.wc,
-      b.wr,
-      b.roof,
-    );
-  });
-
-  // ── Ground / rooftop floor ────────────────
-  const groundGrad = ctx.createLinearGradient(0, GROUND - 20, 0, H);
-  groundGrad.addColorStop(0, "#0f1828");
-  groundGrad.addColorStop(1, "#050a12");
-  ctx.fillStyle = groundGrad;
-  ctx.fillRect(0, GROUND - 8, W, H - GROUND + 8);
-
-  // ── Bokeh overlay — string light feel ────
-  const bokehColors = [
-    [255, 200, 80],
-    [255, 140, 60],
-    [180, 160, 255],
-    [100, 180, 255],
-    [255, 180, 100],
-  ];
-  for (let i = 0; i < 25; i++) {
-    const bx = rng(i * 4.1 + 99) * W;
-    const by = rng(i * 9.3 + 99) * H * 0.75;
-    const br = 30 + rng(i * 3.3 + 99) * 80;
-    const bc = bokehColors[Math.floor(rng(i * 6.1 + 99) * bokehColors.length)];
-    const ba = 0.04 + rng(i * 2.7 + 99) * 0.08;
-    const bg2 = ctx.createRadialGradient(bx, by, 0, bx, by, br);
-    bg2.addColorStop(0, `rgba(${bc[0]},${bc[1]},${bc[2]},${ba})`);
-    bg2.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = bg2;
-    ctx.fillRect(0, 0, W, H);
-  }
-
-  // Final dark vignette on sides
-  const vign = ctx.createRadialGradient(
-    W / 2,
-    H / 2,
-    W * 0.3,
-    W / 2,
-    H / 2,
-    W * 0.75,
+  const horizonGlow = ctx.createRadialGradient(
+    W * 0.5,
+    CITY_MID,
+    0,
+    W * 0.5,
+    CITY_MID,
+    W * 0.55,
   );
-  vign.addColorStop(0, "rgba(0,0,0,0)");
-  vign.addColorStop(1, "rgba(0,0,10,0.55)");
-  ctx.fillStyle = vign;
+  horizonGlow.addColorStop(0, "rgba(60,80,160,0.18)");
+  horizonGlow.addColorStop(0.4, "rgba(40,60,130,0.10)");
+  horizonGlow.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = horizonGlow;
   ctx.fillRect(0, 0, W, H);
+
+  const LIGHT_COLORS = [
+    [255, 240, 180],
+    [255, 220, 140],
+    [255, 200, 100],
+    [220, 235, 255],
+    [180, 210, 255],
+    [255, 230, 160],
+  ];
+
+  for (let i = 0; i < 12000; i++) {
+    const rawX = rng(i * 2.71 + 1) * W;
+    const rawY = CITY_TOP + rng(i * 3.14 + 2) * (CITY_BOTTOM - CITY_TOP);
+
+    const yFrac = (rawY - CITY_TOP) / (CITY_BOTTOM - CITY_TOP);
+    const densityY = Math.sin(yFrac * Math.PI) * 0.85 + 0.15;
+    if (rng(i * 7.77 + 3) > densityY) continue;
+
+    const xFrac = rawX / W;
+    const densityX = 0.4 + 0.6 * Math.sin(xFrac * Math.PI);
+    if (rng(i * 5.55 + 4) > densityX) continue;
+
+    const col =
+      LIGHT_COLORS[Math.floor(rng(i * 11.1 + 5) * LIGHT_COLORS.length)];
+    const r = 0.4 + rng(i * 4.4 + 6) * 1.8;
+    const a = 0.3 + rng(i * 6.6 + 7) * 0.7;
+
+    if (r > 1.4) {
+      const halo = ctx.createRadialGradient(rawX, rawY, 0, rawX, rawY, r * 5);
+      halo.addColorStop(0, `rgba(${col[0]},${col[1]},${col[2]},${a * 0.3})`);
+      halo.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = halo;
+      ctx.fillRect(rawX - r * 5, rawY - r * 5, r * 10, r * 10);
+    }
+
+    ctx.beginPath();
+    ctx.arc(rawX, rawY, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${a})`;
+    ctx.fill();
+  }
+
+  // Faint street grid suggestion
+  ctx.globalAlpha = 0.025;
+  ctx.strokeStyle = "rgba(255,240,180,1)";
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 14; i++) {
+    const lx = rng(i * 8.8 + 20) * W;
+    ctx.beginPath();
+    ctx.moveTo(lx, CITY_TOP);
+    ctx.lineTo(lx + (rng(i * 3.3 + 21) - 0.5) * 80, CITY_BOTTOM);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1.0;
+
+  // ── Ground fade ───────────────────────────
+  const groundFade = ctx.createLinearGradient(0, CITY_BOTTOM - 40, 0, H);
+  groundFade.addColorStop(0, "rgba(0,0,0,0)");
+  groundFade.addColorStop(1, "rgba(1,3,10,1)");
+  ctx.fillStyle = groundFade;
+  ctx.fillRect(0, CITY_BOTTOM - 40, W, H - CITY_BOTTOM + 40);
+
+  // ── Interior vignette — dark sides ────────
+  const leftVig = ctx.createLinearGradient(0, 0, W * 0.28, 0);
+  leftVig.addColorStop(0, "rgba(2,4,14,0.92)");
+  leftVig.addColorStop(0.5, "rgba(2,4,14,0.4)");
+  leftVig.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = leftVig;
+  ctx.fillRect(0, 0, W * 0.28, H);
+
+  const rightVig = ctx.createLinearGradient(W, 0, W * 0.72, 0);
+  rightVig.addColorStop(0, "rgba(2,4,14,0.92)");
+  rightVig.addColorStop(0.5, "rgba(2,4,14,0.4)");
+  rightVig.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = rightVig;
+  ctx.fillRect(W * 0.72, 0, W * 0.28, H);
+
+  // Top vignette
+  const topVig = ctx.createLinearGradient(0, 0, 0, H * 0.18);
+  topVig.addColorStop(0, "rgba(1,2,8,0.85)");
+  topVig.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = topVig;
+  ctx.fillRect(0, 0, W, H * 0.18);
 
   return new THREE.CanvasTexture(gc);
 }
 
-const cityTex = makeCityNight();
+const cityTex = makeAerialNight();
 scene.background = cityTex;
 
-// Warm city glow from below/behind
-export const sunsetBackLight = new THREE.PointLight(0xff8833, 0.9, 70);
-sunsetBackLight.position.set(0, 6, -18);
+// Soft cool city glow from below
+export const sunsetBackLight = new THREE.PointLight(0x4466bb, 1.2, 80);
+sunsetBackLight.position.set(0, 4, -20);
 scene.add(sunsetBackLight);
 
-// Cool moonlight from upper right
-const moonLight = new THREE.PointLight(0x8899dd, 0.4, 60);
-moonLight.position.set(10, 18, -15);
+// Moonlight / starlight from above
+const moonLight = new THREE.PointLight(0x8899dd, 0.5, 70);
+moonLight.position.set(8, 22, -12);
 scene.add(moonLight);
 
-// Warm window-light spill left and right
-const leftSpill = new THREE.PointLight(0xff9944, 0.25, 28);
-leftSpill.position.set(-12, 4, -4);
+// Subtle warm city-glow spill from sides
+const leftSpill = new THREE.PointLight(0xffaa44, 0.2, 30);
+leftSpill.position.set(-14, 3, -6);
 scene.add(leftSpill);
 
-const rightSpill = new THREE.PointLight(0xaabbff, 0.25, 28);
-rightSpill.position.set(12, 4, -4);
+const rightSpill = new THREE.PointLight(0x99bbff, 0.2, 30);
+rightSpill.position.set(14, 3, -6);
 scene.add(rightSpill);

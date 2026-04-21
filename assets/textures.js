@@ -21,51 +21,70 @@ export function makeFloorTex() {
   fc.height = 512;
   const ctx = fc.getContext("2d");
 
-  // Deep midnight base
-  ctx.fillStyle = "#07090f";
+  // Warm dark wood base
+  ctx.fillStyle = "#1a120a";
   ctx.fillRect(0, 0, 512, 512);
 
-  // Subtle marble veins
-  ctx.globalAlpha = 0.06;
-  for (let i = 0; i < 18; i++) {
-    const x0 = Math.random() * 512;
-    ctx.strokeStyle = "#3a4a80";
-    ctx.lineWidth = 1 + Math.random() * 2;
-    ctx.beginPath();
-    ctx.moveTo(x0, 0);
-    ctx.bezierCurveTo(
-      x0 + (Math.random() - 0.5) * 120,
-      128,
-      x0 + (Math.random() - 0.5) * 120,
-      384,
-      x0 + (Math.random() - 0.5) * 80,
-      512,
-    );
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
+  const PLANK_H = 48;
+  const rng = (s) => {
+    let x = Math.sin(s + 1) * 43758.5453;
+    return x - Math.floor(x);
+  };
 
-  // Subtle plank lines
-  ctx.strokeStyle = "#0d1018";
-  ctx.lineWidth = 1.5;
-  for (let y = 0; y < 512; y += 52) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(512, y);
-    ctx.stroke();
+  for (let row = 0; row < Math.ceil(512 / PLANK_H); row++) {
+    const py = row * PLANK_H;
+    const offset = (row % 2) * 80;
+
+    const bright = 28 + rng(row * 3.1) * 18;
+    ctx.fillStyle = `rgb(${Math.floor(bright * 1.6)},${Math.floor(bright * 1.0)},${Math.floor(bright * 0.55)})`;
+    ctx.fillRect(0, py, 512, PLANK_H - 1);
+
+    // Wood grain
+    for (let g = 0; g < 6; g++) {
+      const gy = py + rng(row * 7.7 + g) * (PLANK_H - 2);
+      const alpha = 0.04 + rng(row * 5.5 + g) * 0.08;
+      ctx.strokeStyle = `rgba(80,40,10,${alpha})`;
+      ctx.lineWidth = 0.5 + rng(row * 9.1 + g) * 1.0;
+      ctx.beginPath();
+      ctx.moveTo(0, gy);
+      ctx.bezierCurveTo(
+        128,
+        gy + (rng(row * 4.4 + g) - 0.5) * 4,
+        384,
+        gy + (rng(row * 6.6 + g) - 0.5) * 4,
+        512,
+        gy + (rng(row * 8.8 + g) - 0.5) * 3,
+      );
+      ctx.stroke();
+    }
+
+    // Plank gap
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.fillRect(0, py + PLANK_H - 1, 512, 1);
+
+    // Vertical joint
+    for (
+      let jx = offset;
+      jx < 512;
+      jx += 160 + Math.floor(rng(row * 2.2) * 60)
+    ) {
+      ctx.fillStyle = "rgba(0,0,0,0.4)";
+      ctx.fillRect(jx, py, 1, PLANK_H - 1);
+    }
   }
 
-  // Specular shimmer
-  const shine = ctx.createRadialGradient(256, 256, 0, 256, 256, 280);
-  shine.addColorStop(0, "rgba(80,100,180,0.12)");
-  shine.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.fillStyle = shine;
+  // Warm varnish sheen
+  const sheen = ctx.createLinearGradient(0, 0, 512, 512);
+  sheen.addColorStop(0, "rgba(255,180,80,0.06)");
+  sheen.addColorStop(0.5, "rgba(255,160,60,0.03)");
+  sheen.addColorStop(1, "rgba(180,100,30,0.06)");
+  ctx.fillStyle = sheen;
   ctx.fillRect(0, 0, 512, 512);
 
   const tex = new THREE.CanvasTexture(fc);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(4, 4);
+  tex.repeat.set(5, 5);
   return tex;
 }
 
