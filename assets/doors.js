@@ -136,18 +136,71 @@ doorGroup.traverse((obj) => {
   }
 });
 
-// ── Light spilling through the doorway ────
-// Cool blue-white spotlight aimed at the floor in front of the table
-const doorSpot = new THREE.SpotLight(
-  0x88aadd,
-  4.0,
-  35,
-  Math.PI * 0.22,
-  0.5,
-  1.2,
+// ── Dramatic light beam through the doorway ───────────────────────────────
+
+// 1. Tight bright core beam — narrow cone, high intensity, hits floor centre
+const beamCore = new THREE.SpotLight(
+  0xaaccff,
+  18.0,
+  40,
+  Math.PI * 0.1,
+  0.0,
+  1.4,
 );
-doorSpot.position.set(0, FLOOR_Y + FRAME_H * 0.72, -8.5);
-doorSpot.target.position.set(0, FLOOR_Y + 0.1, 8);
-doorSpot.castShadow = false; // keep perf light
-scene.add(doorSpot);
-scene.add(doorSpot.target);
+beamCore.position.set(0, FLOOR_Y + FRAME_H * 0.85, -8.6);
+beamCore.target.position.set(0, FLOOR_Y, 6);
+beamCore.castShadow = false;
+scene.add(beamCore);
+scene.add(beamCore.target);
+
+// 2. Wide soft halo around the core — same direction, broader cone, softer falloff
+const beamHalo = new THREE.SpotLight(
+  0x7799ee,
+  10.0,
+  38,
+  Math.PI * 0.22,
+  0.6,
+  1.6,
+);
+beamHalo.position.set(0, FLOOR_Y + FRAME_H * 0.85, -8.6);
+beamHalo.target.position.set(0, FLOOR_Y, 5);
+beamHalo.castShadow = false;
+scene.add(beamHalo);
+scene.add(beamHalo.target);
+
+// 3. Floor-level point light at the bright landing spot — bounces light back up
+//    giving the floor that glowing pool look from the reference
+const floorPool = new THREE.PointLight(0x88aadd, 6.0, 10);
+floorPool.position.set(0, FLOOR_Y + 0.08, 2);
+scene.add(floorPool);
+
+// 4. Volumetric-style beam mesh — a long tapered cone of semi-transparent
+//    blue-white material stretching from the doorway to the floor, giving the
+//    "shaft of light" illusion even without real volumetrics
+const beamGeo = new THREE.CylinderGeometry(0.18, 3.8, 14, 16, 1, true);
+const beamMat = new THREE.MeshBasicMaterial({
+  color: 0x99bbff,
+  transparent: true,
+  opacity: 0.045,
+  side: THREE.BackSide,
+  depthWrite: false,
+});
+const beamMesh = new THREE.Mesh(beamGeo, beamMat);
+// Position so the narrow top sits at the doorway opening, wide base on the floor
+beamMesh.position.set(0, FLOOR_Y + 7.8, -2.2);
+beamMesh.rotation.x = 0.18; // slight tilt toward camera matching spotlight angle
+scene.add(beamMesh);
+
+// Second beam layer — slightly wider, even more transparent, for soft glow fringe
+const beamGeo2 = new THREE.CylinderGeometry(0.4, 5.5, 15, 16, 1, true);
+const beamMat2 = new THREE.MeshBasicMaterial({
+  color: 0x7799dd,
+  transparent: true,
+  opacity: 0.022,
+  side: THREE.BackSide,
+  depthWrite: false,
+});
+const beamMesh2 = new THREE.Mesh(beamGeo2, beamMat2);
+beamMesh2.position.set(0, FLOOR_Y + 7.8, -2.2);
+beamMesh2.rotation.x = 0.18;
+scene.add(beamMesh2);

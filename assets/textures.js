@@ -84,7 +84,7 @@ export function makeFloorTex() {
   const tex = new THREE.CanvasTexture(fc);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(5, 5);
+  tex.repeat.set(18, 12);
   return tex;
 }
 
