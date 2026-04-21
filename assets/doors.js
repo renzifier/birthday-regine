@@ -11,7 +11,7 @@ const FRAME_T = 0.22; // frame thickness
 const FLOOR_Y = -2.0;
 
 const doorGroup = new THREE.Group();
-doorGroup.position.set(0, FLOOR_Y, -22);
+doorGroup.position.set(0, FLOOR_Y, -11);
 scene.add(doorGroup);
 
 // ── Materials ──────────────────────────────
@@ -142,12 +142,12 @@ doorGroup.traverse((obj) => {
 const beamCore = new THREE.SpotLight(
   0xffcc88,
   18.0,
-  60,
+  50,
   Math.PI * 0.1,
   0.0,
   1.4,
 );
-beamCore.position.set(0, FLOOR_Y + FRAME_H * 0.85, -21.5);
+beamCore.position.set(0, FLOOR_Y + FRAME_H * 0.85, -10.5);
 beamCore.target.position.set(0, FLOOR_Y, 6);
 beamCore.castShadow = false;
 scene.add(beamCore);
@@ -157,12 +157,12 @@ scene.add(beamCore.target);
 const beamHalo = new THREE.SpotLight(
   0xffaa55,
   10.0,
-  58,
+  48,
   Math.PI * 0.22,
   0.6,
   1.6,
 );
-beamHalo.position.set(0, FLOOR_Y + FRAME_H * 0.85, -21.5);
+beamHalo.position.set(0, FLOOR_Y + FRAME_H * 0.85, -10.5);
 beamHalo.target.position.set(0, FLOOR_Y, 5);
 beamHalo.castShadow = false;
 scene.add(beamHalo);
@@ -176,7 +176,7 @@ scene.add(floorPool);
 
 // 4. Volumetric-style beam mesh — a long tapered cone of semi-transparent
 //    material stretching from the doorway to the floor
-const beamGeo = new THREE.CylinderGeometry(0.18, 5.5, 30, 16, 1, true);
+const beamGeo = new THREE.CylinderGeometry(0.18, 4.5, 22, 16, 1, true);
 const beamMat = new THREE.MeshBasicMaterial({
   color: 0xffdd99,
   transparent: true,
@@ -185,12 +185,12 @@ const beamMat = new THREE.MeshBasicMaterial({
   depthWrite: false,
 });
 const beamMesh = new THREE.Mesh(beamGeo, beamMat);
-beamMesh.position.set(0, FLOOR_Y + 9.0, -10);
-beamMesh.rotation.x = 0.32;
+beamMesh.position.set(0, FLOOR_Y + 8.0, -3.5);
+beamMesh.rotation.x = 0.22;
 scene.add(beamMesh);
 
 // Second beam layer — slightly wider, even more transparent, for soft glow fringe
-const beamGeo2 = new THREE.CylinderGeometry(0.4, 7.5, 32, 16, 1, true);
+const beamGeo2 = new THREE.CylinderGeometry(0.4, 6.5, 24, 16, 1, true);
 const beamMat2 = new THREE.MeshBasicMaterial({
   color: 0xffbb77,
   transparent: true,
@@ -199,6 +199,6 @@ const beamMat2 = new THREE.MeshBasicMaterial({
   depthWrite: false,
 });
 const beamMesh2 = new THREE.Mesh(beamGeo2, beamMat2);
-beamMesh2.position.set(0, FLOOR_Y + 9.0, -10);
-beamMesh2.rotation.x = 0.32;
+beamMesh2.position.set(0, FLOOR_Y + 8.0, -3.5);
+beamMesh2.rotation.x = 0.22;
 scene.add(beamMesh2);
