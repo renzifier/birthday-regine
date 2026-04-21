@@ -17,8 +17,8 @@ renderer.toneMappingExposure = 1.05;
 renderer.outputEncoding = THREE.sRGBEncoding;
 
 export const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x05081a); // deep night blue fallback
-scene.fog = new THREE.FogExp2(0x080d1f, 0.018);
+scene.background = new THREE.Color(0x02040e); // near-black cool blue fallback
+scene.fog = new THREE.FogExp2(0x03060f, 0.016);
 
 export const camera = new THREE.PerspectiveCamera(
   CONFIG.camera.fov,

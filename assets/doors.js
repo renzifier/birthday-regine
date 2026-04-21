@@ -1,38 +1,41 @@
 // ─────────────────────────────────────────
 //  doors.js — double open doors behind
 //  the table, framing the city view.
-//  Inspired by the reference image.
+//  Cool blue-white beam matching reference.
 // ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 
 const FRAME_W = 4.5;
 const FRAME_H = 6.5;
-const FRAME_T = 0.18; // frame thickness
+const FRAME_T = 0.18;
 const FLOOR_Y = -2.0;
 
 const doorGroup = new THREE.Group();
 doorGroup.position.set(0, FLOOR_Y, -19);
 scene.add(doorGroup);
 
-// ── Materials ──────────────────────────────
+// ── Materials — cool blue-grey to match reference ──
 const frameMat = new THREE.MeshStandardMaterial({
-  color: 0xb8ccd8,
-  roughness: 0.28,
-  metalness: 0.06,
+  color: 0xc8d8e8,
+  roughness: 0.22,
+  metalness: 0.08,
+  emissive: 0x1a2a3a,
+  emissiveIntensity: 0.15,
 });
 const doorMat = new THREE.MeshStandardMaterial({
-  color: 0xaabfce,
-  roughness: 0.32,
-  metalness: 0.04,
+  color: 0xb0c8d8,
+  roughness: 0.28,
+  metalness: 0.05,
+  emissive: 0x0a1a2a,
+  emissiveIntensity: 0.1,
 });
 const panelRecessMat = new THREE.MeshStandardMaterial({
-  color: 0x96aebb,
-  roughness: 0.4,
+  color: 0x8aaabb,
+  roughness: 0.38,
   metalness: 0.0,
 });
 
 // ── Door frame ────────────────────────────
-// Top bar
 const topBar = new THREE.Mesh(
   new THREE.BoxGeometry(FRAME_W + FRAME_T * 2, FRAME_T, FRAME_T * 1.5),
   frameMat,
@@ -40,7 +43,6 @@ const topBar = new THREE.Mesh(
 topBar.position.set(0, FRAME_H, 0);
 doorGroup.add(topBar);
 
-// Left post
 const leftPost = new THREE.Mesh(
   new THREE.BoxGeometry(FRAME_T, FRAME_H + FRAME_T, FRAME_T * 1.5),
   frameMat,
@@ -48,7 +50,6 @@ const leftPost = new THREE.Mesh(
 leftPost.position.set(-FRAME_W / 2 - FRAME_T / 2, FRAME_H / 2, 0);
 doorGroup.add(leftPost);
 
-// Right post
 const rightPost = new THREE.Mesh(
   new THREE.BoxGeometry(FRAME_T, FRAME_H + FRAME_T, FRAME_T * 1.5),
   frameMat,
@@ -56,7 +57,6 @@ const rightPost = new THREE.Mesh(
 rightPost.position.set(FRAME_W / 2 + FRAME_T / 2, FRAME_H / 2, 0);
 doorGroup.add(rightPost);
 
-// Centre divider (the bit between the two doors)
 const centreDiv = new THREE.Mesh(
   new THREE.BoxGeometry(FRAME_T * 0.7, FRAME_H, FRAME_T),
   frameMat,
@@ -64,18 +64,16 @@ const centreDiv = new THREE.Mesh(
 centreDiv.position.set(0, FRAME_H / 2, 0);
 doorGroup.add(centreDiv);
 
-// ── Helper: build one door panel with moulding ──
+// ── Helper: build one door panel ──
 function makeDoorPanel(halfW) {
   const grp = new THREE.Group();
 
-  // Main slab
   const slab = new THREE.Mesh(
     new THREE.BoxGeometry(halfW - 0.04, FRAME_H - 0.04, 0.1),
     doorMat,
   );
   grp.add(slab);
 
-  // Upper raised panel
   const upPanel = new THREE.Mesh(
     new THREE.BoxGeometry(halfW - 0.65, FRAME_H * 0.36, 0.035),
     panelRecessMat,
@@ -83,7 +81,6 @@ function makeDoorPanel(halfW) {
   upPanel.position.set(0, FRAME_H * 0.21, 0.07);
   grp.add(upPanel);
 
-  // Lower raised panel
   const loPanel = new THREE.Mesh(
     new THREE.BoxGeometry(halfW - 0.65, FRAME_H * 0.36, 0.035),
     panelRecessMat,
@@ -91,13 +88,12 @@ function makeDoorPanel(halfW) {
   loPanel.position.set(0, -FRAME_H * 0.14, 0.07);
   grp.add(loPanel);
 
-  // Door knob
   const knob = new THREE.Mesh(
     new THREE.SphereGeometry(0.1, 10, 10),
     new THREE.MeshStandardMaterial({
-      color: 0xd4c090,
-      roughness: 0.15,
-      metalness: 0.7,
+      color: 0xd0dde8,
+      roughness: 0.1,
+      metalness: 0.8,
     }),
   );
   grp.add(knob);
@@ -105,30 +101,34 @@ function makeDoorPanel(halfW) {
   return grp;
 }
 
-// ── Left door — hinge at far-left edge (x = -halfW), right side swings open ──
 const halfW = FRAME_W / 2;
+
 const leftPivot = new THREE.Group();
-leftPivot.position.set(-halfW, FRAME_H / 2, 0); // pivot sits on the left post
+leftPivot.position.set(-halfW, FRAME_H / 2, 0);
 const leftPanel = makeDoorPanel(halfW);
-leftPanel.position.set(halfW / 2, 0, 0); // shift panel right so its left edge is at pivot
-leftPanel.children[leftPanel.children.length - 1].position // knob on the right (opening) side
-  .set(halfW * 0.42, 0, 0.1);
+leftPanel.position.set(halfW / 2, 0, 0);
+leftPanel.children[leftPanel.children.length - 1].position.set(
+  halfW * 0.42,
+  0,
+  0.1,
+);
 leftPivot.add(leftPanel);
-leftPivot.rotation.y = Math.PI * 0.36; // swing right side toward camera (+Y opens toward viewer)
+leftPivot.rotation.y = Math.PI * 0.36;
 doorGroup.add(leftPivot);
 
-// ── Right door — hinge at far-right edge (x = +halfW), left side swings open ──
 const rightPivot = new THREE.Group();
-rightPivot.position.set(halfW, FRAME_H / 2, 0); // pivot sits on the right post
+rightPivot.position.set(halfW, FRAME_H / 2, 0);
 const rightPanel = makeDoorPanel(halfW);
-rightPanel.position.set(-halfW / 2, 0, 0); // shift panel left so its right edge is at pivot
-rightPanel.children[rightPanel.children.length - 1].position // knob on the left (opening) side
-  .set(-halfW * 0.42, 0, 0.1);
+rightPanel.position.set(-halfW / 2, 0, 0);
+rightPanel.children[rightPanel.children.length - 1].position.set(
+  -halfW * 0.42,
+  0,
+  0.1,
+);
 rightPivot.add(rightPanel);
-rightPivot.rotation.y = -Math.PI * 0.36; // swing left side toward camera (-Y opens toward viewer)
+rightPivot.rotation.y = -Math.PI * 0.36;
 doorGroup.add(rightPivot);
 
-// ── Shadows ───────────────────────────────
 doorGroup.traverse((obj) => {
   if (obj.isMesh) {
     obj.castShadow = true;
@@ -136,16 +136,16 @@ doorGroup.traverse((obj) => {
   }
 });
 
-// ── Dramatic light beam through the doorway ───────────────────────────────
+// ── Cool blue-white light beam through doorway ──
 
-// 1. Tight bright core beam — narrow cone, high intensity, hits floor centre
+// 1. Tight bright core — cool white-blue
 const beamCore = new THREE.SpotLight(
-  0xffcc88,
-  18.0,
-  50,
-  Math.PI * 0.1,
+  0xddeeff,
+  22.0,
+  55,
+  Math.PI * 0.09,
   0.0,
-  1.4,
+  1.3,
 );
 beamCore.position.set(0, FLOOR_Y + FRAME_H * 0.85, -18.8);
 beamCore.target.position.set(0, FLOOR_Y, 6);
@@ -153,14 +153,14 @@ beamCore.castShadow = false;
 scene.add(beamCore);
 scene.add(beamCore.target);
 
-// 2. Wide soft halo around the core — same direction, broader cone, softer falloff
+// 2. Wide soft halo — cool blue
 const beamHalo = new THREE.SpotLight(
-  0xffaa55,
-  10.0,
-  48,
-  Math.PI * 0.22,
-  0.6,
-  1.6,
+  0xaaccee,
+  12.0,
+  52,
+  Math.PI * 0.2,
+  0.65,
+  1.5,
 );
 beamHalo.position.set(0, FLOOR_Y + FRAME_H * 0.85, -18.8);
 beamHalo.target.position.set(0, FLOOR_Y, 5);
@@ -168,19 +168,17 @@ beamHalo.castShadow = false;
 scene.add(beamHalo);
 scene.add(beamHalo.target);
 
-// 3. Floor-level point light at the bright landing spot — bounces light back up
-//    giving the floor that glowing pool look from the reference
-const floorPool = new THREE.PointLight(0xff9944, 6.0, 14);
+// 3. Floor pool — cool blue-white landing glow
+const floorPool = new THREE.PointLight(0x88aadd, 5.0, 16);
 floorPool.position.set(0, FLOOR_Y + 0.08, 2);
 scene.add(floorPool);
 
-// 4. Volumetric-style beam mesh — a long tapered cone of semi-transparent
-//    material stretching from the doorway to the floor
-const beamGeo = new THREE.CylinderGeometry(0.18, 4.5, 22, 16, 1, true);
+// 4. Volumetric beam mesh — cool white-blue taper
+const beamGeo = new THREE.CylinderGeometry(0.14, 4.2, 22, 16, 1, true);
 const beamMat = new THREE.MeshBasicMaterial({
-  color: 0xffdd99,
+  color: 0xccddff,
   transparent: true,
-  opacity: 0.045,
+  opacity: 0.055,
   side: THREE.BackSide,
   depthWrite: false,
 });
@@ -189,12 +187,12 @@ beamMesh.position.set(0, FLOOR_Y + 5.0, -8.0);
 beamMesh.rotation.x = 0.28;
 scene.add(beamMesh);
 
-// Second beam layer — slightly wider, even more transparent, for soft glow fringe
-const beamGeo2 = new THREE.CylinderGeometry(0.4, 6.5, 24, 16, 1, true);
+// 5. Outer fringe — even softer, wider
+const beamGeo2 = new THREE.CylinderGeometry(0.35, 6.0, 24, 16, 1, true);
 const beamMat2 = new THREE.MeshBasicMaterial({
-  color: 0xffbb77,
+  color: 0xaabbee,
   transparent: true,
-  opacity: 0.022,
+  opacity: 0.025,
   side: THREE.BackSide,
   depthWrite: false,
 });
@@ -202,3 +200,8 @@ const beamMesh2 = new THREE.Mesh(beamGeo2, beamMat2);
 beamMesh2.position.set(0, FLOOR_Y + 5.0, -8.0);
 beamMesh2.rotation.x = 0.28;
 scene.add(beamMesh2);
+
+// 6. Edge glow on door frame — cool blue emissive light
+const frameGlow = new THREE.PointLight(0x6699cc, 3.5, 10);
+frameGlow.position.set(0, FLOOR_Y + FRAME_H * 0.6, -18.5);
+scene.add(frameGlow);
