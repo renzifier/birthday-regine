@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Birthday Scene</title>
+    <link rel="stylesheet" href="assets/style.css" />
+  </head>
+  <body>
+    <div id="wrap">
+      <canvas id="c"></canvas>
+      <div id="hint">click the card 💌</div>
+    </div>
+
+    <div id="cardOverlay">
+      <div id="cardOverlayInner">
+        <img id="cardImg" src="" alt="Birthday Card" />
+        <button id="closeCard">✕</button>
+        <span id="cardHint">press Esc or click outside to close</span>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- ES module entry point — all scene logic lives in assets/main.js -->
+    <script type="module" src="assets/main.js"></script>
+  </body>
+</html>
