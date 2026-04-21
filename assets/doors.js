@@ -42,62 +42,6 @@ const panelRecessMat = new THREE.MeshStandardMaterial({
   metalness: 0.0,
 });
 
-// ── Interior wall material ────────────────
-// Dark blue-grey plaster/concrete — the room walls visible beside the door
-const wallMat = new THREE.MeshStandardMaterial({
-  color: 0x060e1c,
-  roughness: 0.88,
-  metalness: 0.0,
-  emissive: 0x050c18,
-  emissiveIntensity: 0.08,
-});
-
-// ── Interior walls flanking the doorway ───
-// Left wall panel
-const leftWall = new THREE.Mesh(new THREE.BoxGeometry(14, 12, 0.35), wallMat);
-leftWall.position.set(-FRAME_W / 2 - 7.2, FRAME_H * 0.5, 0.1);
-leftWall.receiveShadow = true;
-doorGroup.add(leftWall);
-
-// Right wall panel
-const rightWall = new THREE.Mesh(new THREE.BoxGeometry(14, 12, 0.35), wallMat);
-rightWall.position.set(FRAME_W / 2 + 7.2, FRAME_H * 0.5, 0.1);
-rightWall.receiveShadow = true;
-doorGroup.add(rightWall);
-
-// Ceiling strip above the door
-const ceiling = new THREE.Mesh(
-  new THREE.BoxGeometry(FRAME_W * 6, 3.5, 0.35),
-  wallMat,
-);
-ceiling.position.set(0, FRAME_H + 1.8, 0.1);
-ceiling.receiveShadow = true;
-doorGroup.add(ceiling);
-
-// ── Subtle wall surface detail ─────────────
-// Faint vertical panels/lines on the walls for realism
-const wallDetailMat = new THREE.MeshStandardMaterial({
-  color: 0x080f1a,
-  roughness: 0.92,
-  metalness: 0.0,
-});
-for (let i = 0; i < 3; i++) {
-  const px = -FRAME_W / 2 - 2.5 - i * 3.2;
-  const stripe = new THREE.Mesh(
-    new THREE.BoxGeometry(0.06, 10, 0.04),
-    wallDetailMat,
-  );
-  stripe.position.set(px, FRAME_H * 0.45, 0.22);
-  doorGroup.add(stripe);
-
-  const stripe2 = new THREE.Mesh(
-    new THREE.BoxGeometry(0.06, 10, 0.04),
-    wallDetailMat,
-  );
-  stripe2.position.set(-px, FRAME_H * 0.45, 0.22);
-  doorGroup.add(stripe2);
-}
-
 // ── Door frame ────────────────────────────
 const topBar = new THREE.Mesh(
   new THREE.BoxGeometry(FRAME_W + FRAME_T * 2, FRAME_T, FRAME_T * 1.5),
