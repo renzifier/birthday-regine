@@ -57,7 +57,7 @@ function makeCityNight() {
   ctx.fillRect(0, 0, W, H);
 
   // ── City glow on horizon ─────────────────
-  const horizonY = H * 0.68;
+  const horizonY = H * 0.62;
   const cityGlow = ctx.createLinearGradient(0, horizonY - 60, 0, horizonY + 80);
   cityGlow.addColorStop(0, "rgba(0,0,0,0)");
   cityGlow.addColorStop(0.4, "rgba(255,140,40,0.08)");
@@ -67,7 +67,7 @@ function makeCityNight() {
 
   // ── Draw buildings ───────────────────────
   // Each building: { x, w, h, windows cols, rows }
-  const GROUND = H * 0.98;
+  const GROUND = H * 0.66;
 
   function drawBuilding(x, w, h, winCols, winRows, roofStyle) {
     const top = GROUND - h;
