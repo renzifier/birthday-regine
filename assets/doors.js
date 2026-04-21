@@ -5,13 +5,13 @@
 // ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 
-const FRAME_W = 7.2;
-const FRAME_H = 10.0;
-const FRAME_T = 0.22; // frame thickness
+const FRAME_W = 4.5;
+const FRAME_H = 6.5;
+const FRAME_T = 0.18; // frame thickness
 const FLOOR_Y = -2.0;
 
 const doorGroup = new THREE.Group();
-doorGroup.position.set(0, FLOOR_Y, -11);
+doorGroup.position.set(0, FLOOR_Y, -19);
 scene.add(doorGroup);
 
 // ── Materials ──────────────────────────────
@@ -147,7 +147,7 @@ const beamCore = new THREE.SpotLight(
   0.0,
   1.4,
 );
-beamCore.position.set(0, FLOOR_Y + FRAME_H * 0.85, -10.5);
+beamCore.position.set(0, FLOOR_Y + FRAME_H * 0.85, -18.8);
 beamCore.target.position.set(0, FLOOR_Y, 6);
 beamCore.castShadow = false;
 scene.add(beamCore);
@@ -162,7 +162,7 @@ const beamHalo = new THREE.SpotLight(
   0.6,
   1.6,
 );
-beamHalo.position.set(0, FLOOR_Y + FRAME_H * 0.85, -10.5);
+beamHalo.position.set(0, FLOOR_Y + FRAME_H * 0.85, -18.8);
 beamHalo.target.position.set(0, FLOOR_Y, 5);
 beamHalo.castShadow = false;
 scene.add(beamHalo);
@@ -185,8 +185,8 @@ const beamMat = new THREE.MeshBasicMaterial({
   depthWrite: false,
 });
 const beamMesh = new THREE.Mesh(beamGeo, beamMat);
-beamMesh.position.set(0, FLOOR_Y + 8.0, -3.5);
-beamMesh.rotation.x = 0.22;
+beamMesh.position.set(0, FLOOR_Y + 5.0, -8.0);
+beamMesh.rotation.x = 0.28;
 scene.add(beamMesh);
 
 // Second beam layer — slightly wider, even more transparent, for soft glow fringe
@@ -199,6 +199,6 @@ const beamMat2 = new THREE.MeshBasicMaterial({
   depthWrite: false,
 });
 const beamMesh2 = new THREE.Mesh(beamGeo2, beamMat2);
-beamMesh2.position.set(0, FLOOR_Y + 8.0, -3.5);
-beamMesh2.rotation.x = 0.22;
+beamMesh2.position.set(0, FLOOR_Y + 5.0, -8.0);
+beamMesh2.rotation.x = 0.28;
 scene.add(beamMesh2);
