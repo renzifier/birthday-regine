@@ -186,33 +186,25 @@ ctx.fillRect(0, 0, 480, 600);
 // ── 3-D card objects ──────────────────────
 const cardTex = new THREE.CanvasTexture(cardCanvas);
 
-const flatCard = new THREE.Mesh(
-  new THREE.BoxGeometry(1.6, 0.022, 1.2),
-  std(0xfff0f5, 0.18, 0.0),
-);
-flatCard.position.set(1.2, 0.381, 2.5);
-flatCard.rotation.y = -0.35;
-flatCard.rotation.z = 0.02;
-flatCard.castShadow = true;
-flatCard.receiveShadow = true;
-tableGroup.add(flatCard);
-
 const cardFace = new THREE.Mesh(
-  new THREE.PlaneGeometry(1.6, 1.2),
+  new THREE.PlaneGeometry(1.1, 0.82),
   new THREE.MeshStandardMaterial({
     map: cardTex,
     roughness: 0.18,
     metalness: 0,
+    side: THREE.DoubleSide,
   }),
 );
 cardFace.rotation.x = -Math.PI / 2;
 cardFace.rotation.z = 0.35;
-cardFace.position.set(1.2, 0.393, 2.5);
+cardFace.position.set(1.2, 0.392, 2.5);
+cardFace.castShadow = true;
+cardFace.receiveShadow = true;
 tableGroup.add(cardFace);
 
 // Invisible mesh used as a larger raycasting target
 export const cardHit = new THREE.Mesh(
-  new THREE.PlaneGeometry(1.6, 1.2),
+  new THREE.PlaneGeometry(1.1, 0.82),
   new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }),
 );
 cardHit.rotation.x = -Math.PI / 2;
