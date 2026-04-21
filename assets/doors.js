@@ -140,7 +140,7 @@ doorGroup.traverse((obj) => {
 
 // 1. Tight bright core beam — narrow cone, high intensity, hits floor centre
 const beamCore = new THREE.SpotLight(
-  0xaaccff,
+  0xffcc88,
   18.0,
   40,
   Math.PI * 0.1,
@@ -155,7 +155,7 @@ scene.add(beamCore.target);
 
 // 2. Wide soft halo around the core — same direction, broader cone, softer falloff
 const beamHalo = new THREE.SpotLight(
-  0x7799ee,
+  0xffaa55,
   10.0,
   38,
   Math.PI * 0.22,
@@ -170,7 +170,7 @@ scene.add(beamHalo.target);
 
 // 3. Floor-level point light at the bright landing spot — bounces light back up
 //    giving the floor that glowing pool look from the reference
-const floorPool = new THREE.PointLight(0x88aadd, 6.0, 10);
+const floorPool = new THREE.PointLight(0xff9944, 6.0, 10);
 floorPool.position.set(0, FLOOR_Y + 0.08, 2);
 scene.add(floorPool);
 
@@ -179,7 +179,7 @@ scene.add(floorPool);
 //    "shaft of light" illusion even without real volumetrics
 const beamGeo = new THREE.CylinderGeometry(0.18, 3.8, 14, 16, 1, true);
 const beamMat = new THREE.MeshBasicMaterial({
-  color: 0x99bbff,
+  color: 0xffdd99,
   transparent: true,
   opacity: 0.045,
   side: THREE.BackSide,
@@ -194,7 +194,7 @@ scene.add(beamMesh);
 // Second beam layer — slightly wider, even more transparent, for soft glow fringe
 const beamGeo2 = new THREE.CylinderGeometry(0.4, 5.5, 15, 16, 1, true);
 const beamMat2 = new THREE.MeshBasicMaterial({
-  color: 0x7799dd,
+  color: 0xffbb77,
   transparent: true,
   opacity: 0.022,
   side: THREE.BackSide,

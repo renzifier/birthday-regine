@@ -5,12 +5,12 @@
 // ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 
-// Dim cool night ambient (sky=deep blue, ground=near black)
-const hemi = new THREE.HemisphereLight(0x1a2a6c, 0x050510, 0.4);
+// Warm amber ambient — sky like a candlelit room, ground deep warm brown
+const hemi = new THREE.HemisphereLight(0x5a3010, 0x1a0800, 0.7);
 scene.add(hemi);
 
-// Soft moonlight directional — cool blue-white, low intensity
-const moonLight = new THREE.DirectionalLight(0x8899dd, 0.5);
+// Warm golden key light — like a distant warm lamp rather than cold moonlight
+const moonLight = new THREE.DirectionalLight(0xffcc88, 0.6);
 moonLight.position.set(6, 12, -8);
 moonLight.castShadow = true;
 moonLight.shadow.mapSize.width = 2048;
@@ -23,18 +23,18 @@ moonLight.shadow.camera.far = 40;
 moonLight.shadow.bias = -0.0008;
 scene.add(moonLight);
 
-// Candle — the HERO light. Warm orange, exported so animate.js can flicker it
-export const candleLight = new THREE.PointLight(0xff7722, 5.5, 14);
+// Candle — the HERO light. Rich warm amber, exported so animate.js can flicker it
+export const candleLight = new THREE.PointLight(0xff8800, 7.5, 16);
 candleLight.position.set(-0.5, 5.5, 0);
 candleLight.castShadow = true;
 scene.add(candleLight);
 
-// Warm under-glow from candles bouncing off tablecloth
-const bounceLight = new THREE.PointLight(0xff6600, 1.2, 7);
+// Warm under-glow from candles bouncing off tablecloth — deeper orange
+const bounceLight = new THREE.PointLight(0xff5500, 2.2, 9);
 bounceLight.position.set(-0.5, 1.2, 0.5);
 scene.add(bounceLight);
 
-// Cool rim from the left — moonlight catching the cake edge
-const rimLight = new THREE.DirectionalLight(0x5577cc, 0.35);
+// Warm side fill — amber from the right catching the cake edge
+const rimLight = new THREE.DirectionalLight(0xffaa44, 0.45);
 rimLight.position.set(-8, 4, 2);
 scene.add(rimLight);

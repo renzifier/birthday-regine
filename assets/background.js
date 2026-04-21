@@ -227,21 +227,21 @@ const cityTex = makeAerialNight();
 scene.background = cityTex;
 
 // Cool blue city ambient from behind/below
-export const sunsetBackLight = new THREE.PointLight(0x3355aa, 1.4, 90);
+export const sunsetBackLight = new THREE.PointLight(0xffaa55, 1.4, 90);
 sunsetBackLight.position.set(0, 5, -22);
 scene.add(sunsetBackLight);
 
-// Moonlight / starfield from above
-const moonLight = new THREE.PointLight(0x7799cc, 0.55, 80);
+// Warm golden light from above
+const moonLight = new THREE.PointLight(0xffcc77, 0.55, 80);
 moonLight.position.set(6, 24, -14);
 scene.add(moonLight);
 
-// Cool left spill
-const leftSpill = new THREE.PointLight(0x4466bb, 0.22, 32);
+// Warm left spill
+const leftSpill = new THREE.PointLight(0xff9944, 0.28, 32);
 leftSpill.position.set(-16, 4, -6);
 scene.add(leftSpill);
 
-// Cool right spill
-const rightSpill = new THREE.PointLight(0x5577cc, 0.22, 32);
+// Warm right spill
+const rightSpill = new THREE.PointLight(0xffaa55, 0.28, 32);
 rightSpill.position.set(16, 4, -6);
 scene.add(rightSpill);
