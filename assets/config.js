@@ -6,7 +6,7 @@
 
 export const CARD_TO = "Happy Birthday, Claire!";
 export const CARD_MESSAGE =
-  "This is kinda like my bawi.. so yeah i was replying late cuz of this.. but anywayy " +
+  "This is kinda like my bawi.. so yeah i was replying late cuz of this.. but anywayy! " +
   "You deserve to have fun and enjoy life in every way possible, and i hope you'll always be healthy and nice okayyy? ";
 
 export const CONFIG = {
