@@ -106,8 +106,8 @@ export function startAnimation() {
     }
 
     // ── Subtle camera breathe ────────────
-    camera.position.y = 5.5 + Math.sin(t * 0.3) * 0.03;
-    camera.lookAt(0, 1.2, 0);
+    camera.position.y = 7.0 + Math.sin(t * 0.3) * 0.03;
+    camera.lookAt(0, 2.0, 0);
 
     renderer.render(scene, camera);
   })();

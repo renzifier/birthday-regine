@@ -8,11 +8,11 @@
 import { scene } from "./renderer.js";
 
 // Sky / ground ambient
-const hemi = new THREE.HemisphereLight(0xffcc55, 0x8b4513, 0.9);
+const hemi = new THREE.HemisphereLight(0xffcc55, 0x8b4513, 0.5);
 scene.add(hemi);
 
 // Strong low-angle sun
-const dirLight = new THREE.DirectionalLight(0xff9933, 2.2);
+const dirLight = new THREE.DirectionalLight(0xff9933, 1.4);
 dirLight.position.set(8, 4, 10);
 dirLight.castShadow = true;
 dirLight.shadow.mapSize.width = 2048;
@@ -26,12 +26,12 @@ dirLight.shadow.bias = -0.0008;
 scene.add(dirLight);
 
 // Warm fill from the left
-const fillLight = new THREE.DirectionalLight(0xffaa44, 1.1);
+const fillLight = new THREE.DirectionalLight(0xffaa44, 0.6);
 fillLight.position.set(-3, 4, 10);
 scene.add(fillLight);
 
 // Warm overhead glow
-const pendantLight = new THREE.PointLight(0xffcc55, 2.2, 16);
+const pendantLight = new THREE.PointLight(0xffcc55, 1.2, 16);
 pendantLight.position.set(0, 8, -1);
 scene.add(pendantLight);
 
