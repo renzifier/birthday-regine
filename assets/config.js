@@ -4,10 +4,10 @@
 //  change for common customisations.
 // ─────────────────────────────────────────
 
-export const CARD_TO = "Happy Birthday!";
+export const CARD_TO = "Happy Birthday, Claire!";
 export const CARD_MESSAGE =
-  "Wishing you all the love, laughter, and cake in the world. " +
-  "You deserve every beautiful moment of today. 🎂✨";
+  "This is kinda like my bawi.. so yeah i was replying late cuz of this.. but anywayy " +
+  "You deserve to have fun and enjoy life in every way possible, and i hope you'll always be healthy and nice okayyy? ";
 
 export const CONFIG = {
   camera: { fov: 62, near: 0.1, far: 200, initialRadius: 16 },
