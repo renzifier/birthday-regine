@@ -21,33 +21,51 @@ export function makeFloorTex() {
   fc.height = 512;
   const ctx = fc.getContext("2d");
 
-  ctx.fillStyle = "#1a0f06";
+  // Deep midnight base
+  ctx.fillStyle = "#07090f";
   ctx.fillRect(0, 0, 512, 512);
 
-  ctx.strokeStyle = "#0d0904";
-  ctx.lineWidth = 2;
-  for (let y = 0; y < 512; y += 48) {
+  // Subtle marble veins
+  ctx.globalAlpha = 0.06;
+  for (let i = 0; i < 18; i++) {
+    const x0 = Math.random() * 512;
+    ctx.strokeStyle = "#3a4a80";
+    ctx.lineWidth = 1 + Math.random() * 2;
+    ctx.beginPath();
+    ctx.moveTo(x0, 0);
+    ctx.bezierCurveTo(
+      x0 + (Math.random() - 0.5) * 120,
+      128,
+      x0 + (Math.random() - 0.5) * 120,
+      384,
+      x0 + (Math.random() - 0.5) * 80,
+      512,
+    );
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // Subtle plank lines
+  ctx.strokeStyle = "#0d1018";
+  ctx.lineWidth = 1.5;
+  for (let y = 0; y < 512; y += 52) {
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(512, y);
     ctx.stroke();
   }
 
-  ctx.globalAlpha = 0.04;
-  for (let x = 0; x < 512; x += 3) {
-    ctx.strokeStyle = Math.random() > 0.5 ? "#ffffff" : "#000000";
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, 512);
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
+  // Specular shimmer
+  const shine = ctx.createRadialGradient(256, 256, 0, 256, 256, 280);
+  shine.addColorStop(0, "rgba(80,100,180,0.12)");
+  shine.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = shine;
+  ctx.fillRect(0, 0, 512, 512);
 
   const tex = new THREE.CanvasTexture(fc);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(3, 3);
+  tex.repeat.set(4, 4);
   return tex;
 }
 
@@ -71,13 +89,13 @@ export function makeTableclothTex() {
 
       let br, bg, bb;
       if (dark) {
-        br = 18;
-        bg = 35;
-        bb = 110;
+        br = 8;
+        bg = 12;
+        bb = 48;
       } else {
-        br = 245;
-        bg = 245;
-        bb = 250;
+        br = 18;
+        bg = 28;
+        bb = 80;
       }
 
       const threadCol = Math.floor(px / THREAD);

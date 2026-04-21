@@ -11,14 +11,14 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.85;
+renderer.toneMappingExposure = 1.05;
 // NOTE: outputEncoding is deprecated in r152+.
 // Swap to `renderer.outputColorSpace = THREE.SRGBColorSpace` when upgrading.
 renderer.outputEncoding = THREE.sRGBEncoding;
 
 export const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xf5a020); // warm gold fallback before skybox loads
-scene.fog = new THREE.FogExp2(0xe8831a, 0.003);
+scene.background = new THREE.Color(0x05081a); // deep night blue fallback
+scene.fog = new THREE.FogExp2(0x080d1f, 0.018);
 
 export const camera = new THREE.PerspectiveCamera(
   CONFIG.camera.fov,
