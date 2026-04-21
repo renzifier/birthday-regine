@@ -7,7 +7,7 @@ import { scene } from "./renderer.js";
 
 const FRAME_W = 7.2;
 const FRAME_H = 10.0;
-const FRAME_T = 0.22;  // frame thickness
+const FRAME_T = 0.22; // frame thickness
 const FLOOR_Y = -2.2;
 
 const doorGroup = new THREE.Group();
@@ -94,34 +94,38 @@ function makeDoorPanel(halfW) {
   // Door knob
   const knob = new THREE.Mesh(
     new THREE.SphereGeometry(0.1, 10, 10),
-    new THREE.MeshStandardMaterial({ color: 0xd4c090, roughness: 0.15, metalness: 0.7 }),
+    new THREE.MeshStandardMaterial({
+      color: 0xd4c090,
+      roughness: 0.15,
+      metalness: 0.7,
+    }),
   );
   grp.add(knob);
 
   return grp;
 }
 
-// ── Left door — hinged at left, swings toward camera-left ──
+// ── Left door — hinge at far-left edge (x = -halfW), right side swings open ──
 const halfW = FRAME_W / 2;
 const leftPivot = new THREE.Group();
-leftPivot.position.set(-halfW / 2, FRAME_H / 2, 0);
+leftPivot.position.set(-halfW, FRAME_H / 2, 0); // pivot sits on the left post
 const leftPanel = makeDoorPanel(halfW);
-leftPanel.position.set(halfW / 4, 0, 0);           // hinge at panel's left edge
-leftPanel.children[leftPanel.children.length - 1]  // knob
-  .position.set(halfW * 0.38, 0, 0.1);
+leftPanel.position.set(halfW / 2, 0, 0); // shift panel right so its left edge is at pivot
+leftPanel.children[leftPanel.children.length - 1].position // knob on the right (opening) side
+  .set(halfW * 0.42, 0, 0.1);
 leftPivot.add(leftPanel);
-leftPivot.rotation.y = -Math.PI * 0.36;            // open ~65°
+leftPivot.rotation.y = Math.PI * 0.36; // swing right side toward camera (+Y opens toward viewer)
 doorGroup.add(leftPivot);
 
-// ── Right door — hinged at right, swings toward camera-right ──
+// ── Right door — hinge at far-right edge (x = +halfW), left side swings open ──
 const rightPivot = new THREE.Group();
-rightPivot.position.set(halfW / 2, FRAME_H / 2, 0);
+rightPivot.position.set(halfW, FRAME_H / 2, 0); // pivot sits on the right post
 const rightPanel = makeDoorPanel(halfW);
-rightPanel.position.set(-halfW / 4, 0, 0);          // hinge at panel's right edge
-rightPanel.children[rightPanel.children.length - 1] // knob
-  .position.set(-halfW * 0.38, 0, 0.1);
+rightPanel.position.set(-halfW / 2, 0, 0); // shift panel left so its right edge is at pivot
+rightPanel.children[rightPanel.children.length - 1].position // knob on the left (opening) side
+  .set(-halfW * 0.42, 0, 0.1);
 rightPivot.add(rightPanel);
-rightPivot.rotation.y = Math.PI * 0.36;
+rightPivot.rotation.y = -Math.PI * 0.36; // swing left side toward camera (-Y opens toward viewer)
 doorGroup.add(rightPivot);
 
 // ── Shadows ───────────────────────────────
@@ -134,7 +138,14 @@ doorGroup.traverse((obj) => {
 
 // ── Light spilling through the doorway ────
 // Cool blue-white spotlight aimed at the floor in front of the table
-const doorSpot = new THREE.SpotLight(0x88aadd, 4.0, 35, Math.PI * 0.22, 0.5, 1.2);
+const doorSpot = new THREE.SpotLight(
+  0x88aadd,
+  4.0,
+  35,
+  Math.PI * 0.22,
+  0.5,
+  1.2,
+);
 doorSpot.position.set(0, FLOOR_Y + FRAME_H * 0.72, -8.5);
 doorSpot.target.position.set(0, FLOOR_Y + 0.1, 8);
 doorSpot.castShadow = false; // keep perf light
