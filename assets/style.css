@@ -4,6 +4,112 @@
   padding: 0;
 }
 
+/* ── Intro terminal screen ── */
+#introScreen {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1.2s ease;
+}
+
+#introScreen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#introTerminal {
+  width: min(680px, 90vw);
+  background: #0a0a0a;
+  border: 1px solid #1a3a1a;
+  border-radius: 8px;
+  box-shadow:
+    0 0 40px rgba(0, 255, 80, 0.08),
+    0 0 2px rgba(0, 255, 80, 0.25),
+    inset 0 0 60px rgba(0, 0, 0, 0.8);
+  padding: 32px 36px 28px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(13px, 1.6vw, 16px);
+  line-height: 1.75;
+  position: relative;
+  /* subtle scanline overlay */
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+}
+
+/* Terminal title bar dots */
+#introTerminal::before {
+  content: "● ● ●";
+  position: absolute;
+  top: 10px;
+  left: 16px;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: #333;
+}
+
+#introLines {
+  margin-top: 6px;
+}
+
+#introLines .line {
+  display: block;
+  color: #00dd55;
+  text-shadow: 0 0 8px rgba(0, 255, 80, 0.5);
+  white-space: pre;
+  min-height: 1.75em;
+}
+
+#introLines .line.dim {
+  color: #006622;
+  text-shadow: none;
+}
+
+#introLines .line.bright {
+  color: #88ffaa;
+  text-shadow: 0 0 12px rgba(100, 255, 140, 0.8);
+  font-weight: bold;
+}
+
+#introLines .line.pink {
+  color: #ff88bb;
+  text-shadow: 0 0 10px rgba(255, 100, 160, 0.6);
+}
+
+#introLines .line.white {
+  color: #ccddcc;
+  text-shadow: none;
+}
+
+#introCursor {
+  display: inline-block;
+  color: #00ff55;
+  text-shadow: 0 0 8px rgba(0, 255, 80, 0.7);
+  animation: blink 0.75s step-end infinite;
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(13px, 1.6vw, 16px);
+  vertical-align: baseline;
+  margin-left: 1px;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
 body {
   background: #000;
   display: flex;

@@ -12,6 +12,14 @@
       <div id="hint">drag to orbit · scroll to zoom · click the card 💌</div>
     </div>
 
+    <!-- ── Terminal intro screen ── -->
+    <div id="introScreen">
+      <div id="introTerminal">
+        <div id="introLines"></div>
+        <span id="introCursor">█</span>
+      </div>
+    </div>
+
     <div id="cardOverlay">
       <div id="cardOverlayInner">
         <img id="cardImg" src="" alt="Birthday Card" />
@@ -22,6 +30,139 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- ── Terminal intro script ── -->
+    <script>
+      (function () {
+        const screen = document.getElementById("introScreen");
+        const linesEl = document.getElementById("introLines");
+        const cursor = document.getElementById("introCursor");
+
+        // ── Script to type out ──────────────────
+        const SCRIPT = [
+          { text: "BIRTHDAY.EXE", cls: "dim", delay: 0, charDelay: 60 },
+          { text: "", cls: "white", delay: 320, charDelay: 0 },
+          {
+            text: "> Initializing birthday sequence...",
+            cls: "dim",
+            delay: 180,
+            charDelay: 28,
+          },
+          {
+            text: "> Loading confetti module......  OK",
+            cls: "dim",
+            delay: 120,
+            charDelay: 22,
+          },
+          {
+            text: "> Lighting candles.............  OK",
+            cls: "dim",
+            delay: 80,
+            charDelay: 22,
+          },
+          {
+            text: "> Baking cake..................  OK",
+            cls: "dim",
+            delay: 80,
+            charDelay: 22,
+          },
+          {
+            text: "> Inflating balloons...........  OK",
+            cls: "dim",
+            delay: 80,
+            charDelay: 22,
+          },
+          { text: "", cls: "white", delay: 280, charDelay: 0 },
+          {
+            text: "> Recipient found: CLAIRE",
+            cls: "white",
+            delay: 200,
+            charDelay: 38,
+          },
+          { text: "", cls: "white", delay: 260, charDelay: 0 },
+          {
+            text: "★ ★ ★  HAPPY BIRTHDAY  ★ ★ ★",
+            cls: "bright",
+            delay: 180,
+            charDelay: 55,
+          },
+          { text: "", cls: "white", delay: 220, charDelay: 0 },
+          {
+            text: "  Hope your day is as amazing",
+            cls: "pink",
+            delay: 160,
+            charDelay: 38,
+          },
+          { text: "  as you are! ♥", cls: "pink", delay: 80, charDelay: 38 },
+          { text: "", cls: "white", delay: 300, charDelay: 0 },
+          {
+            text: "> Opening your surprise...",
+            cls: "dim",
+            delay: 220,
+            charDelay: 34,
+          },
+        ];
+
+        // Total time before scene reveals (ms after last line finishes)
+        const HOLD_AFTER = 900;
+        const FADE_DELAY = 300;
+
+        let lineIndex = 0;
+
+        function typeNextLine() {
+          if (lineIndex >= SCRIPT.length) {
+            // All lines done — hold then fade out
+            cursor.style.display = "none";
+            setTimeout(() => {
+              screen.classList.add("fade-out");
+              setTimeout(() => {
+                screen.style.display = "none";
+              }, 1300);
+            }, HOLD_AFTER);
+            return;
+          }
+
+          const entry = SCRIPT[lineIndex];
+          lineIndex++;
+
+          setTimeout(() => {
+            const span = document.createElement("span");
+            span.className = "line " + entry.cls;
+            linesEl.appendChild(span);
+
+            // Move cursor after this line's span
+            linesEl.after(cursor);
+
+            if (entry.charDelay === 0 || entry.text === "") {
+              // Instant line
+              span.textContent = entry.text;
+              typeNextLine();
+            } else {
+              // Type character by character
+              let ci = 0;
+              function typeChar() {
+                if (ci < entry.text.length) {
+                  span.textContent += entry.text[ci];
+                  ci++;
+                  setTimeout(
+                    typeChar,
+                    entry.charDelay +
+                      (Math.random() * entry.charDelay * 0.4 -
+                        entry.charDelay * 0.2),
+                  );
+                } else {
+                  typeNextLine();
+                }
+              }
+              typeChar();
+            }
+          }, entry.delay);
+        }
+
+        // Kick off after a short boot pause
+        setTimeout(typeNextLine, 400);
+      })();
+    </script>
+
     <!-- ES module entry point — all scene logic lives in assets/main.js -->
     <script type="module" src="assets/main.js"></script>
   </body>
