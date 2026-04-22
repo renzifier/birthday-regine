@@ -60,12 +60,15 @@ canvas {
 #introScreen {
   position: fixed;
   inset: 0;
-  background: #000;
+  background: #f5f5f5;
   z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  gap: 20px;
   transition: opacity 1.2s ease;
+  cursor: pointer;
 }
 
 #introScreen.fade-out {
@@ -75,37 +78,28 @@ canvas {
 
 #introTerminal {
   width: min(680px, 90vw);
-  background: #0a0a0a;
-  border: 1px solid #1a3a1a;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
   box-shadow:
-    0 0 40px rgba(0, 255, 80, 0.08),
-    0 0 2px rgba(0, 255, 80, 0.25),
-    inset 0 0 60px rgba(0, 0, 0, 0.8);
+    0 8px 40px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.06);
   padding: 32px 36px 28px;
   font-family: "Courier New", Courier, monospace;
   font-size: clamp(13px, 1.6vw, 16px);
   line-height: 1.75;
   position: relative;
-  /* subtle scanline overlay */
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
 }
 
-/* Terminal title bar dots */
+/* macOS-style title bar dots */
 #introTerminal::before {
   content: "● ● ●";
   position: absolute;
-  top: 10px;
+  top: 12px;
   left: 16px;
-  font-size: 10px;
-  letter-spacing: 4px;
-  color: #333;
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: #ddd;
 }
 
 #introLines {
@@ -114,42 +108,69 @@ canvas {
 
 #introLines .line {
   display: block;
-  color: #00dd55;
-  text-shadow: 0 0 8px rgba(0, 255, 80, 0.5);
+  color: #222;
+  text-shadow: none;
   white-space: pre;
   min-height: 1.75em;
 }
 
 #introLines .line.dim {
-  color: #006622;
+  color: #999;
   text-shadow: none;
 }
 
 #introLines .line.bright {
-  color: #88ffaa;
-  text-shadow: 0 0 12px rgba(100, 255, 140, 0.8);
+  color: #111;
+  text-shadow: none;
   font-weight: bold;
 }
 
 #introLines .line.pink {
-  color: #ff88bb;
-  text-shadow: 0 0 10px rgba(255, 100, 160, 0.6);
+  color: #d63a7a;
+  text-shadow: none;
 }
 
 #introLines .line.white {
-  color: #ccddcc;
+  color: #555;
   text-shadow: none;
 }
 
 #introCursor {
   display: inline-block;
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+  color: #333;
+  text-shadow: none;
   animation: blink 0.75s step-end infinite;
   font-family: "Courier New", Courier, monospace;
   font-size: clamp(13px, 1.6vw, 16px);
   vertical-align: baseline;
   margin-left: 1px;
+}
+
+/* ── Continue hint ── */
+#continueHint {
+  display: none;
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(11px, 1.4vw, 13px);
+  color: #aaa;
+  letter-spacing: 0.05em;
+  animation: pulse 1.6s ease-in-out infinite;
+  user-select: none;
+}
+
+#continueHint .hint-desktop {
+  display: inline;
+}
+#continueHint .hint-mobile {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  #continueHint .hint-desktop {
+    display: none;
+  }
+  #continueHint .hint-mobile {
+    display: inline;
+  }
 }
 
 @keyframes blink {
@@ -305,12 +326,12 @@ canvas {
 @media (max-width: 600px) {
   #introTerminal {
     padding: 24px 18px 20px;
-    border-radius: 6px;
+    border-radius: 8px;
   }
 
   #introTerminal::before {
-    font-size: 8px;
-    letter-spacing: 3px;
+    font-size: 9px;
+    letter-spacing: 4px;
   }
 
   #cardOverlayInner {

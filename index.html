@@ -34,6 +34,10 @@
         <div id="introLines"></div>
         <span id="introCursor">█</span>
       </div>
+      <div id="continueHint">
+        <span class="hint-desktop">— click anywhere to continue —</span>
+        <span class="hint-mobile">— tap anywhere to continue —</span>
+      </div>
     </div>
 
     <div id="cardOverlay">
@@ -126,14 +130,27 @@
 
         function typeNextLine() {
           if (lineIndex >= SCRIPT.length) {
-            // All lines done — hold then fade out
+            // All lines done — show continue hint, wait for click/tap
             cursor.style.display = "none";
-            setTimeout(() => {
+            const hint = document.getElementById("continueHint");
+            hint.style.display = "block";
+
+            function dismiss() {
               screen.classList.add("fade-out");
               setTimeout(() => {
                 screen.style.display = "none";
               }, 1300);
-            }, HOLD_AFTER);
+            }
+
+            screen.addEventListener("click", dismiss, { once: true });
+            screen.addEventListener(
+              "touchend",
+              function (e) {
+                e.preventDefault();
+                dismiss();
+              },
+              { once: true, passive: false },
+            );
             return;
           }
 
