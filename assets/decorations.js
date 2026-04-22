@@ -95,10 +95,10 @@ function makeFrame(x, z, rotY, lean, photoPath, idx) {
   tableGroup.add(grp);
 }
 
-makeFrame(-3.6, -1.5, 0.28, 0.02, "assets/photos/photo1.jpg", 0);
-makeFrame(3.3, -1.4, -0.25, -0.02, "assets/photos/photo2.jpg", 1);
-makeFrame(-3.3, 1.4, 0.55, 0.03, "assets/photos/photo3.jpg", 2);
-makeFrame(3.5, 1.6, -0.55, -0.03, "assets/photos/photo4.jpg", 3);
+makeFrame(-3.6, -1.5, 0.28, 0.02, "assets/photos/claire.jpg", 0);
+makeFrame(3.3, -1.4, -0.25, -0.02, "assets/photos/taeclaire.jpg", 1);
+makeFrame(-3.3, 1.4, 0.55, 0.03, "assets/photos/clairee.png", 2);
+makeFrame(3.5, 1.6, -0.55, -0.03, "assets/photos/clairepool.png", 3);
 
 // ── Balloons ──────────────────────────────
 const BALLOON_DATA = [
