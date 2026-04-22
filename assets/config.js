@@ -7,7 +7,7 @@
 export const CARD_TO = "Happy Birthday, Claire!";
 export const CARD_MESSAGE =
   "This is kinda like my bawi.. so yeah i was replying late cuz of this.. but anywayy! " +
-  "You deserve to have fun and enjoy life in every way possible, and i hope you'll always be healthy and nice okayyy? ";
+  "You deserve to have fun and enjoy life in every way possible, and i hope you'll always be healthy and nice okayyy? This is like me saying im here and that i love ya!! >//< ";
 
 export const CONFIG = {
   camera: { fov: 62, near: 0.1, far: 200, initialRadius: 16 },
