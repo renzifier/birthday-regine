@@ -28,7 +28,8 @@
       </div>
     </div>
 
-    <!-- ── Terminal intro screen ── -->
+    <!-- ── Birthday music — swap src for your audio file ── -->
+    <audio id="bgMusic" src="assets/music.mp3" loop preload="auto"></audio>
     <div id="introScreen">
       <div id="introTerminal">
         <div id="introLines"></div>
@@ -136,6 +137,9 @@
             hint.style.display = "block";
 
             function dismiss() {
+              // Play audio on the user gesture — browsers require this
+              const music = document.getElementById("bgMusic");
+              music.play().catch(() => {}); // silently ignore if blocked
               screen.classList.add("fade-out");
               setTimeout(() => {
                 screen.style.display = "none";
