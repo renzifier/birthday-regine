@@ -6,8 +6,8 @@
 
 export const CARD_TO = "Happy Birthday, Claire!";
 export const CARD_MESSAGE =
-  "This is kinda like my bawi.. so yeah i was replying late cuz of this.. but anywayy! " +
-  "You deserve to have fun and enjoy life in every way possible, and i hope you'll always be healthy and nice okayyy? This is like me saying im here and that i love ya!! >//< ";
+  "Ewan ko if you knew i was making this but sorry ah surprise talaga to bahala ka, pinakita ko naman sa quicksnaps kaya na sabi ko yung ano yung tatanong uli😭😭😭😭 but anyway!!" +
+  "Happy Birthday, Mishieeee!! Di ko alam if sapat nato para as something na nangyare sa birthday mo but yeah im broke saka malayo pa.. this is like the only thing i can do. I wish you the best and always stay healthy ah💕💕💕💕💕💕💕 ";
 
 export const CONFIG = {
   camera: { fov: 62, near: 0.1, far: 200, initialRadius: 16 },
