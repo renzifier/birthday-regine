@@ -100,7 +100,7 @@ function makeFrame(x, z, rotY, lean, photoPath, idx) {
 
 makeFrame(-3.6, -1.5, 0.28, 0.02, "assets/photos/mich1.jpg", 0);
 makeFrame(3.3, -1.4, -0.25, -0.02, "assets/photos/mich3.jpg", 1);
-makeFrame(-3.3, 1.4, 0.55, 0.03, "assets/photos/mich2.png", 2);
+makeFrame(-3.3, 1.4, 0.55, 0.03, "assets/photos/mich2.jpg", 2);
 makeFrame(3.5, 1.6, -0.55, -0.03, "assets/photos/mich4.png", 3);
 
 // ── Balloons ──────────────────────────────
