@@ -209,7 +209,8 @@ export const cardHit = new THREE.Mesh(
 );
 cardHit.rotation.x = -Math.PI / 2;
 cardHit.rotation.z = 0.35;
-cardHit.position.set(1.2, 0.4, 2.5);
+// FIX: match cardFace y exactly so raycasting aligns with the visible mesh
+cardHit.position.set(1.2, 0.392, 2.5);
 tableGroup.add(cardHit);
 
 // ── Overlay UI ────────────────────────────

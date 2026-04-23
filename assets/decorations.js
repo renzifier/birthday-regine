@@ -30,6 +30,9 @@ for (const [px, pz] of PETAL_POSITIONS) {
 }
 
 // ── Photo frames ──────────────────────────
+// One shared loader — more efficient than creating a new instance per frame.
+const photoLoader = new THREE.TextureLoader();
+
 function makeFrame(x, z, rotY, lean, photoPath, idx) {
   const grp = new THREE.Group();
   const fw = 2.2;
@@ -65,7 +68,7 @@ function makeFrame(x, z, rotY, lean, photoPath, idx) {
 
   // Swap in a real photo if available
   if (photoPath) {
-    new THREE.TextureLoader().load(
+    photoLoader.load(
       photoPath,
       (tex) => {
         photoMesh.material.map = tex;

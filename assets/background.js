@@ -5,19 +5,18 @@
 //  just above the city horizon.
 // ─────────────────────────────────────────
 import { scene } from "./renderer.js";
+import { rng } from "./utils.js";
 
 function makeAerialNight() {
-  const W = 2048,
-    H = 1024;
+  // Halve texture resolution on narrow/mobile screens — no visible difference,
+  // saves significant GPU texture memory.
+  const isMobile = window.innerWidth < 768;
+  const W = isMobile ? 1024 : 2048;
+  const H = isMobile ? 512 : 1024;
   const gc = document.createElement("canvas");
   gc.width = W;
   gc.height = H;
   const ctx = gc.getContext("2d");
-
-  const rng = (s) => {
-    let x = Math.sin(s + 1) * 43758.5453;
-    return x - Math.floor(x);
-  };
 
   // ── Deep blue night sky ───────────────────
   const sky = ctx.createLinearGradient(0, 0, 0, H);
@@ -429,9 +428,10 @@ function makeAerialNight() {
 const cityTex = makeAerialNight();
 scene.background = cityTex;
 
-export const sunsetBackLight = new THREE.PointLight(0xffaa55, 1.4, 90);
-sunsetBackLight.position.set(0, 5, -22);
-scene.add(sunsetBackLight);
+// Renamed from sunsetBackLight — this is city/ambient back light, not a sunset
+export const cityBackLight = new THREE.PointLight(0xffaa55, 1.4, 90);
+cityBackLight.position.set(0, 5, -22);
+scene.add(cityBackLight);
 
 const moonLight = new THREE.PointLight(0xffcc77, 0.55, 80);
 moonLight.position.set(6, 24, -14);

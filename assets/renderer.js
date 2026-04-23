@@ -12,9 +12,13 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
-// NOTE: outputEncoding is deprecated in r152+.
-// Swap to `renderer.outputColorSpace = THREE.SRGBColorSpace` when upgrading.
-renderer.outputEncoding = THREE.sRGBEncoding;
+// Forward-compatible output colour space: use the new API when available
+// (Three.js r152+), fall back to deprecated outputEncoding for r128.
+if (renderer.outputColorSpace !== undefined) {
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+} else {
+  renderer.outputEncoding = THREE.sRGBEncoding;
+}
 
 export const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x02040e); // near-black cool blue fallback

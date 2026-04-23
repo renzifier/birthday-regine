@@ -9,7 +9,7 @@
 // ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 import { CONFIG } from "./config.js";
-import { std, makeRoughnessMap, makeCandleTex } from "./textures.js";
+import { std, BASE_CLOTH, makeCandleTex } from "./textures.js";
 import { tableGroup } from "./table.js";
 
 export const flameMeshes = [];
@@ -32,7 +32,9 @@ function addLayer(geo, mat, y) {
 }
 
 // ── Shared materials ──────────────────────
-const icingRoughMap = makeRoughnessMap();
+// Reuse the shared roughness map from textures.js instead of generating a
+// duplicate canvas texture — multiple materials can safely share one instance.
+const icingRoughMap = BASE_CLOTH.rough;
 const chocoMat = std(0xe8a040, 0.75, 0.0);
 const icingMat = new THREE.MeshStandardMaterial({
   color: 0xff5588,
@@ -253,10 +255,19 @@ for (let ci = 0; ci < 3; ci++) {
   perFlameLights.push({ light: flameLight, offset: ci * 2.1 });
 
   // Smoke particle system
+  // FIX: smoke Points are added directly to scene (world space), so the base
+  // position must be the true world-space position of the flame tip.
+  // cakeGroup lives inside tableGroup (scale 1.8, position 0,0,0), so:
+  //   world = (cakeGroup.position + local) * tableGroup.scale
+  const tgScale = tableGroup.scale.x; // 1.8
   const SMOKE_COUNT = 18;
   const smokeGeo = new THREE.BufferGeometry();
   const smokePos = new Float32Array(SMOKE_COUNT * 3);
-  const smokeBase = { x: -0.5 + cfx, y: 0.37 + 3.62, z: cfz };
+  const smokeBase = {
+    x: (CONFIG.cake.offsetX + cfx) * tgScale,
+    y: (CONFIG.cake.tableY + 3.62) * tgScale,
+    z: cfz * tgScale,
+  };
 
   for (let sp = 0; sp < SMOKE_COUNT; sp++) {
     smokePos[sp * 3] = smokeBase.x + (Math.random() - 0.5) * 0.04;

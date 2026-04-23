@@ -6,6 +6,7 @@
 //  bump) are generated ONCE and exported as
 //  BASE_CLOTH so callers can clone cheaply.
 // ─────────────────────────────────────────
+import { rng } from "./utils.js";
 
 const THREAD = 6; // weave thread width in pixels
 
@@ -26,10 +27,6 @@ export function makeFloorTex() {
   ctx.fillRect(0, 0, 512, 512);
 
   const PLANK_H = 48;
-  const rng = (s) => {
-    let x = Math.sin(s + 1) * 43758.5453;
-    return x - Math.floor(x);
-  };
 
   for (let row = 0; row < Math.ceil(512 / PLANK_H); row++) {
     const py = row * PLANK_H;

@@ -9,6 +9,9 @@
 // 1. Core — renderer, scene, camera
 import "./renderer.js";
 
+// 2. Shared utilities (rng etc.) — imported before any module that uses them
+import "./utils.js";
+
 // 2. Lights before anything casts shadows
 import "./lights.js";
 

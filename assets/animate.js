@@ -8,7 +8,7 @@
 import { renderer, scene, camera, canvas } from "./renderer.js";
 import { CONFIG } from "./config.js";
 import { candleLight } from "./lights.js";
-import { sunsetBackLight } from "./background.js";
+import { cityBackLight } from "./background.js";
 import { flameMeshes, perFlameLights, smokeSystems } from "./cake.js";
 import { cardHit, openCard } from "./card.js";
 
@@ -64,23 +64,26 @@ canvas.addEventListener(
   { passive: true },
 );
 canvas.addEventListener("touchend", (e) => {
-  const t = e.changedTouches[0];
-  const dx = t.clientX - touchStartX;
-  const dy = t.clientY - touchStartY;
-  if (Math.hypot(dx, dy) < 8) {
+  const touch = e.changedTouches[0];
+  const dx = touch.clientX - touchStartX;
+  const dy = touch.clientY - touchStartY;
+  // Only suppress default behaviour (and open the card) when it's a clean
+  // tap that lands on the card — not on every touchend across the canvas.
+  if (Math.hypot(dx, dy) < 8 && hitTestCard(touch.clientX, touch.clientY)) {
     e.preventDefault();
-    if (hitTestCard(t.clientX, t.clientY)) openCard();
+    openCard();
   }
 });
 
 // ── Animation loop ────────────────────────
 const clock = new THREE.Clock();
-let t = 0;
 
 export function startAnimation() {
   (function loop() {
     requestAnimationFrame(loop);
-    t += clock.getDelta();
+    // getElapsedTime() returns total seconds since the clock started —
+    // avoids drift that could occur by accumulating getDelta() manually.
+    const t = clock.getElapsedTime();
 
     // ── Orbit controls update ────────────
     controls.update();
@@ -103,7 +106,7 @@ export function startAnimation() {
     }
 
     // ── Background light pulse ───────────
-    sunsetBackLight.intensity = 2.5 + Math.sin(t * 0.12) * 0.3;
+    cityBackLight.intensity = 2.5 + Math.sin(t * 0.12) * 0.3;
 
     // ── Flame scale animation ────────────
     for (const ff of flameMeshes) {
