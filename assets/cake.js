@@ -1,15 +1,15 @@
 // ─────────────────────────────────────────
 //  cake.js
-//  Two-tier birthday cake: chocolate layers,
-//  icing, drips, swirls, berries, pearls,
-//  candles with flames and smoke.
-//  Exports flameMeshes / perFlameLights /
-//  smokeSystems so animate.js can update
-//  them every frame.
+//  Single-tier white cream birthday cake:
+//  ruffle shell borders top + base,
+//  pink ribbon bows, scattered pink hearts,
+//  "happy birthday" text on top,
+//  one thin white candle with gold speckles,
+//  flame + smoke for animate.js.
 // ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 import { CONFIG } from "./config.js";
-import { std, BASE_CLOTH, makeCandleTex } from "./textures.js";
+import { std } from "./textures.js";
 import { tableGroup } from "./table.js";
 
 export const flameMeshes = [];
@@ -21,7 +21,6 @@ const cakeGroup = new THREE.Group();
 cakeGroup.position.set(CONFIG.cake.offsetX, CONFIG.cake.tableY, 0);
 tableGroup.add(cakeGroup);
 
-/** Shorthand: add a mesh at height y inside cakeGroup. */
 function addLayer(geo, mat, y) {
   const m = new THREE.Mesh(geo, mat);
   m.position.y = y;
@@ -31,251 +30,351 @@ function addLayer(geo, mat, y) {
   return m;
 }
 
-// ── Shared materials ──────────────────────
-// Reuse the shared roughness map from textures.js instead of generating a
-// duplicate canvas texture — multiple materials can safely share one instance.
-const icingRoughMap = BASE_CLOTH.rough;
-const chocoMat = std(0xe8a040, 0.75, 0.0);
-const icingMat = new THREE.MeshStandardMaterial({
-  color: 0xff5588,
-  roughness: 0.2,
-  metalness: 0,
-  roughnessMap: icingRoughMap,
+// ── Materials ─────────────────────────────
+const creamMat = new THREE.MeshStandardMaterial({
+  color: 0xfff8ee, // warm off-white cream
+  roughness: 0.55,
+  metalness: 0.0,
 });
-const frostMat = new THREE.MeshStandardMaterial({
-  color: 0xff4477,
-  roughness: 0.22,
-  metalness: 0,
-  roughnessMap: icingRoughMap,
+const creamRuffleMat = new THREE.MeshStandardMaterial({
+  color: 0xfffaf2,
+  roughness: 0.6,
+  metalness: 0.0,
 });
-const plateMat = std(0xf8f8f8, 0.04, 0.06);
-const swirlMat = std(0xfff8f0, 0.28, 0.0);
-const pearlMat = std(0xf8f8ff, 0.05, 0.1);
-const dripBodyMat = new THREE.MeshStandardMaterial({
-  color: 0xff4477,
-  roughness: 0.14,
-  metalness: 0,
-  roughnessMap: icingRoughMap,
+const plateMat = new THREE.MeshStandardMaterial({
+  color: 0xf0f0f0,
+  roughness: 0.12,
+  metalness: 0.04,
 });
-const dripBlobMat = std(0xff4477, 0.06, 0.0);
-const berryRedMat = std(0xcc1133, 0.18, 0.0);
-const berryGreenMat = std(0x228822, 0.45, 0.0);
-const seedMat = std(0xffee44, 0.4, 0.0);
-const waxMat = std(0xfff8f0, 0.55, 0.0);
-const spongeLayerMat = std(0xfff0d8, 0.6, 0.0);
-const jamLayerMat = std(0xff7733, 0.4, 0.0);
+const pinkMat = new THREE.MeshStandardMaterial({
+  color: 0xf4a7b9,
+  roughness: 0.45,
+  metalness: 0.0,
+});
+const heartMat = new THREE.MeshStandardMaterial({
+  color: 0xf08090,
+  roughness: 0.5,
+  metalness: 0.0,
+});
+const candleMat = new THREE.MeshStandardMaterial({
+  color: 0xfefefe,
+  roughness: 0.38,
+  metalness: 0.0,
+});
+const ribbonMat = new THREE.MeshStandardMaterial({
+  color: 0xf4afc0,
+  roughness: 0.7,
+  metalness: 0.0,
+  side: THREE.DoubleSide,
+});
 
-// ── Helper: icing drips around a tier ────
-function addDrips(radius, baseY, count, angleOffset) {
-  for (let i = 0; i < count; i++) {
-    const a = (i / count) * Math.PI * 2 + angleOffset;
-    const dH = 0.2 + Math.random() * 0.26;
-    const cx = Math.cos(a) * radius;
-    const cz = Math.sin(a) * radius;
+// ── Cake board / plate ────────────────────
+addLayer(new THREE.CylinderGeometry(1.72, 1.72, 0.08, 56), plateMat, 0.04);
 
-    const body = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.06, 0.02, dH, 8),
-      dripBodyMat,
-    );
-    body.position.set(cx, baseY - dH * 0.5, cz);
-    cakeGroup.add(body);
-
-    const blob = new THREE.Mesh(
-      new THREE.SphereGeometry(0.042, 8, 8),
-      dripBlobMat,
-    );
-    blob.position.set(cx, baseY - dH, cz);
-    cakeGroup.add(blob);
-  }
-}
-
-// ── Tier 1 ───────────────────────────────
-addLayer(new THREE.CylinderGeometry(1.78, 1.78, 0.11, 56), plateMat, 0.055);
-addLayer(new THREE.CylinderGeometry(1.4, 1.4, 1.0, 56), chocoMat, 0.61);
-addLayer(new THREE.CylinderGeometry(1.45, 1.45, 0.2, 56), icingMat, 0.61);
+// ── Main cake body ────────────────────────
+// Tier: radius 1.28, height 1.4
+const TIER_R = 1.28;
+const TIER_H = 1.4;
+const TIER_Y = 0.08 + TIER_H / 2; // sits on top of plate
 addLayer(
-  new THREE.CylinderGeometry(1.38, 1.38, 0.055, 56),
-  spongeLayerMat,
-  0.61,
+  new THREE.CylinderGeometry(TIER_R, TIER_R, TIER_H, 56),
+  creamMat,
+  TIER_Y,
 );
-addLayer(new THREE.CylinderGeometry(1.38, 1.38, 0.025, 56), jamLayerMat, 0.655);
-addDrips(1.45, 0.51, 15, 0.18);
 
-// ── Tier 2 ───────────────────────────────
-addLayer(new THREE.CylinderGeometry(1.13, 1.13, 0.9, 56), chocoMat, 1.56);
-addLayer(new THREE.CylinderGeometry(1.18, 1.18, 0.18, 56), icingMat, 1.56);
+const TOP_Y = 0.08 + TIER_H; // = 1.48
+
+// ── Top flat surface ──────────────────────
 addLayer(
-  new THREE.CylinderGeometry(1.11, 1.11, 0.05, 56),
-  spongeLayerMat,
-  1.56,
+  new THREE.CylinderGeometry(TIER_R, TIER_R, 0.04, 56),
+  creamMat,
+  TOP_Y + 0.02,
 );
-addLayer(new THREE.CylinderGeometry(1.11, 1.11, 0.022, 56), jamLayerMat, 1.6);
-addDrips(1.18, 1.47, 12, 0.52);
 
-// ── Top frost ─────────────────────────────
-addLayer(new THREE.CylinderGeometry(1.14, 1.14, 0.07, 56), frostMat, 2.045);
+// ── "happy birthday" text on top ──────────
+// Rendered onto a canvas, applied as a texture on a thin disc
+(function makeTopText() {
+  const cv = document.createElement("canvas");
+  cv.width = 512;
+  cv.height = 512;
+  const ctx = cv.getContext("2d");
 
-// ── Cream swirls ──────────────────────────
-for (let i = 0; i < 14; i++) {
-  const a = (i / 14) * Math.PI * 2;
-  const swirl = new THREE.Mesh(
-    new THREE.SphereGeometry(0.11, 10, 10),
-    swirlMat,
-  );
-  swirl.scale.y = 1.6;
-  swirl.position.set(Math.cos(a) * 0.95, 2.11, Math.sin(a) * 0.95);
-  swirl.castShadow = true;
-  cakeGroup.add(swirl);
-}
+  // Transparent background
+  ctx.clearRect(0, 0, 512, 512);
 
-// ── Strawberries ──────────────────────────
-const berryData = [
-  [0, 0, 0.21],
-  [0.28, 0.06, 0.19],
-  [-0.22, 0.15, 0.17],
-  [0.06, -0.28, 0.2],
-  [0.2, -0.16, 0.18],
-];
-for (const [bx, bz, br] of berryData) {
-  const berry = new THREE.Mesh(
-    new THREE.SphereGeometry(br, 12, 12),
-    berryRedMat,
-  );
-  berry.scale.y = 1.28;
-  berry.position.set(bx, 2.2, bz);
-  berry.castShadow = true;
-  cakeGroup.add(berry);
+  // Pink text — "happy birthday" in two lines, cursive style
+  ctx.fillStyle = "#e8758a";
+  ctx.font = "bold italic 72px Georgia, serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("happy", 256, 200);
+  ctx.fillText("birthday", 256, 296);
 
-  for (let s = 0; s < 6; s++) {
-    const sa = (s / 6) * Math.PI * 2;
-    const seed = new THREE.Mesh(new THREE.SphereGeometry(0.016, 4, 4), seedMat);
-    seed.position.set(
-      bx + Math.cos(sa) * br * 0.85,
-      2.2 + Math.sin(sa) * 0.07,
-      bz + Math.sin(sa) * br * 0.85,
-    );
-    cakeGroup.add(seed);
+  // Scatter small heart dots
+  const heartPositions = [
+    [90, 140],
+    [420, 150],
+    [130, 350],
+    [390, 340],
+    [200, 130],
+    [320, 130],
+    [80, 260],
+    [440, 260],
+    [170, 390],
+    [340, 390],
+    [256, 120],
+    [256, 380],
+    [110, 200],
+    [400, 210],
+  ];
+  ctx.fillStyle = "#e8758a";
+  for (const [hx, hy] of heartPositions) {
+    const s = 10 + Math.random() * 8;
+    // Simple heart using bezier
+    ctx.save();
+    ctx.translate(hx, hy);
+    ctx.scale(s / 30, s / 30);
+    ctx.beginPath();
+    ctx.moveTo(0, -8);
+    ctx.bezierCurveTo(8, -18, 20, -10, 20, 0);
+    ctx.bezierCurveTo(20, 10, 8, 20, 0, 28);
+    ctx.bezierCurveTo(-8, 20, -20, 10, -20, 0);
+    ctx.bezierCurveTo(-20, -10, -8, -18, 0, -8);
+    ctx.fill();
+    ctx.restore();
   }
 
-  const leaf = new THREE.Mesh(
-    new THREE.SphereGeometry(0.07, 6, 6),
-    berryGreenMat,
-  );
-  leaf.scale.y = 0.35;
-  leaf.position.set(bx, 2.2 + br * 1.15, bz);
-  cakeGroup.add(leaf);
-}
-
-// ── Pearl border ──────────────────────────
-for (let i = 0; i < 26; i++) {
-  const a = (i / 26) * Math.PI * 2;
-  const pearl = new THREE.Mesh(
-    new THREE.SphereGeometry(0.072, 10, 10),
-    pearlMat,
-  );
-  pearl.position.set(Math.cos(a) * 1.65, 0.12, Math.sin(a) * 1.65);
-  cakeGroup.add(pearl);
-}
-
-// ── Candles ───────────────────────────────
-const CANDLE_STRIPES = [
-  ["#ffffff", "#ff99bb"],
-  ["#ffbbdd", "#ffffff"],
-  ["#ffffff", "#ff77aa"],
-];
-
-for (let ci = 0; ci < 3; ci++) {
-  const ang = (ci / 3) * Math.PI * 2;
-  const cfx = Math.cos(ang) * 0.44;
-  const cfz = Math.sin(ang) * 0.44;
-
-  // Candle body
-  const candle = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.055, 0.065, 1.35, 14),
+  const tex = new THREE.CanvasTexture(cv);
+  const disc = new THREE.Mesh(
+    new THREE.CircleGeometry(TIER_R - 0.01, 56),
     new THREE.MeshStandardMaterial({
-      map: makeCandleTex(...CANDLE_STRIPES[ci]),
-      roughness: 0.45,
+      map: tex,
+      transparent: true,
+      roughness: 0.5,
       metalness: 0,
+      depthWrite: false,
     }),
   );
-  candle.position.set(cfx, 2.79, cfz);
+  disc.rotation.x = -Math.PI / 2;
+  disc.position.y = TOP_Y + 0.041;
+  cakeGroup.add(disc);
+})();
+
+// ── Ruffle shell helper ────────────────────
+// Places a ring of overlapping petal/shell shapes at a given height and radius.
+// Each "shell" is a flattened hemisphere.
+function addRuffleRing(radius, y, count, petalR, scaleY, angleTilt) {
+  for (let i = 0; i < count; i++) {
+    const a = (i / count) * Math.PI * 2;
+    const px = Math.cos(a) * radius;
+    const pz = Math.sin(a) * radius;
+
+    const petal = new THREE.Mesh(
+      new THREE.SphereGeometry(
+        petalR,
+        10,
+        8,
+        0,
+        Math.PI * 2,
+        0,
+        Math.PI * 0.55,
+      ),
+      creamRuffleMat,
+    );
+    petal.scale.set(1.0, scaleY, 1.0);
+    petal.position.set(px, y, pz);
+    // Face outward
+    petal.rotation.y = a + Math.PI;
+    if (angleTilt) petal.rotation.x = angleTilt;
+    petal.castShadow = true;
+    cakeGroup.add(petal);
+  }
+}
+
+// ── Top ruffle border (scalloped edge around top) ────
+// Two rings for fullness: outer shells and slightly inner raised shells
+addRuffleRing(TIER_R - 0.04, TOP_Y + 0.04, 22, 0.21, 0.55, -0.18);
+addRuffleRing(TIER_R - 0.22, TOP_Y + 0.09, 18, 0.18, 0.5, -0.25);
+
+// ── Base ruffle border (around the bottom edge) ──────
+addRuffleRing(TIER_R - 0.04, 0.08 + 0.18, 22, 0.2, 0.6, 0.18);
+addRuffleRing(TIER_R - 0.22, 0.08 + 0.1, 18, 0.17, 0.55, 0.28);
+
+// ── Pink hearts scattered on sides ────────
+// Created as tiny flat heart-textured planes mapped onto the side
+function addSideHearts(count) {
+  const cv = document.createElement("canvas");
+  cv.width = 64;
+  cv.height = 64;
+  const ctx = cv.getContext("2d");
+  ctx.clearRect(0, 0, 64, 64);
+  ctx.fillStyle = "#f08090";
+  ctx.save();
+  ctx.translate(32, 30);
+  ctx.scale(1.1, 1.1);
+  ctx.beginPath();
+  ctx.moveTo(0, -8);
+  ctx.bezierCurveTo(8, -18, 20, -10, 20, 0);
+  ctx.bezierCurveTo(20, 10, 8, 20, 0, 28);
+  ctx.bezierCurveTo(-8, 20, -20, 10, -20, 0);
+  ctx.bezierCurveTo(-20, -10, -8, -18, 0, -8);
+  ctx.fill();
+  ctx.restore();
+  const heartTex = new THREE.CanvasTexture(cv);
+
+  const heartMesh = new THREE.MeshBasicMaterial({
+    map: heartTex,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+
+  for (let i = 0; i < count; i++) {
+    const a = (i / count) * Math.PI * 2 + 0.3;
+    const yOff = 0.2 + (i % 3) * 0.38;
+    const hx = Math.cos(a) * (TIER_R + 0.005);
+    const hz = Math.sin(a) * (TIER_R + 0.005);
+
+    const h = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.16), heartMesh);
+    h.position.set(hx, 0.08 + yOff, hz);
+    h.rotation.y = a + Math.PI;
+    cakeGroup.add(h);
+  }
+}
+addSideHearts(16);
+
+// ── Pink ribbon bows ──────────────────────
+function addBow(a, y) {
+  const bx = Math.cos(a) * (TIER_R + 0.01);
+  const bz = Math.sin(a) * (TIER_R + 0.01);
+
+  const bowGroup = new THREE.Group();
+  bowGroup.position.set(bx, y, bz);
+  bowGroup.rotation.y = a + Math.PI;
+
+  // Two bow loops (left and right wing)
+  for (const side of [-1, 1]) {
+    const loop = new THREE.Mesh(
+      new THREE.SphereGeometry(0.095, 8, 6),
+      ribbonMat,
+    );
+    loop.scale.set(0.5, 0.32, 0.18);
+    loop.position.set(side * 0.1, 0, 0);
+    loop.rotation.z = side * 0.4;
+    bowGroup.add(loop);
+  }
+
+  // Centre knot
+  const knot = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), ribbonMat);
+  bowGroup.add(knot);
+
+  // Two ribbon tails hanging down
+  for (const side of [-1, 1]) {
+    const pts = [
+      new THREE.Vector3(side * 0.03, 0, 0),
+      new THREE.Vector3(side * 0.06, -0.18, 0.02),
+      new THREE.Vector3(side * 0.04, -0.36, 0.04),
+    ];
+    const tail = new THREE.Mesh(
+      new THREE.TubeGeometry(
+        new THREE.CatmullRomCurve3(pts),
+        8,
+        0.012,
+        4,
+        false,
+      ),
+      ribbonMat,
+    );
+    bowGroup.add(tail);
+  }
+
+  cakeGroup.add(bowGroup);
+}
+
+// 6 bows evenly spaced around the side, at mid-height
+const BOW_COUNT = 6;
+for (let i = 0; i < BOW_COUNT; i++) {
+  const angle = (i / BOW_COUNT) * Math.PI * 2;
+  addBow(angle, TOP_Y - 0.05);
+}
+
+// ── Single white candle ───────────────────
+// Thin, tall, slightly tilted — with gold speckle texture
+(function makeCandle() {
+  const cv = document.createElement("canvas");
+  cv.width = 32;
+  cv.height = 256;
+  const ctx = cv.getContext("2d");
+  ctx.fillStyle = "#fefefe";
+  ctx.fillRect(0, 0, 32, 256);
+  // Gold speckles
+  ctx.fillStyle = "rgba(200,160,40,0.7)";
+  for (let i = 0; i < 28; i++) {
+    const sx = Math.random() * 32;
+    const sy = Math.random() * 256;
+    const sr = 0.8 + Math.random() * 1.4;
+    ctx.beginPath();
+    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const tex = new THREE.CanvasTexture(cv);
+
+  const candle = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.038, 0.044, 1.6, 12),
+    new THREE.MeshStandardMaterial({ map: tex, roughness: 0.4, metalness: 0 }),
+  );
+  // Slightly off-centre and tilted like in the photo
+  candle.position.set(0.08, TOP_Y + 0.06 + 0.8, 0.05);
+  candle.rotation.z = 0.08;
   candle.castShadow = true;
   cakeGroup.add(candle);
 
-  // Wax drips (2 per candle)
-  for (let wd = 0; wd < 2; wd++) {
-    const wdA = ang + (wd === 0 ? 0.4 : -0.5);
-    const wdH = 0.18 + Math.random() * 0.14;
-    const wx = cfx + Math.cos(wdA) * 0.058;
-    const wz = cfz + Math.sin(wdA) * 0.058;
+  // ── Flame ──────────────────────────────
+  const FLAME_X = 0.08 + Math.sin(0.08) * (TOP_Y + 0.06 + 1.6);
+  // Approximate world-local tip position
+  const flameLX = 0.08 + 0.08 * 1.4;
+  const flameLY = TOP_Y + 0.06 + 1.6 + 0.12;
+  const flameLZ = 0.05;
 
-    const wdrop = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.018, 0.008, wdH, 6),
-      waxMat,
-    );
-    wdrop.position.set(wx, 2.79 + 0.3 - wdH * 0.5, wz);
-    cakeGroup.add(wdrop);
-
-    const wblob = new THREE.Mesh(new THREE.SphereGeometry(0.014, 6, 6), waxMat);
-    wblob.position.set(wx, 2.79 + 0.3 - wdH, wz);
-    cakeGroup.add(wblob);
-  }
-
-  // Decorative ring at candle base
-  const ring = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.082, 0.082, 0.065, 14),
-    std(0xff99bb, 0.3),
-  );
-  ring.position.set(cfx, 2.13, cfz);
-  cakeGroup.add(ring);
-
-  // Outer flame
   const flOut = new THREE.Mesh(
-    new THREE.SphereGeometry(0.088, 10, 10),
+    new THREE.SphereGeometry(0.072, 10, 10),
     new THREE.MeshBasicMaterial({ color: 0xffcc22 }),
   );
-  flOut.scale.set(0.62, 1.8, 0.62);
-  flOut.position.set(cfx, 3.57, cfz);
+  flOut.scale.set(0.55, 1.7, 0.55);
+  flOut.position.set(flameLX, flameLY, flameLZ);
   cakeGroup.add(flOut);
-  flameMeshes.push({ mesh: flOut, offset: ci * 2.1 });
+  flameMeshes.push({ mesh: flOut, offset: 0 });
 
-  // Inner bright core
   const flIn = new THREE.Mesh(
-    new THREE.SphereGeometry(0.048, 8, 8),
+    new THREE.SphereGeometry(0.038, 8, 8),
     new THREE.MeshBasicMaterial({ color: 0xffffcc }),
   );
-  flIn.scale.set(0.5, 1.2, 0.5);
-  flIn.position.set(cfx, 3.54, cfz);
+  flIn.scale.set(0.45, 1.1, 0.45);
+  flIn.position.set(flameLX, flameLY - 0.02, flameLZ);
   cakeGroup.add(flIn);
 
-  // Per-flame light — added to cakeGroup so it moves with the cake
-  const flameLight = new THREE.PointLight(0xff9933, 0.5, 2.5);
-  flameLight.position.set(cfx, 3.57, cfz);
+  // Per-flame point light
+  const flameLight = new THREE.PointLight(0xff9933, 0.55, 2.8);
+  flameLight.position.set(flameLX, flameLY, flameLZ);
   cakeGroup.add(flameLight);
-  perFlameLights.push({ light: flameLight, offset: ci * 2.1 });
+  perFlameLights.push({ light: flameLight, offset: 0 });
 
-  // Smoke particle system
-  // FIX: smoke Points are added directly to scene (world space), so the base
-  // position must be the true world-space position of the flame tip.
-  // cakeGroup lives inside tableGroup (scale 1.8, position 0,0,0), so:
-  //   world = (cakeGroup.position + local) * tableGroup.scale
-  const tgScale = tableGroup.scale.x; // 1.8
+  // Smoke
+  const tgScale = tableGroup.scale.x;
   const SMOKE_COUNT = 18;
   const smokeGeo = new THREE.BufferGeometry();
   const smokePos = new Float32Array(SMOKE_COUNT * 3);
   const smokeBase = {
-    x: (CONFIG.cake.offsetX + cfx) * tgScale,
-    y: (CONFIG.cake.tableY + 3.62) * tgScale,
-    z: cfz * tgScale,
+    x: (CONFIG.cake.offsetX + flameLX) * tgScale,
+    y: (CONFIG.cake.tableY + flameLY + 0.05) * tgScale,
+    z: flameLZ * tgScale,
   };
-
   for (let sp = 0; sp < SMOKE_COUNT; sp++) {
     smokePos[sp * 3] = smokeBase.x + (Math.random() - 0.5) * 0.04;
     smokePos[sp * 3 + 1] = smokeBase.y + sp * 0.06;
     smokePos[sp * 3 + 2] = smokeBase.z + (Math.random() - 0.5) * 0.04;
   }
   smokeGeo.setAttribute("position", new THREE.BufferAttribute(smokePos, 3));
-
   const smokePoints = new THREE.Points(
     smokeGeo,
     new THREE.PointsMaterial({
@@ -287,11 +386,10 @@ for (let ci = 0; ci < 3; ci++) {
     }),
   );
   scene.add(smokePoints);
-  // Random phase offset makes each candle's smoke look independent
   smokeSystems.push({
     pts: smokePoints,
     geo: smokeGeo,
     base: smokeBase,
-    phase: ci * 1.3 + Math.random() * 0.8,
+    phase: Math.random() * 0.8,
   });
-}
+})();
