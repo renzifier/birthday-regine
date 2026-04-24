@@ -124,12 +124,10 @@ addLayer(
   ctx.font = "bold italic 84px Georgia, 'Times New Roman', serif";
   ctx.fillText("birthday", 256, 298);
 
-  // ── tiny red hearts — fewer, near the rim so they don't crowd the text ──
+  // ── tiny red hearts — rim only, clear of the text ──
   const HEART_POS = [
     [80, 160],
     [432, 155],
-    [155, 390],
-    [368, 385],
     [256, 88],
     [256, 418],
     [92, 285],
