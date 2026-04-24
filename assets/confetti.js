@@ -20,13 +20,13 @@ const COLORS = [
 ];
 
 // ── Pool settings ─────────────────────────
-const PIECE_COUNT  = 180;   // total pieces in the pool
-const GRAVITY      = -4.8;  // units/s²
-const DRAG         = 0.985; // velocity damping per frame
-const SPREAD_X     = 7.0;   // horizontal spread radius
-const SPREAD_Z     = 4.5;
-const SPAWN_Y      = 9.5;   // start height (above the cake)
-const FLOOR_Y      = -1.8;  // land / fade out below this
+const PIECE_COUNT = 180; // total pieces in the pool
+const GRAVITY = -4.8; // units/s²
+const DRAG = 0.985; // velocity damping per frame
+const SPREAD_X = 7.0; // horizontal spread radius
+const SPREAD_Z = 4.5;
+const SPAWN_Y = 9.5; // start height (above the cake)
+const FLOOR_Y = -1.8; // land / fade out below this
 
 // Each piece is a thin flat box — cheap and reads well
 const GEO = new THREE.BoxGeometry(0.18, 0.008, 0.11);
@@ -47,10 +47,10 @@ const MATS = COLORS.map(
 const pieces = [];
 
 for (let i = 0; i < PIECE_COUNT; i++) {
-  const mat  = MATS[i % MATS.length].clone(); // clone so opacity is independent
+  const mat = MATS[i % MATS.length].clone(); // clone so opacity is independent
   const mesh = new THREE.Mesh(GEO, mat);
   mesh.castShadow = false;
-  mesh.visible    = false;
+  mesh.visible = false;
   scene.add(mesh);
 
   pieces.push({
@@ -58,11 +58,17 @@ for (let i = 0; i < PIECE_COUNT; i++) {
     mat,
     active: false,
     // physics
-    vx: 0, vy: 0, vz: 0,
+    vx: 0,
+    vy: 0,
+    vz: 0,
     // spin axis + speed
-    ax: 0, ay: 0, az: 0, spinSpeed: 0,
+    ax: 0,
+    ay: 0,
+    az: 0,
+    spinSpeed: 0,
     // fade timer
-    age: 0, lifetime: 0,
+    age: 0,
+    lifetime: 0,
   });
 }
 
@@ -72,9 +78,8 @@ function rnd(min, max) {
 }
 
 function spawnPiece(p) {
-  p.active   = true;
-  p.age      = 0;
-  p.lifetime = rnd(2.8, 5.0); // seconds before fully faded
+  p.active = true;
+  p.age = 0;
 
   // Random position above cake area
   p.mesh.position.set(
@@ -107,6 +112,15 @@ function spawnPiece(p) {
 
 // ── Public API ────────────────────────────
 
+/** Call this when candles are relit to clear all confetti. */
+export function clearConfetti() {
+  for (const p of pieces) {
+    p.active = false;
+    p.mesh.visible = false;
+    p.mat.opacity = 1.0;
+  }
+}
+
 /** Call this when the candles are blown out. */
 export function launchConfetti() {
   // Stagger spawning slightly so they don't all appear the same frame
@@ -131,22 +145,23 @@ export function updateConfetti(dt) {
     p.mesh.position.y += p.vy * dt;
     p.mesh.position.z += p.vz * dt;
 
-    // Spin
-    p.mesh.rotation.x += p.ax * p.spinSpeed * dt;
-    p.mesh.rotation.y += p.ay * p.spinSpeed * dt;
-    p.mesh.rotation.z += p.az * p.spinSpeed * dt;
+    // Spin — damp out as it approaches the floor
+    const spinDamp = Math.max(
+      0,
+      Math.min(1, (p.mesh.position.y - FLOOR_Y) * 2),
+    );
+    p.mesh.rotation.x += p.ax * p.spinSpeed * spinDamp * dt;
+    p.mesh.rotation.y += p.ay * p.spinSpeed * spinDamp * dt;
+    p.mesh.rotation.z += p.az * p.spinSpeed * spinDamp * dt;
 
-    // Fade out in last 30% of lifetime
-    const progress = p.age / p.lifetime;
-    if (progress > 0.7) {
-      p.mat.opacity = 1.0 - (progress - 0.7) / 0.3;
-    }
-
-    // Recycle when done or fallen below floor
-    if (p.age >= p.lifetime || p.mesh.position.y < FLOOR_Y) {
-      p.active        = false;
-      p.mesh.visible  = false;
-      p.mat.opacity   = 1.0;
+    // Land — freeze at floor level and stay visible forever
+    if (p.mesh.position.y <= FLOOR_Y) {
+      p.mesh.position.y = FLOOR_Y;
+      p.vy = 0;
+      p.vx = 0;
+      p.vz = 0;
+      p.spinSpeed = 0;
+      p.active = false; // no longer needs physics, but mesh stays
     }
   }
 }

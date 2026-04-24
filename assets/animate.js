@@ -13,7 +13,7 @@ import { cityBackLight } from "./background.js";
 import { flameMeshes, perFlameLights, smokeSystems } from "./cake.js";
 import { cardHit, openCard } from "./card.js";
 import { initBlow, onBlow } from "./blow.js";
-import { launchConfetti, updateConfetti } from "./confetti.js";
+import { launchConfetti, updateConfetti, clearConfetti } from "./confetti.js";
 
 // ── Orbit Controls ────────────────────────
 const controls = new THREE.OrbitControls(camera, canvas);
@@ -54,6 +54,7 @@ canvas.addEventListener("click", (e) => {
   if (flameState === "out") {
     flameState = "relighting";
     flameT = 0;
+    clearConfetti();
     _hideRelightHint();
   }
 });
@@ -79,6 +80,7 @@ canvas.addEventListener("touchend", (e) => {
       e.preventDefault();
       flameState = "relighting";
       flameT = 0;
+      clearConfetti();
       _hideRelightHint();
     } else if (hitTestCard(touch.clientX, touch.clientY)) {
       e.preventDefault();
