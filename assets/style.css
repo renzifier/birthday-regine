@@ -291,47 +291,62 @@ canvas {
   }
 }
 
-/* ── Envelope body (lower portion) ── z-index 2 so it sits over card */
+/* ── Envelope back panel — z:0, sits behind card ── */
 #envBody {
   position: absolute;
   inset: 0;
   border-radius: 10px;
-  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(160deg, #f5789c 0%, #e8186c 100%);
+  box-shadow:
+    inset 0 -3px 12px rgba(255, 255, 255, 0.1),
+    inset 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Front pocket — z:2, covers bottom 55%, sits OVER the card ── */
+#envPocket {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 58%;
+  border-radius: 0 0 10px 10px;
   z-index: 2;
   pointer-events: none;
 
-  /* Pink gradient body */
-  background: linear-gradient(160deg, #ffb3d1 0%, #ff6aac 55%, #e8186c 100%);
+  background: linear-gradient(175deg, #ffb3d1 0%, #ff6aac 45%, #e8186c 100%);
   box-shadow:
     inset 0 -3px 12px rgba(255, 255, 255, 0.18),
-    inset 0 3px 8px rgba(0, 0, 0, 0.08);
+    inset 0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* Envelope V-fold lines on body */
-#envBody::before {
+/* V-fold lines on pocket */
+#envPocket::before {
   content: "";
   position: absolute;
   inset: 0;
   background:
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.18) 0 49.9%,
+      rgba(255, 255, 255, 0.15) 0 49.9%,
       transparent 50% 100%
     ),
     linear-gradient(
       225deg,
-      rgba(255, 255, 255, 0.12) 0 49.9%,
+      rgba(255, 255, 255, 0.1) 0 49.9%,
       transparent 50% 100%
     );
   pointer-events: none;
+  border-radius: 0 0 10px 10px;
 }
 
-/* Heart seal on body */
+/* Heart seal sits on the pocket */
 #envSeal {
   position: absolute;
   left: 50%;
-  top: 56%;
-  transform: translate(-50%, -50%);
+  top: 10%;
+  transform: translate(-50%, 0);
   font-size: 32px;
   color: #fff;
   text-shadow: 0 2px 8px rgba(180, 0, 60, 0.55);
