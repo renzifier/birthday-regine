@@ -248,7 +248,7 @@ function addUprightRing(radius, y, count, blobR) {
       new THREE.SphereGeometry(blobR, 12, 10),
       rosetteMat,
     );
-    base.scale.set(1.0, 1.15, 1.0);
+    base.scale.set(0.85, 1.1, 0.85);
     base.position.set(px, y, pz);
     base.castShadow = true;
     cakeGroup.add(base);
@@ -265,7 +265,7 @@ function addUprightRing(radius, y, count, blobR) {
 }
 
 // Top border — upright standing rosettes on the rim
-addUprightRing(TIER_R - 0.02, TOP_Y + 0.1, 20, 0.145);
+addUprightRing(TIER_R - 0.02, TOP_Y + 0.065, 22, 0.092);
 
 // Base border — shells flaring outward/upward
 addShellRing(TIER_R - 0.02, PLATE_Y + 0.16, 20, 0.155, 0.26);
