@@ -234,8 +234,38 @@ function addShellRing(radius, y, count, shellR, tiltX) {
   }
 }
 
-// Top border — shells tilting inward/downward slightly
-addShellRing(TIER_R - 0.02, TOP_Y + 0.06, 20, 0.155, -0.22);
+// ── Upright rosette ring for the top border ──
+// Each rosette is a standing round blob — like a freshly piped
+// cream puff sitting on the rim, not a flat pancake.
+function addUprightRing(radius, y, count, blobR) {
+  for (let i = 0; i < count; i++) {
+    const a = (i / count) * Math.PI * 2;
+    const px = Math.cos(a) * radius;
+    const pz = Math.sin(a) * radius;
+
+    // Base blob — full sphere, slightly oval upward
+    const base = new THREE.Mesh(
+      new THREE.SphereGeometry(blobR, 12, 10),
+      rosetteMat,
+    );
+    base.scale.set(1.0, 1.15, 1.0);
+    base.position.set(px, y, pz);
+    base.castShadow = true;
+    cakeGroup.add(base);
+
+    // Smaller top highlight — gives the piped "peak" look
+    const peak = new THREE.Mesh(
+      new THREE.SphereGeometry(blobR * 0.55, 9, 8),
+      rosetteMat,
+    );
+    peak.scale.set(0.9, 1.1, 0.9);
+    peak.position.set(px, y + blobR * 1.0, pz);
+    cakeGroup.add(peak);
+  }
+}
+
+// Top border — upright standing rosettes on the rim
+addUprightRing(TIER_R - 0.02, TOP_Y + 0.1, 20, 0.145);
 
 // Base border — shells flaring outward/upward
 addShellRing(TIER_R - 0.02, PLATE_Y + 0.16, 20, 0.155, 0.26);
@@ -443,9 +473,13 @@ for (let i = 0; i < 6; i++) {
     cakeGroup.add(wblob);
   }
 
-  // Flame position — approximate tip after tilt
-  const flameLX = CANDLE_X + Math.sin(TILT_Z) * CANDLE_LEN * 0.5;
-  const flameLY = CANDLE_BASE_Y + CANDLE_LEN + 0.1;
+  // Flame position — exact tip of the tilted candle
+  // Rotating (0, CANDLE_LEN/2, 0) around Z by TILT_Z gives:
+  //   X offset = -CANDLE_LEN/2 * sin(TILT_Z)   (negative — leans left)
+  //   Y offset =  CANDLE_LEN/2 * cos(TILT_Z)
+  const halfLen = CANDLE_LEN * 0.5;
+  const flameLX = CANDLE_X - halfLen * Math.sin(TILT_Z);
+  const flameLY = CANDLE_BASE_Y + halfLen + halfLen * Math.cos(TILT_Z) + 0.08;
   const flameLZ = CANDLE_Z;
 
   // Outer flame
