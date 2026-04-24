@@ -8,9 +8,9 @@ const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(120, 40),
   new THREE.MeshStandardMaterial({
     map: makeFloorTex(),
-    color: 0x0a0d14, // deep blue-black tint over the texture
-    roughness: 0.55, // less glossy — absorbs more light
-    metalness: 0.0, // no metallic sheen
+    color: 0x1e2235, // dark blue-grey — lets more texture show through
+    roughness: 0.42, // slight sheen to catch blue light
+    metalness: 0.04, // very faint reflectivity
   }),
 );
 floor.rotation.x = -Math.PI / 2;
