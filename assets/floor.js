@@ -8,11 +8,12 @@ const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(120, 40),
   new THREE.MeshStandardMaterial({
     map: makeFloorTex(),
-    roughness: 0.25,
-    metalness: 0.05,
+    color: 0x0a0d14, // deep blue-black tint over the texture
+    roughness: 0.55, // less glossy — absorbs more light
+    metalness: 0.0, // no metallic sheen
   }),
 );
 floor.rotation.x = -Math.PI / 2;
-floor.position.set(0, -2, -2); // shift centre back slightly so it reaches z=-24
+floor.position.set(0, -2, -2);
 floor.receiveShadow = true;
 scene.add(floor);

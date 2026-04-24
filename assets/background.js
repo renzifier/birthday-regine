@@ -429,7 +429,7 @@ const cityTex = makeAerialNight();
 scene.background = cityTex;
 
 // Renamed from sunsetBackLight — this is city/ambient back light, not a sunset
-export const cityBackLight = new THREE.PointLight(0xffaa55, 1.4, 90);
+export const cityBackLight = new THREE.PointLight(0x6688cc, 0.7, 90);
 cityBackLight.position.set(0, 5, -22);
 scene.add(cityBackLight);
 

@@ -106,7 +106,7 @@ export function startAnimation() {
     }
 
     // ── Background light pulse ───────────
-    cityBackLight.intensity = 2.5 + Math.sin(t * 0.12) * 0.3;
+    cityBackLight.intensity = 0.6 + Math.sin(t * 0.12) * 0.15;
 
     // ── Flame scale animation ────────────
     for (const ff of flameMeshes) {

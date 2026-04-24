@@ -23,7 +23,7 @@ export function makeFloorTex() {
   const ctx = fc.getContext("2d");
 
   // Warm dark wood base
-  ctx.fillStyle = "#1a120a";
+  ctx.fillStyle = "#0b0906";
   ctx.fillRect(0, 0, 512, 512);
 
   const PLANK_H = 48;
@@ -32,7 +32,7 @@ export function makeFloorTex() {
     const py = row * PLANK_H;
     const offset = (row % 2) * 80;
 
-    const bright = 28 + rng(row * 3.1) * 18;
+    const bright = 12 + rng(row * 3.1) * 10;
     ctx.fillStyle = `rgb(${Math.floor(bright * 1.6)},${Math.floor(bright * 1.0)},${Math.floor(bright * 0.55)})`;
     ctx.fillRect(0, py, 512, PLANK_H - 1);
 
