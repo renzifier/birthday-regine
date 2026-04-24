@@ -17,7 +17,7 @@ export function onBlow(cb) {
 // ── Tuning ────────────────────────────────
 // RMS threshold above which we consider it a "blow" vs ambient noise.
 // 0.018 works well in a quiet room; raise to ~0.04 in noisier environments.
-const BLOW_THRESHOLD = 0.01;
+const BLOW_THRESHOLD = 0.013;
 // How many consecutive frames above threshold before we fire the event.
 const BLOW_FRAMES_MIN = 2;
 // Cooldown in ms before another blow can fire.

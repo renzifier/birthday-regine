@@ -13,6 +13,7 @@ import { cityBackLight } from "./background.js";
 import { flameMeshes, perFlameLights, smokeSystems } from "./cake.js";
 import { cardHit, openCard } from "./card.js";
 import { initBlow, onBlow } from "./blow.js";
+import { launchConfetti, updateConfetti } from "./confetti.js";
 
 // ── Orbit Controls ────────────────────────
 const controls = new THREE.OrbitControls(camera, canvas);
@@ -107,6 +108,7 @@ onBlow(() => {
       if (flameState === "blowing") {
         flameState = "out";
         flameT = 0;
+        launchConfetti();
         _showRelightHint();
       }
     }, 200);
@@ -153,18 +155,24 @@ export function startAnimation() {
       '<span class="hint-mobile">🎂 Blow into your mic · drag to orbit · tap the card</span>';
   }
 
+  let lastT = 0;
   (function loop() {
     requestAnimationFrame(loop);
     const t = clock.getElapsedTime();
+    const dt = Math.min(t - lastT, 0.05); // cap at 50ms to avoid spiral on tab-switch
+    lastT = t;
 
     controls.update();
 
     // ── Advance transition progress ──────
     if (flameState !== "lit") {
       const dur = flameState === "relighting" ? RELIGHT_DUR : EXTINGUISH_DUR;
-      flameT = Math.min(1, flameT + 0.016 / dur);
+      flameT = Math.min(1, flameT + dt / dur);
       if (flameState === "relighting" && flameT >= 1) flameState = "lit";
     }
+
+    // ── Confetti ─────────────────────────
+    updateConfetti(dt);
 
     // ── Derive flame scale multiplier ────
     let flameScaleY, flameScaleX, lightMult;
