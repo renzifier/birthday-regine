@@ -124,26 +124,16 @@ addLayer(
   ctx.font = "bold italic 84px Georgia, 'Times New Roman', serif";
   ctx.fillText("birthday", 256, 298);
 
-  // ── tiny red hearts scattered on surface ──
+  // ── tiny red hearts — fewer, near the rim so they don't crowd the text ──
   const HEART_POS = [
-    [76, 148],
-    [436, 138],
-    [118, 370],
-    [402, 358],
-    [192, 118],
-    [320, 108],
-    [72, 262],
-    [448, 258],
-    [162, 400],
-    [348, 398],
-    [256, 100],
-    [256, 396],
-    [104, 198],
-    [408, 208],
-    [136, 310],
-    [376, 316],
-    [218, 430],
-    [300, 432],
+    [80, 160],
+    [432, 155],
+    [155, 390],
+    [368, 385],
+    [256, 88],
+    [256, 418],
+    [92, 285],
+    [424, 278],
   ];
   function drawHeart(ctx, cx, cy, r) {
     ctx.save();
