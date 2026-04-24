@@ -132,6 +132,8 @@ addLayer(
     [256, 430],
     [76, 220],
     [436, 215],
+    [155, 445],
+    [368, 442],
   ];
   function drawHeart(ctx, cx, cy, r) {
     ctx.save();
