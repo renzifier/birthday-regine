@@ -254,67 +254,78 @@ function addBow(angle, y) {
   grp.rotation.y = angle + Math.PI;
 
   // ── Loops ──
+  // Large satin loops matching reference: each loop ~0.35 units wide,
+  // nearly round in profile, flat in depth (satin ribbon look).
   for (const side of [-1, 1]) {
-    // Main loop oval
+    // Main loop — big round oval, flat Z for flat-ribbon appearance
     const loop = new THREE.Mesh(
-      new THREE.SphereGeometry(0.115, 10, 7),
+      new THREE.SphereGeometry(0.2, 14, 10),
       ribbonMat,
     );
-    loop.scale.set(0.48, 0.36, 0.18);
-    loop.position.set(side * 0.118, 0.015, -0.012);
-    loop.rotation.z = side * 0.32;
-    loop.rotation.x = -0.12;
+    loop.scale.set(0.9, 0.88, 0.22); // ~0.36 wide × 0.35 tall × 0.088 deep
+    loop.position.set(side * 0.24, 0.02, -0.014);
+    loop.rotation.z = side * 0.26;
+    loop.rotation.x = -0.1;
     grp.add(loop);
 
-    // Inner crease — darker oval in the loop shadow
+    // Inner crease shadow — slightly smaller, darker, recessed
     const crease = new THREE.Mesh(
-      new THREE.SphereGeometry(0.07, 8, 6),
+      new THREE.SphereGeometry(0.13, 10, 8),
       ribbonDarkMat,
     );
-    crease.scale.set(0.38, 0.28, 0.16);
-    crease.position.set(side * 0.108, 0.005, -0.005);
-    crease.rotation.z = side * 0.32;
+    crease.scale.set(0.76, 0.74, 0.18);
+    crease.position.set(side * 0.22, 0.01, -0.005);
+    crease.rotation.z = side * 0.26;
     grp.add(crease);
   }
 
-  // ── Centre knot — thick oval ──
-  const knot = new THREE.Mesh(new THREE.SphereGeometry(0.06, 9, 8), ribbonMat);
-  knot.scale.set(0.7, 0.62, 0.36);
+  // ── Centre knot — thick squarish oval ──
+  const knot = new THREE.Mesh(
+    new THREE.SphereGeometry(0.082, 10, 9),
+    ribbonMat,
+  );
+  knot.scale.set(0.78, 0.72, 0.44);
   grp.add(knot);
 
   // ── Two hanging ribbon tails ──
+  // Tails fall from the knot to near the cake base — long and gently curved.
+  // Tube radius 0.026 gives a wide, visible ribbon strip.
   for (const side of [-1, 1]) {
-    // Each tail is a flat TubeGeometry that curves away from the bow
     const tailPts = [
-      new THREE.Vector3(side * 0.04, 0.0, 0.0),
-      new THREE.Vector3(side * 0.07, -0.18, 0.02),
-      new THREE.Vector3(side * 0.05, -0.36, 0.035),
-      new THREE.Vector3(side * 0.08, -0.5, 0.03),
+      new THREE.Vector3(side * 0.055, 0.0, 0.0),
+      new THREE.Vector3(side * 0.085, -0.22, 0.028),
+      new THREE.Vector3(side * 0.065, -0.46, 0.042),
+      new THREE.Vector3(side * 0.092, -0.68, 0.036),
     ];
     const tail = new THREE.Mesh(
       new THREE.TubeGeometry(
         new THREE.CatmullRomCurve3(tailPts),
-        10,
-        0.014,
-        5,
+        14,
+        0.026, // wider tube → more visible satin ribbon
+        6,
         false,
       ),
       ribbonMat,
     );
     grp.add(tail);
 
-    // Ribbon tail end — slight diagonal cut effect (flat plane)
-    const tip = new THREE.Mesh(new THREE.PlaneGeometry(0.032, 0.06), ribbonMat);
-    tip.position.set(side * 0.082, -0.53, 0.03);
-    tip.rotation.z = side * 0.25;
-    grp.add(tip);
+    // Diagonal-cut ribbon end (V-notch look via two angled planes)
+    for (const notch of [-1, 1]) {
+      const tip = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.028, 0.072),
+        ribbonMat,
+      );
+      tip.position.set(side * 0.095, -0.73 + notch * 0.018, 0.036);
+      tip.rotation.z = side * 0.28 + notch * 0.18;
+      grp.add(tip);
+    }
   }
 
   cakeGroup.add(grp);
 }
 
-// 6 bows — positioned at mid-height of the cake side
-const BOW_Y = PLATE_Y + TIER_H * 0.52;
+// 6 bows — placed slightly above mid-height so tails reach the base border
+const BOW_Y = PLATE_Y + TIER_H * 0.6;
 for (let i = 0; i < 6; i++) {
   addBow((i / 6) * Math.PI * 2, BOW_Y);
 }
