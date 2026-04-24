@@ -252,7 +252,7 @@ function addBow(angle, y) {
 
   const grp = new THREE.Group();
   grp.position.set(bx, y, bz);
-  grp.rotation.y = angle + Math.PI;
+  grp.rotation.y = Math.PI / 2 - angle;
   // Local axes: +X tangential, +Y up, +Z outward (viewer looks along –Z)
 
   // ── Loops — tall torus ovals that rise above the cake rim ──
