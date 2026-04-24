@@ -26,7 +26,36 @@ const DRAG = 0.985; // velocity damping per frame
 const SPREAD_X = 7.0; // horizontal spread radius
 const SPREAD_Z = 4.5;
 const SPAWN_Y = 9.5; // start height (above the cake)
-const FLOOR_Y = -1.8; // land / fade out below this
+const FLOOR_Y = -1.8; // floor level
+
+// ── Surface definitions ───────────────────
+// World-space landing surfaces. Pieces stop on whichever they hit first.
+// Table top world Y = (0.28 + 0.09) * 1.8 ≈ 0.67; half-extents = local * 1.8
+const SURFACES = [
+  {
+    y: 0.67,
+    minX: -8.55,
+    maxX: 8.55,
+    minZ: -5.85,
+    maxZ: 5.85,
+  },
+  {
+    y: FLOOR_Y,
+    minX: -Infinity,
+    maxX: Infinity,
+    minZ: -Infinity,
+    maxZ: Infinity,
+  },
+];
+
+function landingY(x, z) {
+  for (const s of SURFACES) {
+    if (x >= s.minX && x <= s.maxX && z >= s.minZ && z <= s.maxZ) {
+      return s.y;
+    }
+  }
+  return FLOOR_Y;
+}
 
 // Each piece is a thin flat box — cheap and reads well
 const GEO = new THREE.BoxGeometry(0.18, 0.008, 0.11);
@@ -145,23 +174,21 @@ export function updateConfetti(dt) {
     p.mesh.position.y += p.vy * dt;
     p.mesh.position.z += p.vz * dt;
 
-    // Spin — damp out as it approaches the floor
-    const spinDamp = Math.max(
-      0,
-      Math.min(1, (p.mesh.position.y - FLOOR_Y) * 2),
-    );
+    // Spin — damp out as piece approaches its landing surface
+    const surfY = landingY(p.mesh.position.x, p.mesh.position.z);
+    const spinDamp = Math.max(0, Math.min(1, (p.mesh.position.y - surfY) * 2));
     p.mesh.rotation.x += p.ax * p.spinSpeed * spinDamp * dt;
     p.mesh.rotation.y += p.ay * p.spinSpeed * spinDamp * dt;
     p.mesh.rotation.z += p.az * p.spinSpeed * spinDamp * dt;
 
-    // Land — freeze at floor level and stay visible forever
-    if (p.mesh.position.y <= FLOOR_Y) {
-      p.mesh.position.y = FLOOR_Y;
+    // Land — freeze on whichever surface is below, stay visible forever
+    if (p.mesh.position.y <= surfY) {
+      p.mesh.position.y = surfY;
       p.vy = 0;
       p.vx = 0;
       p.vz = 0;
       p.spinSpeed = 0;
-      p.active = false; // no longer needs physics, but mesh stays
+      p.active = false; // physics done, mesh stays visible
     }
   }
 }
