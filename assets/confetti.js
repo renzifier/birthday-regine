@@ -43,11 +43,6 @@ const SPAWN_Y = 9.5;
 
 const SURFACES = [
   {
-    label: "cake",
-    y: 4.5,
-    test: (x, z) => x * x + z * z < 1.1 * 1.1, // cylinder radius ~1.1
-  },
-  {
     label: "table",
     y: 0.67,
     test: (x, z) => Math.abs(x) <= 8.55 && Math.abs(z) <= 5.85,
