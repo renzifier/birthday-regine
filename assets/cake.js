@@ -72,16 +72,16 @@ const ribbonDarkMat = new THREE.MeshStandardMaterial({
 // ════════════════════════════════════════
 //  CAKE DIMENSIONS
 // ════════════════════════════════════════
-const TIER_R = 1.3; // radius — wide & squat like the reference
-const TIER_H = 1.3; // height
+const TIER_R = 0.92; // radius — smaller bento cake
+const TIER_H = 0.92; // height — squat & compact like reference
 const PLATE_Y = 0.04;
-const TIER_Y = PLATE_Y + TIER_H / 2; // = 0.69
-const TOP_Y = PLATE_Y + TIER_H; // = 1.34  (top surface level)
+const TIER_Y = PLATE_Y + TIER_H / 2; // = 0.50
+const TOP_Y = PLATE_Y + TIER_H; // = 0.96  (top surface level)
 
 // ════════════════════════════════════════
 //  PLATE
 // ════════════════════════════════════════
-addLayer(new THREE.CylinderGeometry(1.68, 1.68, 0.08, 56), plateMat, PLATE_Y);
+addLayer(new THREE.CylinderGeometry(1.19, 1.19, 0.08, 56), plateMat, PLATE_Y);
 
 // ════════════════════════════════════════
 //  MAIN CAKE BODY
@@ -235,15 +235,16 @@ function addShellRing(radius, y, count, shellR, tiltX) {
 }
 
 // Top border — shells tilting inward/downward slightly
-addShellRing(TIER_R - 0.02, TOP_Y + 0.075, 24, 0.2, -0.22);
+addShellRing(TIER_R - 0.02, TOP_Y + 0.06, 20, 0.155, -0.22);
 
 // Base border — shells flaring outward/upward
-addShellRing(TIER_R - 0.02, PLATE_Y + 0.22, 24, 0.2, 0.26);
+addShellRing(TIER_R - 0.02, PLATE_Y + 0.16, 20, 0.155, 0.26);
 
 // ════════════════════════════════════════
 //  RED RIBBON BOWS  — 6 evenly spaced
-//  Each bow: two oval loops + centre knot
-//  + two hanging tails with gentle curve
+//  Loops built with TorusGeometry so the
+//  centre is hollow — reads as a real
+//  folded satin ribbon loop from any angle.
 // ════════════════════════════════════════
 function addBow(angle, y) {
   const bx = Math.cos(angle) * (TIER_R + 0.005);
@@ -252,56 +253,55 @@ function addBow(angle, y) {
   const grp = new THREE.Group();
   grp.position.set(bx, y, bz);
   grp.rotation.y = angle + Math.PI;
+  // Local axes after rotation:
+  //   +X → tangential (left/right along cake edge)
+  //   +Y → up
+  //   +Z → outward from cake surface  ← viewer looks along –Z
 
-  // ── Loops ──
-  // Large satin loops matching reference: each loop ~0.35 units wide,
-  // nearly round in profile, flat in depth (satin ribbon look).
+  // ── Loops — Torus ring faces outward (+Z) by default ──
   for (const side of [-1, 1]) {
-    // Main loop — big round oval, flat Z for flat-ribbon appearance
     const loop = new THREE.Mesh(
-      new THREE.SphereGeometry(0.2, 14, 10),
+      new THREE.TorusGeometry(0.105, 0.034, 9, 24),
       ribbonMat,
     );
-    loop.scale.set(0.9, 0.88, 0.22); // ~0.36 wide × 0.35 tall × 0.088 deep
-    loop.position.set(side * 0.24, 0.02, -0.014);
-    loop.rotation.z = side * 0.26;
-    loop.rotation.x = -0.1;
+    // Oval: slightly taller than wide; flat in Z (satin ribbon depth)
+    loop.scale.set(0.88, 1.15, 0.3);
+    loop.position.set(side * 0.14, 0.05, 0.0);
+    loop.rotation.z = side * 0.2;
     grp.add(loop);
 
-    // Inner crease shadow — slightly smaller, darker, recessed
-    const crease = new THREE.Mesh(
-      new THREE.SphereGeometry(0.13, 10, 8),
-      ribbonDarkMat,
+    // Highlight torus — slightly brighter inner ring for sheen
+    const shine = new THREE.Mesh(
+      new THREE.TorusGeometry(0.072, 0.018, 7, 20),
+      ribbonMat,
     );
-    crease.scale.set(0.76, 0.74, 0.18);
-    crease.position.set(side * 0.22, 0.01, -0.005);
-    crease.rotation.z = side * 0.26;
-    grp.add(crease);
+    shine.scale.set(0.88, 1.15, 0.28);
+    shine.position.set(side * 0.14, 0.05, 0.004);
+    shine.rotation.z = side * 0.2;
+    grp.add(shine);
   }
 
-  // ── Centre knot — thick squarish oval ──
+  // ── Centre knot ──
   const knot = new THREE.Mesh(
-    new THREE.SphereGeometry(0.082, 10, 9),
+    new THREE.SphereGeometry(0.055, 10, 9),
     ribbonMat,
   );
-  knot.scale.set(0.78, 0.72, 0.44);
+  knot.scale.set(0.82, 0.7, 0.48);
   grp.add(knot);
 
   // ── Two hanging ribbon tails ──
-  // Tails fall from the knot to near the cake base — long and gently curved.
-  // Tube radius 0.026 gives a wide, visible ribbon strip.
   for (const side of [-1, 1]) {
     const tailPts = [
-      new THREE.Vector3(side * 0.055, 0.0, 0.0),
-      new THREE.Vector3(side * 0.085, -0.22, 0.028),
-      new THREE.Vector3(side * 0.065, -0.46, 0.042),
-      new THREE.Vector3(side * 0.092, -0.68, 0.036),
+      new THREE.Vector3(side * 0.042, 0.0, 0.0),
+      new THREE.Vector3(side * 0.065, -0.16, 0.018),
+      new THREE.Vector3(side * 0.05, -0.32, 0.028),
+      new THREE.Vector3(side * 0.07, -0.46, 0.022),
     ];
     const tail = new THREE.Mesh(
       new THREE.TubeGeometry(
         new THREE.CatmullRomCurve3(tailPts),
         14,
-        0.026, // wider tube → more visible satin ribbon
+        0.02,
         6,
         false,
       ),
@@ -309,14 +309,14 @@ function addBow(angle, y) {
     );
     grp.add(tail);
 
-    // Diagonal-cut ribbon end (V-notch look via two angled planes)
+    // V-notch ribbon end
     for (const notch of [-1, 1]) {
       const tip = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.028, 0.072),
+        new THREE.PlaneGeometry(0.022, 0.055),
         ribbonMat,
       );
-      tip.position.set(side * 0.095, -0.73 + notch * 0.018, 0.036);
-      tip.rotation.z = side * 0.28 + notch * 0.18;
+      tip.position.set(side * 0.072, -0.495 + notch * 0.014, 0.022);
+      tip.rotation.z = side * 0.28 + notch * 0.15;
       grp.add(tip);
     }
   }
@@ -324,8 +324,8 @@ function addBow(angle, y) {
   cakeGroup.add(grp);
 }
 
-// 6 bows — placed slightly above mid-height so tails reach the base border
-const BOW_Y = PLATE_Y + TIER_H * 0.6;
+// 6 bows at 60° intervals — tails reach the base scallop border
+const BOW_Y = PLATE_Y + TIER_H * 0.62;
 for (let i = 0; i < 6; i++) {
   addBow((i / 6) * Math.PI * 2, BOW_Y);
 }
@@ -363,7 +363,7 @@ for (let i = 0; i < 6; i++) {
   });
 
   // 18 hearts at 3 height levels, offset from bow angles
-  const OFFSETS = [0.33, 0.68, 1.04];
+  const OFFSETS = [0.22, 0.48, 0.74];
   for (let i = 0; i < 18; i++) {
     const a = (i / 18) * Math.PI * 2 + 0.52; // rotated between bows
     const yOff = OFFSETS[i % 3];
@@ -415,7 +415,7 @@ for (let i = 0; i < 6; i++) {
   const CANDLE_X = 0.06;
   const CANDLE_Z = 0.04;
   const CANDLE_BASE_Y = TOP_Y + 0.055;
-  const CANDLE_LEN = 1.55;
+  const CANDLE_LEN = 1.1;
   const TILT_Z = 0.07; // slight lean
 
   const candle = new THREE.Mesh(
