@@ -56,6 +56,20 @@ canvas {
   }
 }
 
+/* ── Bottom hint ── */
+#hint {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: clamp(10px, 2.5vw, 12px);
+  font-family: monospace;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ── Intro screen ── */
 #introScreen {
   position: fixed;
   inset: 0;
@@ -90,7 +104,6 @@ canvas {
   position: relative;
 }
 
-/* macOS-style title bar dots */
 #introTerminal::before {
   content: "● ● ●";
   position: absolute;
@@ -108,36 +121,26 @@ canvas {
 #introLines .line {
   display: block;
   color: #ffffff;
-  text-shadow: none;
   white-space: pre;
   min-height: 1.75em;
 }
-
 #introLines .line.dim {
   color: #888;
-  text-shadow: none;
 }
-
 #introLines .line.bright {
   color: #ffffff;
-  text-shadow: none;
   font-weight: bold;
 }
-
 #introLines .line.pink {
   color: #ff6aac;
-  text-shadow: none;
 }
-
 #introLines .line.white {
   color: #ffffff;
-  text-shadow: none;
 }
 
 #introCursor {
   display: inline-block;
   color: #ffffff;
-  text-shadow: none;
   animation: blink 0.75s step-end infinite;
   font-family: "Courier New", Courier, monospace;
   font-size: clamp(13px, 1.6vw, 16px);
@@ -145,7 +148,6 @@ canvas {
   margin-left: 1px;
 }
 
-/* ── Continue hint ── */
 #continueHint {
   display: none;
   font-family: "Courier New", Courier, monospace;
@@ -182,135 +184,6 @@ canvas {
   }
 }
 
-body {
-  background: #000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  font-family: monospace;
-}
-
-#wrap {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-}
-
-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-/* FIX 5: #ui styles removed — no matching <div id="ui"> exists in index.html */
-
-/* ── Bottom hint ── */
-#hint {
-  position: absolute;
-  bottom: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: rgba(255, 255, 255, 0.35);
-  font-size: clamp(10px, 2.5vw, 12px);
-  font-family: monospace;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-/* ── Card overlay ──
-   FIX: use visibility + opacity instead of display:none → display:flex
-   so the CSS transition actually plays (display can't be transitioned).
-*/
-#cardOverlay {
-  visibility: hidden;
-  opacity: 0;
-  transition:
-    opacity 0.25s ease,
-    visibility 0.25s ease;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#cardOverlay.open {
-  visibility: visible;
-  opacity: 1;
-}
-
-#cardOverlayInner {
-  position: relative;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
-  /* pop-in still works because it fires on the child, not the overlay */
-  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  /* only run animation when overlay is open */
-  animation-play-state: paused;
-}
-
-#cardOverlay.open #cardOverlayInner {
-  animation-play-state: running;
-}
-
-@keyframes popIn {
-  from {
-    transform: scale(0.7);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-#cardImg {
-  display: block;
-  width: min(320px, 88vw);
-  height: auto;
-  aspect-ratio: 4 / 5;
-}
-
-#closeCard {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background: rgba(255, 255, 255, 0.85);
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  font-size: 16px;
-  cursor: pointer;
-  line-height: 32px;
-  text-align: center;
-  color: #cc4477;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-#closeCard:hover {
-  background: #fff;
-}
-
-/* Click hint on card */
-#cardHint {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 12px;
-  font-family: monospace;
-  pointer-events: none;
-  white-space: nowrap;
-  animation: pulse 2s ease-in-out infinite;
-}
-
 @keyframes pulse {
   0%,
   100% {
@@ -321,28 +194,279 @@ canvas {
   }
 }
 
-/* ── Mobile-specific tweaks ── */
+/* ════════════════════════════════════════
+   ENVELOPE OVERLAY
+   ════════════════════════════════════════ */
+
+#envOverlay {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#envOverlay.open {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Close button */
+#closeEnv {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 17px;
+  cursor: pointer;
+  line-height: 36px;
+  text-align: center;
+  color: #cc4477;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  z-index: 10;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+#closeEnv:hover {
+  background: #fff;
+  transform: scale(1.08);
+}
+
+/* Hint text */
+.env-hint {
+  text-align: center;
+  color: rgba(255, 220, 235, 0.72);
+  font-family: "Courier New", Courier, monospace;
+  font-size: 13px;
+  margin-top: 18px;
+  pointer-events: none;
+  animation: pulse 2s ease-in-out infinite;
+  letter-spacing: 0.04em;
+}
+
+/* ── envScene — fades out when card is pulled ── */
+#envScene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity 0.35s ease;
+}
+#envScene.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── envWrap — the whole envelope assembly ── */
+#envWrap {
+  position: relative;
+  /* envelope size: matches roughly 3:2 landscape ratio */
+  width: min(380px, 88vw);
+  height: min(266px, 61.6vw);
+  cursor: pointer;
+  animation: floatIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  filter: drop-shadow(0 18px 40px rgba(180, 20, 80, 0.35));
+}
+
+@keyframes floatIn {
+  from {
+    transform: scale(0.7) translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+  }
+}
+
+/* ── Envelope body (lower portion) ── z-index 2 so it sits over card */
+#envBody {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
+
+  /* Pink gradient body */
+  background: linear-gradient(160deg, #ffb3d1 0%, #ff6aac 55%, #e8186c 100%);
+  box-shadow:
+    inset 0 -3px 12px rgba(255, 255, 255, 0.18),
+    inset 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Envelope V-fold lines on body */
+#envBody::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.18) 0 49.9%,
+      transparent 50% 100%
+    ),
+    linear-gradient(
+      225deg,
+      rgba(255, 255, 255, 0.12) 0 49.9%,
+      transparent 50% 100%
+    );
+  pointer-events: none;
+}
+
+/* Heart seal on body */
+#envSeal {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(180, 0, 60, 0.55);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  filter: drop-shadow(0 1px 3px rgba(220, 50, 100, 0.7));
+  user-select: none;
+}
+
+/* ── Flap container — clips the folding flap ── */
+#envFlapOuter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* flap covers top ~52% of envelope */
+  height: 52%;
+  overflow: hidden;
+  z-index: 3;
+  pointer-events: none;
+  /* perspective for 3-D fold */
+  perspective: 600px;
+  perspective-origin: 50% 100%;
+}
+
+/* ── Flap — the triangle that folds back ── */
+#envFlap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200%; /* tall enough to contain the triangle even after fold */
+  transform-origin: 50% 100%; /* fold from its bottom edge = envelope top crease */
+  transform: rotateX(0deg);
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  backface-visibility: hidden;
+
+  /* Triangle via clip-path */
+  clip-path: polygon(0% 0%, 100% 0%, 50% 50%);
+  background: linear-gradient(175deg, #ffd6ea 0%, #ff8fc2 60%, #e8186c 100%);
+  box-shadow: 0 4px 12px rgba(180, 0, 60, 0.22);
+}
+
+/* Flap open: fold back 180° */
+#envFlap.open {
+  transform: rotateX(180deg);
+}
+
+/* ── Card inside the envelope ──
+   z:1 so envelope body (z:2) covers lower half,
+   giving the illusion it sits inside.              */
+#cardInEnv {
+  position: absolute;
+  /* card positioned so top third peeks above envelope body */
+  left: 50%;
+  top: 6%;
+  transform: translateX(-50%) translateY(0px);
+  z-index: 1;
+  width: 58%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  cursor: grab;
+  touch-action: none;
+  display: none; /* shown by JS after flap opens */
+  user-select: none;
+}
+#cardInEnv:active {
+  cursor: grabbing;
+}
+
+#cardInEnv img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ── Full card view (stage 3) ── */
+#cardFullView {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+#cardFullView.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+#cardFullView img {
+  width: min(320px, 88vw);
+  height: auto;
+  aspect-ratio: 4 / 5;
+  border-radius: 18px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.75) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+  }
+}
+
+/* ── Mobile tweaks ── */
 @media (max-width: 600px) {
   #introTerminal {
     padding: 24px 18px 20px;
     border-radius: 8px;
   }
-
   #introTerminal::before {
     font-size: 9px;
     letter-spacing: 4px;
   }
-
-  #cardOverlayInner {
-    border-radius: 12px;
-  }
-
   #hint {
     bottom: max(14px, env(safe-area-inset-bottom));
   }
+  #envSeal {
+    font-size: 26px;
+  }
 }
 
-/* Safe area insets for notched phones */
 @supports (padding: env(safe-area-inset-bottom)) {
   #hint {
     bottom: calc(14px + env(safe-area-inset-bottom));

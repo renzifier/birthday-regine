@@ -21,20 +21,22 @@
       <canvas id="c"></canvas>
       <div id="hint">
         <span class="hint-desktop"
-          >drag to orbit · scroll to zoom · click the card 💌</span
+          >drag to orbit · scroll to zoom · click the envelope 💌</span
         ><span class="hint-mobile"
-          >drag to orbit · pinch to zoom · tap the card 💌</span
+          >drag to orbit · pinch to zoom · tap the envelope 💌</span
         >
       </div>
     </div>
 
-    <!-- ── Birthday music — swap src for your audio file ── -->
+    <!-- ── Birthday music ── -->
     <audio
       id="bgMusic"
       src="assets/hindi mo lang alam.mp3"
       loop
       preload="auto"
     ></audio>
+
+    <!-- ── Intro terminal ── -->
     <div id="introScreen">
       <div id="introTerminal">
         <div id="introLines"></div>
@@ -46,16 +48,48 @@
       </div>
     </div>
 
-    <div id="cardOverlay">
-      <div id="cardOverlayInner">
-        <img id="cardImg" src="" alt="Birthday Card" />
-        <button id="closeCard">✕</button>
-        <span id="cardHint">press Esc or click outside to close</span>
+    <!-- ══════════════════════════════════════
+         ENVELOPE OVERLAY
+         Stage 1: closed envelope  (tap to open)
+         Stage 2: flap opens       (animated)
+         Stage 3: drag card out    (pointerdown/move/up)
+    ═══════════════════════════════════════ -->
+    <div id="envOverlay">
+      <!-- Always-visible close button -->
+      <button id="closeEnv" aria-label="Close">✕</button>
+
+      <!-- Stages 1 & 2: the envelope itself -->
+      <div id="envScene">
+        <div id="envWrap">
+          <!-- Flap — sits above body, folds back on open -->
+          <div id="envFlapOuter">
+            <div id="envFlap"></div>
+          </div>
+
+          <!-- Card — behind body (z:1), shown after flap opens, draggable -->
+          <div id="cardInEnv" role="img" aria-label="Birthday card">
+            <img id="cardPullImg" alt="Birthday Card" draggable="false" />
+          </div>
+
+          <!-- Envelope body — covers lower portion of card (z:2) -->
+          <div id="envBody">
+            <span id="envSeal" aria-hidden="true">♥</span>
+          </div>
+        </div>
+        <p id="envHint" class="env-hint" aria-live="polite">tap to open</p>
+      </div>
+
+      <!-- Stage 3: full card view (after drag-out) -->
+      <div id="cardFullView" aria-hidden="true">
+        <img id="cardFullImg" alt="Birthday Card" />
+        <p class="env-hint">press Esc · tap outside to close</p>
       </div>
     </div>
+    <!-- /#envOverlay -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
     <!-- ── Terminal intro script ── -->
     <script>
       (function () {
@@ -63,7 +97,6 @@
         const linesEl = document.getElementById("introLines");
         const cursor = document.getElementById("introCursor");
 
-        // ── Script to type out ──────────────────
         const SCRIPT = [
           { text: "BIRTHDAY.EXE", cls: "dim", delay: 0, charDelay: 60 },
           { text: "", cls: "white", delay: 320, charDelay: 0 },
@@ -93,6 +126,12 @@
           },
           {
             text: "> Inflating balloons...........  OK",
+            cls: "dim",
+            delay: 80,
+            charDelay: 22,
+          },
+          {
+            text: "> Sealing envelope.............  OK",
             cls: "dim",
             delay: 80,
             charDelay: 22,
@@ -128,23 +167,17 @@
           },
         ];
 
-        // Total time before scene reveals (ms after last line finishes)
-        const HOLD_AFTER = 900;
-        const FADE_DELAY = 300;
-
         let lineIndex = 0;
 
         function typeNextLine() {
           if (lineIndex >= SCRIPT.length) {
-            // All lines done — show continue hint, wait for click/tap
             cursor.style.display = "none";
             const hint = document.getElementById("continueHint");
             hint.style.display = "block";
 
             function dismiss() {
-              // Play audio on the user gesture — browsers require this
               const music = document.getElementById("bgMusic");
-              music.play().catch(() => {}); // silently ignore if blocked
+              music.play().catch(() => {});
               screen.classList.add("fade-out");
               setTimeout(() => {
                 screen.style.display = "none";
@@ -170,16 +203,12 @@
             const span = document.createElement("span");
             span.className = "line " + entry.cls;
             linesEl.appendChild(span);
-
-            // Move cursor after this line's span
             linesEl.after(cursor);
 
             if (entry.charDelay === 0 || entry.text === "") {
-              // Instant line
               span.textContent = entry.text;
               typeNextLine();
             } else {
-              // Type character by character
               let ci = 0;
               function typeChar() {
                 if (ci < entry.text.length) {
@@ -200,12 +229,10 @@
           }, entry.delay);
         }
 
-        // Kick off after a short boot pause
         setTimeout(typeNextLine, 400);
       })();
     </script>
 
-    <!-- ES module entry point — all scene logic lives in assets/main.js -->
     <script type="module" src="assets/main.js"></script>
   </body>
 </html>

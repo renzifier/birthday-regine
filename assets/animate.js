@@ -2,7 +2,7 @@
 //  animate.js
 //  Frame loop: candle flicker, flame scale,
 //  smoke drift, orbit controls.
-//  Also owns click / touch → card open
+//  Also owns click / touch → envelope open
 //  via raycasting.
 //  NEW: blow-to-extinguish candles via mic.
 // ─────────────────────────────────────────
@@ -11,7 +11,7 @@ import { CONFIG } from "./config.js";
 import { candleLight } from "./lights.js";
 import { cityBackLight } from "./background.js";
 import { flameMeshes, perFlameLights, smokeSystems } from "./cake.js";
-import { cardHit, openCard } from "./card.js";
+import { envelopeHit, openEnvelope } from "./card.js";
 import { initBlow, onBlow } from "./blow.js";
 import { launchConfetti, updateConfetti, clearConfetti } from "./confetti.js";
 
@@ -26,10 +26,10 @@ controls.minPolarAngle = CONFIG.controls.minPhi;
 controls.maxPolarAngle = CONFIG.controls.maxPhi;
 controls.update();
 
-// ── Raycaster — card click / tap ──────────
+// ── Raycaster — envelope click / tap ──────
 const raycaster = new THREE.Raycaster();
 
-function hitTestCard(clientX, clientY) {
+function hitTestEnvelope(clientX, clientY) {
   raycaster.setFromCamera(
     new THREE.Vector2(
       (clientX / window.innerWidth) * 2 - 1,
@@ -37,7 +37,7 @@ function hitTestCard(clientX, clientY) {
     ),
     camera,
   );
-  return raycaster.intersectObject(cardHit).length > 0;
+  return raycaster.intersectObject(envelopeHit).length > 0;
 }
 
 let pointerDownX = 0;
@@ -49,7 +49,8 @@ canvas.addEventListener("pointerdown", (e) => {
 canvas.addEventListener("click", (e) => {
   const dx = e.clientX - pointerDownX;
   const dy = e.clientY - pointerDownY;
-  if (Math.hypot(dx, dy) < 5 && hitTestCard(e.clientX, e.clientY)) openCard();
+  if (Math.hypot(dx, dy) < 5 && hitTestEnvelope(e.clientX, e.clientY))
+    openEnvelope();
   // Relight candles on any click when out
   if (flameState === "out") {
     flameState = "relighting";
@@ -82,25 +83,20 @@ canvas.addEventListener("touchend", (e) => {
       flameT = 0;
       clearConfetti();
       _hideRelightHint();
-    } else if (hitTestCard(touch.clientX, touch.clientY)) {
+    } else if (hitTestEnvelope(touch.clientX, touch.clientY)) {
       e.preventDefault();
-      openCard();
+      openEnvelope();
     }
   }
 });
 
 // ── Flame state machine ───────────────────
-//  'lit'        — normal flickering
-//  'blowing'    — flame bending before going out
-//  'out'        — extinguished
-//  'relighting' — growing back on click
 let flameState = "lit";
 let flameT = 0;
 
-const EXTINGUISH_DUR = 0.55; // seconds
+const EXTINGUISH_DUR = 0.55;
 const RELIGHT_DUR = 0.7;
 
-// Start mic blow detection
 initBlow();
 
 onBlow(() => {
@@ -149,34 +145,30 @@ function _hideRelightHint() {
 const clock = new THREE.Clock();
 
 export function startAnimation() {
-  // Update hint text to mention blowing
   const hint = document.getElementById("hint");
   if (hint) {
     hint.innerHTML =
-      '<span class="hint-desktop">🎂 Blow into your mic to extinguish · drag to orbit · click the card</span>' +
-      '<span class="hint-mobile">🎂 Blow into your mic · drag to orbit · tap the card</span>';
+      '<span class="hint-desktop">🎂 Blow into your mic to extinguish · drag to orbit · click the envelope</span>' +
+      '<span class="hint-mobile">🎂 Blow into your mic · drag to orbit · tap the envelope</span>';
   }
 
   let lastT = 0;
   (function loop() {
     requestAnimationFrame(loop);
     const t = clock.getElapsedTime();
-    const dt = Math.min(t - lastT, 0.05); // cap at 50ms to avoid spiral on tab-switch
+    const dt = Math.min(t - lastT, 0.05);
     lastT = t;
 
     controls.update();
 
-    // ── Advance transition progress ──────
     if (flameState !== "lit") {
       const dur = flameState === "relighting" ? RELIGHT_DUR : EXTINGUISH_DUR;
       flameT = Math.min(1, flameT + dt / dur);
       if (flameState === "relighting" && flameT >= 1) flameState = "lit";
     }
 
-    // ── Confetti ─────────────────────────
     updateConfetti(dt);
 
-    // ── Derive flame scale multiplier ────
     let flameScaleY, flameScaleX, lightMult;
 
     if (flameState === "lit") {
@@ -184,23 +176,21 @@ export function startAnimation() {
       flameScaleX = 1.0;
       lightMult = 1.0;
     } else if (flameState === "blowing") {
-      flameScaleY = 0.5 + Math.sin(t * 30) * 0.25; // frantic flicker
-      flameScaleX = 1.5; // blown sideways
+      flameScaleY = 0.5 + Math.sin(t * 30) * 0.25;
+      flameScaleX = 1.5;
       lightMult = 0.35 + Math.random() * 0.3;
     } else if (flameState === "out") {
-      const ease = 1 - flameT * flameT; // ease-out to zero
+      const ease = 1 - flameT * flameT;
       flameScaleY = ease;
       flameScaleX = ease * 0.7;
       lightMult = ease;
     } else {
-      // relighting
-      const ease = flameT * (2 - flameT); // ease-in
+      const ease = flameT * (2 - flameT);
       flameScaleY = ease;
       flameScaleX = ease;
       lightMult = ease;
     }
 
-    // ── Candle flicker ───────────────────
     const baseIntensity =
       CONFIG.candle.minIntensity +
       Math.max(
@@ -214,16 +204,13 @@ export function startAnimation() {
       candleLight.position.z = Math.sin(t * 6.3) * 0.12;
     }
 
-    // ── Per-flame lights ─────────────────
     for (const pfl of perFlameLights) {
       pfl.light.intensity =
         (0.3 + Math.max(0, Math.sin(t * 9.3 + pfl.offset) * 0.18)) * lightMult;
     }
 
-    // ── Background light pulse ───────────
     cityBackLight.intensity = 0.6 + Math.sin(t * 0.12) * 0.15;
 
-    // ── Flame meshes ─────────────────────
     for (const ff of flameMeshes) {
       const normalSY = 1.65 + Math.sin(t * 9.0 + ff.offset) * 0.28;
       const normalSX = 0.58 + Math.sin(t * 11.5 + ff.offset) * 0.1;
@@ -235,7 +222,6 @@ export function startAnimation() {
       );
     }
 
-    // ── Smoke drift ──────────────────────
     for (const ss of smokeSystems) {
       const pos = ss.geo.attributes.position.array;
       for (let sp = 0; sp < 18; sp++) {
@@ -249,7 +235,6 @@ export function startAnimation() {
       }
       ss.geo.attributes.position.needsUpdate = true;
 
-      // Smoke puffs up more right after blowing out
       const smokeBoost = flameState === "out" ? Math.min(1, flameT * 2.5) : 0;
       ss.pts.material.opacity =
         0.14 + Math.sin(t * 0.6 + ss.phase) * 0.06 + smokeBoost * 0.25;
