@@ -126,12 +126,12 @@ addLayer(
 
   // ── tiny red hearts — rim only, clear of the text ──
   const HEART_POS = [
-    [80, 160],
-    [432, 155],
-    [256, 88],
-    [256, 418],
-    [92, 285],
-    [424, 278],
+    [80, 155],
+    [432, 150],
+    [256, 82],
+    [256, 430],
+    [76, 220],
+    [436, 215],
   ];
   function drawHeart(ctx, cx, cy, r) {
     ctx.save();
