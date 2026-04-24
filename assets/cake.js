@@ -242,9 +242,9 @@ addShellRing(TIER_R - 0.02, PLATE_Y + 0.16, 20, 0.155, 0.26);
 
 // ════════════════════════════════════════
 //  RED RIBBON BOWS  — 6 evenly spaced
-//  Loops built with TorusGeometry so the
-//  centre is hollow — reads as a real
-//  folded satin ribbon loop from any angle.
+//  Bow knot sits near the top of the cake
+//  so loops rise above the rim, tails fall
+//  in a wide uniform V to the base border.
 // ════════════════════════════════════════
 function addBow(angle, y) {
   const bx = Math.cos(angle) * (TIER_R + 0.005);
@@ -253,55 +253,53 @@ function addBow(angle, y) {
   const grp = new THREE.Group();
   grp.position.set(bx, y, bz);
   grp.rotation.y = angle + Math.PI;
-  // Local axes after rotation:
-  //   +X → tangential (left/right along cake edge)
-  //   +Y → up
-  //   +Z → outward from cake surface  ← viewer looks along –Z
+  // Local axes: +X tangential, +Y up, +Z outward (viewer looks along –Z)
 
-  // ── Loops — Torus ring faces outward (+Z) by default ──
+  // ── Loops — tall torus ovals that rise above the cake rim ──
   for (const side of [-1, 1]) {
     const loop = new THREE.Mesh(
-      new THREE.TorusGeometry(0.105, 0.034, 9, 24),
+      new THREE.TorusGeometry(0.118, 0.036, 9, 26),
       ribbonMat,
     );
-    // Oval: slightly taller than wide; flat in Z (satin ribbon depth)
-    loop.scale.set(0.88, 1.15, 0.3);
-    loop.position.set(side * 0.14, 0.05, 0.0);
-    loop.rotation.z = side * 0.2;
+    // Tall oval: Y scale ~1.6 so loops are noticeably taller than wide
+    loop.scale.set(0.82, 1.58, 0.28);
+    loop.position.set(side * 0.148, 0.1, 0.0);
+    loop.rotation.z = side * 0.18;
     grp.add(loop);
 
-    // Highlight torus — slightly brighter inner ring for sheen
+    // Inner highlight ring for satin sheen
     const shine = new THREE.Mesh(
-      new THREE.TorusGeometry(0.072, 0.018, 7, 20),
+      new THREE.TorusGeometry(0.078, 0.019, 7, 22),
       ribbonMat,
     );
-    shine.scale.set(0.88, 1.15, 0.28);
-    shine.position.set(side * 0.14, 0.05, 0.004);
-    shine.rotation.z = side * 0.2;
+    shine.scale.set(0.82, 1.58, 0.26);
+    shine.position.set(side * 0.148, 0.1, 0.005);
+    shine.rotation.z = side * 0.18;
     grp.add(shine);
   }
 
   // ── Centre knot ──
   const knot = new THREE.Mesh(
-    new THREE.SphereGeometry(0.055, 10, 9),
+    new THREE.SphereGeometry(0.058, 10, 9),
     ribbonMat,
   );
-  knot.scale.set(0.82, 0.7, 0.48);
+  knot.scale.set(0.85, 0.68, 0.5);
   grp.add(knot);
 
-  // ── Two hanging ribbon tails ──
+  // ── Tails — wide spreading V, fall to near base border ──
+  // X offset grows steadily so tails fan out uniformly.
   for (const side of [-1, 1]) {
     const tailPts = [
-      new THREE.Vector3(side * 0.042, 0.0, 0.0),
-      new THREE.Vector3(side * 0.065, -0.16, 0.018),
-      new THREE.Vector3(side * 0.05, -0.32, 0.028),
-      new THREE.Vector3(side * 0.07, -0.46, 0.022),
+      new THREE.Vector3(side * 0.038, 0.0, 0.0),
+      new THREE.Vector3(side * 0.095, -0.15, 0.016),
+      new THREE.Vector3(side * 0.135, -0.34, 0.026),
+      new THREE.Vector3(side * 0.155, -0.56, 0.018),
     ];
     const tail = new THREE.Mesh(
       new THREE.TubeGeometry(
         new THREE.CatmullRomCurve3(tailPts),
-        14,
-        0.02,
+        16,
+        0.021,
         6,
         false,
       ),
@@ -312,11 +310,11 @@ function addBow(angle, y) {
     // V-notch ribbon end
     for (const notch of [-1, 1]) {
       const tip = new THREE.Mesh(
-        new THREE.PlaneGeometry(0.022, 0.055),
+        new THREE.PlaneGeometry(0.024, 0.058),
         ribbonMat,
       );
-      tip.position.set(side * 0.072, -0.495 + notch * 0.014, 0.022);
-      tip.rotation.z = side * 0.28 + notch * 0.15;
+      tip.position.set(side * 0.16, -0.595 + notch * 0.015, 0.018);
+      tip.rotation.z = side * 0.3 + notch * 0.15;
       grp.add(tip);
     }
   }
@@ -324,8 +322,8 @@ function addBow(angle, y) {
   cakeGroup.add(grp);
 }
 
-// 6 bows at 60° intervals — tails reach the base scallop border
-const BOW_Y = PLATE_Y + TIER_H * 0.62;
+// Bows near the top of the cake — loops breach the rim, tails reach the base
+const BOW_Y = PLATE_Y + TIER_H * 0.82;
 for (let i = 0; i < 6; i++) {
   addBow((i / 6) * Math.PI * 2, BOW_Y);
 }
