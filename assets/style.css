@@ -277,8 +277,6 @@ canvas {
   height: min(266px, 61.6vw);
   cursor: pointer;
   animation: floatIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  overflow: hidden;
-  border-radius: 10px;
   /* NOTE: drop-shadow filter removed — it flattens z-index stacking inside,
      causing the card to appear behind the pocket. Shadow moved to #envBody. */
 }
@@ -399,14 +397,28 @@ canvas {
   transform: rotateX(180deg);
 }
 
+/* ── Card clip wrapper — clips card so it cannot escape above the envelope opening ── */
+#cardClip {
+  position: absolute;
+  /* The flap crease sits at ~42% from top of envWrap.
+     We clip to show only from that crease downward. */
+  top: 42%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* ── Card inside the envelope ──
-   z:1 so pocket (z:2) covers bottom edge.
-   Card starts fully inside envelope; drag pulls it up. */
+   Positioned relative to #cardClip.
+   z:1 (cardClip) sits below pocket (z:2). */
 #cardInEnv {
   position: absolute;
   left: 50%;
-  /* seated inside — top of card sits just below flap crease */
-  top: 22%;
+  /* start at top of clip area = card top visible at flap crease */
+  top: 0;
   transform: translateX(-50%) translateY(0px);
   z-index: 1;
   width: 62%;
@@ -417,6 +429,7 @@ canvas {
   touch-action: none;
   display: none; /* shown by JS after flap opens */
   user-select: none;
+  pointer-events: auto;
 }
 #cardInEnv:active {
   cursor: grabbing;

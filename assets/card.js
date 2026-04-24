@@ -591,6 +591,7 @@ const envScene = document.getElementById("envScene");
 const envWrap = document.getElementById("envWrap");
 const envFlap = document.getElementById("envFlap");
 const envSeal = document.getElementById("envSeal");
+const cardClip = document.getElementById("cardClip");
 const cardInEnv = document.getElementById("cardInEnv");
 const cardPullImg = document.getElementById("cardPullImg");
 const envHint = document.getElementById("envHint");
@@ -609,6 +610,7 @@ export function openEnvelope() {
   // Reset all states
   envFlap.classList.remove("open");
   cardInEnv.style.cssText = "";
+  if (cardClip) cardClip.style.display = "none";
   cardInEnv.style.display = "none";
   envScene.classList.remove("hidden");
   cardFullView.classList.remove("visible");
@@ -654,15 +656,16 @@ envWrap.addEventListener("click", (e) => {
   // After flap animation: reveal card peeking
   setTimeout(() => {
     stage = "open";
+    if (cardClip) cardClip.style.display = "block";
     cardInEnv.style.display = "block";
-    cardInEnv.style.transform = "translateX(-50%) translateY(0px)"; // fully inside
+    cardInEnv.style.transform = "translateX(-50%) translateY(0px)";
 
     // Slight delay then peek card up
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         cardInEnv.style.transition =
           "transform 0.45s cubic-bezier(0.34,1.56,0.64,1)";
-        cardInEnv.style.transform = "translateX(-50%) translateY(-30px)";
+        cardInEnv.style.transform = "translateX(-50%) translateY(0px)";
         setTimeout(() => {
           cardInEnv.style.transition = "";
           envHint.textContent = "drag the card out  ↑";
@@ -675,7 +678,7 @@ envWrap.addEventListener("click", (e) => {
 });
 
 // ── Stage 2 → 3: drag card out ────────────
-const PEEK_Y = -30; // px card peeks slightly above envelope after open
+const PEEK_Y = 0; // card sits at clip top (flap crease level)
 const SNAP_THRESHOLD = 110; // additional drag to snap card out
 
 let isDragging = false;

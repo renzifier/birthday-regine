@@ -66,9 +66,11 @@
             <div id="envFlap"></div>
           </div>
 
-          <!-- Card — behind body (z:1), shown after flap opens, draggable -->
-          <div id="cardInEnv" role="img" aria-label="Birthday card">
-            <img id="cardPullImg" alt="Birthday Card" draggable="false" />
+          <!-- Card — wrapped in clip div so it cannot escape above flap crease -->
+          <div id="cardClip">
+            <div id="cardInEnv" role="img" aria-label="Birthday card">
+              <img id="cardPullImg" alt="Birthday Card" draggable="false" />
+            </div>
           </div>
 
           <!-- Envelope body — covers lower portion of card (z:2) -->
