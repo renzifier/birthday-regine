@@ -17,25 +17,28 @@ export function onBlow(cb) {
 // ── Tuning ────────────────────────────────
 // RMS threshold above which we consider it a "blow" vs ambient noise.
 // 0.018 works well in a quiet room; raise to ~0.04 in noisier environments.
-const BLOW_THRESHOLD    = 0.018;
+const BLOW_THRESHOLD = 0.01;
 // How many consecutive frames above threshold before we fire the event.
-const BLOW_FRAMES_MIN   = 4;
+const BLOW_FRAMES_MIN = 2;
 // Cooldown in ms before another blow can fire.
-const BLOW_COOLDOWN_MS  = 1800;
+const BLOW_COOLDOWN_MS = 1800;
 
 let _ready = false;
 let _analyser = null;
-let _dataArr  = null;
+let _dataArr = null;
 
 export async function initBlow() {
   if (_ready) return;
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    const ctx    = new (window.AudioContext || window.webkitAudioContext)();
-    const src    = ctx.createMediaStreamSource(stream);
-    _analyser    = ctx.createAnalyser();
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false,
+    });
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = ctx.createMediaStreamSource(stream);
+    _analyser = ctx.createAnalyser();
     _analyser.fftSize = 256;
-    _dataArr     = new Float32Array(_analyser.fftSize);
+    _dataArr = new Float32Array(_analyser.fftSize);
     src.connect(_analyser);
     _ready = true;
     _poll();
@@ -44,8 +47,8 @@ export async function initBlow() {
   }
 }
 
-let _framesAbove  = 0;
-let _lastBlow     = 0;
+let _framesAbove = 0;
+let _lastBlow = 0;
 
 function _rms(arr) {
   let sum = 0;
@@ -70,9 +73,11 @@ function _poll() {
       if (now - _lastBlow > BLOW_COOLDOWN_MS) {
         _lastBlow = now;
         blowState.active = true;
-        _listeners.forEach(cb => cb(rms));
+        _listeners.forEach((cb) => cb(rms));
         // Auto-reset active flag after 400 ms
-        setTimeout(() => { blowState.active = false; }, 400);
+        setTimeout(() => {
+          blowState.active = false;
+        }, 400);
       }
     }
   } else {
