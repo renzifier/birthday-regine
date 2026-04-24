@@ -292,7 +292,7 @@ function addBow(angle, y) {
       ribbonMat,
     );
     // Tall oval: Y scale ~1.6 so loops are noticeably taller than wide
-    loop.scale.set(0.82, 1.58, 0.28);
+    loop.scale.set(0.82, 2.1, 0.28);
     loop.position.set(side * 0.148, 0.1, 0.0);
     loop.rotation.z = side * 0.18;
     grp.add(loop);
@@ -302,7 +302,7 @@ function addBow(angle, y) {
       new THREE.TorusGeometry(0.078, 0.019, 7, 22),
       ribbonMat,
     );
-    shine.scale.set(0.82, 1.58, 0.26);
+    shine.scale.set(0.82, 2.1, 0.26);
     shine.position.set(side * 0.148, 0.1, 0.005);
     shine.rotation.z = side * 0.18;
     grp.add(shine);
@@ -390,14 +390,14 @@ for (let i = 0; i < 6; i++) {
     side: THREE.DoubleSide,
   });
 
-  // 18 hearts at 3 height levels, offset from bow angles
-  const OFFSETS = [0.22, 0.48, 0.74];
-  for (let i = 0; i < 18; i++) {
-    const a = (i / 18) * Math.PI * 2 + 0.52; // rotated between bows
-    const yOff = OFFSETS[i % 3];
+  // 36 hearts at 4 height levels, scattered around the full cake side
+  const OFFSETS = [0.14, 0.34, 0.54, 0.72];
+  for (let i = 0; i < 36; i++) {
+    const a = (i / 36) * Math.PI * 2 + 0.28;
+    const yOff = OFFSETS[i % 4];
     const hx = Math.cos(a) * (TIER_R + 0.008);
     const hz = Math.sin(a) * (TIER_R + 0.008);
-    const h = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.13), heartMat);
+    const h = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.11), heartMat);
     h.position.set(hx, PLATE_Y + yOff, hz);
     h.rotation.y = a + Math.PI;
     cakeGroup.add(h);
