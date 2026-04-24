@@ -19,11 +19,11 @@ scene.add(doorGroup);
 
 // Frame: near-white so the edge glow reads bright
 const frameMat = new THREE.MeshStandardMaterial({
-  color: 0xddeeff,
+  color: 0x8899bb,
   roughness: 0.18,
   metalness: 0.04,
-  emissive: 0x8ab8e0,
-  emissiveIntensity: 0.55, // glowing frame edges
+  emissive: 0x1a2d55,
+  emissiveIntensity: 0.25,
 });
 
 // Door panels: very dark — almost black with a faint blue tint
@@ -150,10 +150,10 @@ doorGroup.traverse((obj) => {
 //  LIGHTS
 // ══════════════════════════════════════════
 
-// 1. Tight bright core — cool white-blue beam
+// 1. Tight core — deep blue, not white
 const beamCore = new THREE.SpotLight(
-  0xddeeff,
-  22.0,
+  0x0d2060,
+  5.0,
   55,
   Math.PI * 0.09,
   0.0,
@@ -165,10 +165,10 @@ beamCore.castShadow = false;
 scene.add(beamCore);
 scene.add(beamCore.target);
 
-// 2. Wide soft halo — cool blue
+// 2. Wide soft halo — deep indigo
 const beamHalo = new THREE.SpotLight(
-  0xaaccee,
-  12.0,
+  0x081840,
+  3.0,
   52,
   Math.PI * 0.2,
   0.65,
@@ -181,16 +181,16 @@ scene.add(beamHalo);
 scene.add(beamHalo.target);
 
 // 3. Floor pool — cool blue-white landing glow
-const floorPool = new THREE.PointLight(0x88aadd, 5.0, 16);
+const floorPool = new THREE.PointLight(0x1a2d66, 2.0, 16);
 floorPool.position.set(0, FLOOR_Y + 0.08, 2);
 scene.add(floorPool);
 
 // 4. Volumetric beam mesh — cool white-blue taper
 const beamGeo = new THREE.CylinderGeometry(0.14, 4.2, 22, 16, 1, true);
 const beamMat = new THREE.MeshBasicMaterial({
-  color: 0xccddff,
+  color: 0x0a1a55,
   transparent: true,
-  opacity: 0.055,
+  opacity: 0.04,
   side: THREE.BackSide,
   depthWrite: false,
 });
@@ -202,9 +202,9 @@ scene.add(beamMesh);
 // 5. Outer fringe beam
 const beamGeo2 = new THREE.CylinderGeometry(0.35, 6.0, 24, 16, 1, true);
 const beamMat2 = new THREE.MeshBasicMaterial({
-  color: 0xaabbee,
+  color: 0x08124a,
   transparent: true,
-  opacity: 0.025,
+  opacity: 0.018,
   side: THREE.BackSide,
   depthWrite: false,
 });
@@ -214,17 +214,17 @@ beamMesh2.rotation.x = 0.28;
 scene.add(beamMesh2);
 
 // 6. Strong door frame edge glow — bright cool-white rim
-const frameGlow = new THREE.PointLight(0xaaddff, 8.0, 14);
+const frameGlow = new THREE.PointLight(0x2244aa, 3.0, 14);
 frameGlow.position.set(0, FLOOR_Y + FRAME_H * 0.55, -18.4);
 scene.add(frameGlow);
 
 // 7. Left frame rim light — illuminates the inner edge of left post
-const leftFrameRim = new THREE.PointLight(0x88bbee, 4.5, 8);
+const leftFrameRim = new THREE.PointLight(0x1a3366, 2.0, 8);
 leftFrameRim.position.set(-FRAME_W / 2 - 0.1, FLOOR_Y + FRAME_H * 0.5, -18.6);
 scene.add(leftFrameRim);
 
 // 8. Right frame rim light
-const rightFrameRim = new THREE.PointLight(0x88bbee, 4.5, 8);
+const rightFrameRim = new THREE.PointLight(0x1a3366, 2.0, 8);
 rightFrameRim.position.set(FRAME_W / 2 + 0.1, FLOOR_Y + FRAME_H * 0.5, -18.6);
 scene.add(rightFrameRim);
 
