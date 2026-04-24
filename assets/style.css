@@ -277,7 +277,10 @@ canvas {
   height: min(266px, 61.6vw);
   cursor: pointer;
   animation: floatIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  filter: drop-shadow(0 18px 40px rgba(180, 20, 80, 0.35));
+  overflow: hidden;
+  border-radius: 10px;
+  /* NOTE: drop-shadow filter removed — it flattens z-index stacking inside,
+     causing the card to appear behind the pocket. Shadow moved to #envBody. */
 }
 
 @keyframes floatIn {
@@ -301,7 +304,8 @@ canvas {
   background: linear-gradient(160deg, #f5789c 0%, #e8186c 100%);
   box-shadow:
     inset 0 -3px 12px rgba(255, 255, 255, 0.1),
-    inset 0 3px 8px rgba(0, 0, 0, 0.1);
+    inset 0 3px 8px rgba(0, 0, 0, 0.1),
+    0 18px 40px rgba(180, 20, 80, 0.35);
 }
 
 /* ── Front pocket — z:2, covers bottom 55%, sits OVER the card ── */
@@ -396,16 +400,16 @@ canvas {
 }
 
 /* ── Card inside the envelope ──
-   z:1 so envelope body (z:2) covers lower half,
-   giving the illusion it sits inside.              */
+   z:1 so pocket (z:2) covers bottom edge.
+   Card starts fully inside envelope; drag pulls it up. */
 #cardInEnv {
   position: absolute;
-  /* card positioned so top third peeks above envelope body */
   left: 50%;
-  top: 6%;
+  /* seated inside — top of card sits just below flap crease */
+  top: 22%;
   transform: translateX(-50%) translateY(0px);
   z-index: 1;
-  width: 58%;
+  width: 62%;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
