@@ -675,7 +675,7 @@ envWrap.addEventListener("click", (e) => {
 });
 
 // ── Stage 2 → 3: drag card out ────────────
-const PEEK_Y = -40; // card peeks 40px above envelope opening
+const PEEK_Y = -15; // card peeks just slightly above envelope opening
 const SNAP_THRESHOLD = 110; // additional drag to snap card out
 
 let isDragging = false;

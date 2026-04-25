@@ -417,7 +417,7 @@ canvas {
   /* envWrap is taller than envelope to allow card to peek up.
      Card top = envelope top + ~15% of envelope height.
      envelope starts at bottom of envWrap; tune top% to sit just inside opening. */
-  top: 40%;
+  top: 58%;
   transform: translateX(-50%) translateY(0px);
   z-index: 1;
   width: 62%;
