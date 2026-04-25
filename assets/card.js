@@ -21,6 +21,18 @@ cardCanvas.width = W;
 cardCanvas.height = H;
 const ctx = cardCanvas.getContext("2d");
 
+// Dog photo — loaded async, drawing deferred until ready
+let _dogImg = null;
+const _dogLoaded = new Promise((resolve) => {
+  const img = new Image();
+  img.onload = () => {
+    _dogImg = img;
+    resolve();
+  };
+  img.onerror = () => resolve(); // fallback: draw without dog
+  img.src = "assets/fatdog.png";
+});
+
 // ── Helpers ───────────────────────────────
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -188,242 +200,21 @@ const DOG_DARK = "#9a6030";
 const DOG_WHITE = "#fdf5ec";
 const EAR_INNER = "#e09060";
 
-// Shadow
-const shadow = ctx.createRadialGradient(
-  DOG_X,
-  DOG_Y + DOG_R - 5,
-  0,
-  DOG_X,
-  DOG_Y + DOG_R - 5,
-  DOG_R * 0.9,
-);
-shadow.addColorStop(0, "rgba(0,0,0,0.10)");
-shadow.addColorStop(1, "rgba(0,0,0,0)");
-ctx.fillStyle = shadow;
-ctx.beginPath();
-ctx.ellipse(DOG_X, DOG_Y + DOG_R + 6, DOG_R * 0.85, 16, 0, 0, Math.PI * 2);
-ctx.fill();
-
-// Left ear
-ctx.save();
-ctx.fillStyle = DOG_TAN;
-ctx.beginPath();
-ctx.ellipse(DOG_X - 76, DOG_Y + 8, 28, 50, -0.38, 0, Math.PI * 2);
-ctx.fill();
-ctx.fillStyle = EAR_INNER;
-ctx.beginPath();
-ctx.ellipse(DOG_X - 76, DOG_Y + 12, 16, 34, -0.38, 0, Math.PI * 2);
-ctx.fill();
-ctx.restore();
-
-// Right ear
-ctx.save();
-ctx.fillStyle = DOG_TAN;
-ctx.beginPath();
-ctx.ellipse(DOG_X + 76, DOG_Y + 8, 28, 50, 0.38, 0, Math.PI * 2);
-ctx.fill();
-ctx.fillStyle = EAR_INNER;
-ctx.beginPath();
-ctx.ellipse(DOG_X + 76, DOG_Y + 12, 16, 34, 0.38, 0, Math.PI * 2);
-ctx.fill();
-ctx.restore();
-
-// Head
-const bodyGrad = ctx.createRadialGradient(
-  DOG_X - 20,
-  DOG_Y - 26,
-  8,
-  DOG_X,
-  DOG_Y,
-  DOG_R,
-);
-bodyGrad.addColorStop(0, DOG_LIGHT);
-bodyGrad.addColorStop(0.6, DOG_TAN);
-bodyGrad.addColorStop(1, DOG_DARK);
-ctx.fillStyle = bodyGrad;
-ctx.beginPath();
-ctx.arc(DOG_X, DOG_Y, DOG_R, 0, Math.PI * 2);
-ctx.fill();
-
-// Forehead patch
-ctx.fillStyle = "rgba(140,80,30,0.20)";
-ctx.beginPath();
-ctx.ellipse(DOG_X - 16, DOG_Y - 38, 28, 22, -0.3, 0, Math.PI * 2);
-ctx.fill();
-
-// Muzzle
-const muzzleGrad = ctx.createRadialGradient(
-  DOG_X,
-  DOG_Y + 26,
-  4,
-  DOG_X,
-  DOG_Y + 26,
-  52,
-);
-muzzleGrad.addColorStop(0, DOG_WHITE);
-muzzleGrad.addColorStop(0.65, "#f0dcc0");
-muzzleGrad.addColorStop(1, "#ddb88a");
-ctx.fillStyle = muzzleGrad;
-ctx.beginPath();
-ctx.ellipse(DOG_X, DOG_Y + 26, 52, 40, 0, 0, Math.PI * 2);
-ctx.fill();
-
-// Eyes
-for (const [ex, sign] of [
-  [DOG_X - 28, -1],
-  [DOG_X + 28, 1],
-]) {
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.ellipse(ex, DOG_Y - 16, 13, 14, sign * 0.1, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#2a1200";
-  ctx.beginPath();
-  ctx.arc(ex, DOG_Y - 14, 10, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#7a4010";
-  ctx.beginPath();
-  ctx.arc(ex, DOG_Y - 14, 7, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#2a1200";
-  ctx.beginPath();
-  ctx.arc(ex, DOG_Y - 14, 5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.arc(ex + 3, DOG_Y - 18, 3, 0, Math.PI * 2);
-  ctx.fill();
-  // Eyebrow
-  ctx.fillStyle = "rgba(120,65,20,0.5)";
-  ctx.beginPath();
-  ctx.ellipse(ex, DOG_Y - 30, 9, 4, sign * 0.15, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-// Nose
-const noseGrad = ctx.createRadialGradient(
-  DOG_X - 3,
-  DOG_Y + 6,
-  0,
-  DOG_X,
-  DOG_Y + 10,
-  18,
-);
-noseGrad.addColorStop(0, "#555");
-noseGrad.addColorStop(0.6, "#111");
-noseGrad.addColorStop(1, "#000");
-ctx.fillStyle = noseGrad;
-ctx.beginPath();
-ctx.moveTo(DOG_X - 18, DOG_Y + 8);
-ctx.bezierCurveTo(DOG_X - 18, DOG_Y, DOG_X + 18, DOG_Y, DOG_X + 18, DOG_Y + 8);
-ctx.bezierCurveTo(
-  DOG_X + 18,
-  DOG_Y + 18,
-  DOG_X - 18,
-  DOG_Y + 18,
-  DOG_X - 18,
-  DOG_Y + 8,
-);
-ctx.fill();
-ctx.fillStyle = "rgba(255,255,255,0.3)";
-ctx.beginPath();
-ctx.ellipse(DOG_X - 4, DOG_Y + 5, 6, 3.5, -0.2, 0, Math.PI * 2);
-ctx.fill();
-
-// Mouth
-ctx.strokeStyle = "#7a3010";
-ctx.lineWidth = 2.5;
-ctx.lineCap = "round";
-ctx.beginPath();
-ctx.moveTo(DOG_X, DOG_Y + 18);
-ctx.lineTo(DOG_X, DOG_Y + 26);
-ctx.stroke();
-ctx.beginPath();
-ctx.moveTo(DOG_X, DOG_Y + 26);
-ctx.quadraticCurveTo(DOG_X - 16, DOG_Y + 38, DOG_X - 26, DOG_Y + 32);
-ctx.stroke();
-ctx.beginPath();
-ctx.moveTo(DOG_X, DOG_Y + 26);
-ctx.quadraticCurveTo(DOG_X + 16, DOG_Y + 38, DOG_X + 26, DOG_Y + 32);
-ctx.stroke();
-
-// Tongue
-ctx.fillStyle = "#ff5588";
-ctx.beginPath();
-ctx.ellipse(DOG_X, DOG_Y + 44, 14, 11, 0, 0, Math.PI * 2);
-ctx.fill();
-ctx.strokeStyle = "#cc2255";
-ctx.lineWidth = 1.6;
-ctx.beginPath();
-ctx.moveTo(DOG_X, DOG_Y + 33);
-ctx.lineTo(DOG_X, DOG_Y + 54);
-ctx.stroke();
-
-// Blush
-for (const [bx, ang] of [
-  [DOG_X - 46, -0.3],
-  [DOG_X + 46, 0.3],
-]) {
-  const blush = ctx.createRadialGradient(bx, DOG_Y + 20, 0, bx, DOG_Y + 20, 26);
-  blush.addColorStop(0, "rgba(255,105,135,0.36)");
-  blush.addColorStop(1, "rgba(255,105,135,0)");
-  ctx.fillStyle = blush;
-  ctx.beginPath();
-  ctx.ellipse(bx, DOG_Y + 22, 26, 16, ang, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-// Party hat
-const hatTip = { x: DOG_X + 4, y: DOG_Y - DOG_R - 52 };
-const hatBaseY = DOG_Y - 60;
-ctx.save();
-ctx.beginPath();
-ctx.moveTo(hatTip.x, hatTip.y);
-ctx.lineTo(DOG_X - 46, hatBaseY);
-ctx.lineTo(DOG_X + 46, hatBaseY);
-ctx.closePath();
-const hatGrad = ctx.createLinearGradient(hatTip.x, hatTip.y, DOG_X, hatBaseY);
-hatGrad.addColorStop(0, "#ff4488");
-hatGrad.addColorStop(1, "#cc1166");
-ctx.fillStyle = hatGrad;
-ctx.fill();
-// Hat shine
-ctx.beginPath();
-ctx.moveTo(hatTip.x, hatTip.y);
-ctx.lineTo(hatTip.x + 26, hatBaseY);
-ctx.lineTo(DOG_X + 18, hatBaseY);
-ctx.closePath();
-ctx.fillStyle = "rgba(255,220,0,0.45)";
-ctx.fill();
-ctx.restore();
-// Hat brim
-ctx.fillStyle = "#ffee44";
-ctx.fillRect(DOG_X - 47, hatBaseY - 4, 94, 11);
-// Pom
-const pomGrad = ctx.createRadialGradient(
-  hatTip.x,
-  hatTip.y,
-  0,
-  hatTip.x,
-  hatTip.y,
-  11,
-);
-pomGrad.addColorStop(0, "#fff");
-pomGrad.addColorStop(1, "#ffe0ee");
-ctx.fillStyle = pomGrad;
-ctx.beginPath();
-ctx.arc(hatTip.x, hatTip.y, 10, 0, Math.PI * 2);
-ctx.fill();
-// Hat sparkles
-ctx.fillStyle = "rgba(255,255,255,0.8)";
-for (const [sx, sy] of [
-  [DOG_X - 12, DOG_Y - 98],
-  [DOG_X + 8, DOG_Y - 116],
-  [DOG_X - 2, DOG_Y - 138],
-]) {
-  ctx.beginPath();
-  ctx.arc(sx, sy, 2, 0, Math.PI * 2);
-  ctx.fill();
+// Dog photo — drawn centered in left column
+if (_dogImg) {
+  // The image has a black background — use "screen" blend mode to knock it out
+  // Fit image into left column with padding
+  const imgMaxW = COL_L - 40;
+  const imgMaxH = H - HEADER_H - 40;
+  const scale = Math.min(imgMaxW / _dogImg.width, imgMaxH / _dogImg.height);
+  const dw = _dogImg.width * scale;
+  const dh = _dogImg.height * scale;
+  const dx = DOG_X - dw / 2;
+  const dy = HEADER_H + (H - HEADER_H) / 2 - dh / 2;
+  ctx.save();
+  ctx.globalCompositeOperation = "multiply"; // knock out black bg
+  ctx.drawImage(_dogImg, dx, dy, dw, dh);
+  ctx.restore();
 }
 
 // Vertical divider between columns
@@ -447,8 +238,8 @@ const RIGHT_W = W - COL_L - 60; // text max width
 const nameY = HEADER_H + 58;
 ctx.textAlign = "center";
 ctx.fillStyle = "#ad1457";
-ctx.font = "bold italic 38px Georgia, 'Times New Roman', serif";
-ctx.fillText("Happy Birthday, " + CARD_TO + "!", RX, nameY);
+ctx.font = "bold italic 32px Georgia, 'Times New Roman', serif";
+ctx.fillText(CARD_TO + "!", RX, nameY);
 
 // Small heart divider
 const divY = nameY + 22;
@@ -636,10 +427,25 @@ let stage = "";
 
 // ── Open / Close ──────────────────────────
 export function openEnvelope() {
-  // Pre-load card images
-  const dataUrl = cardCanvas.toDataURL("image/png");
-  cardPullImg.src = dataUrl;
-  cardFullImg.src = dataUrl;
+  // Ensure dog photo drawn before exporting canvas
+  _dogLoaded.then(() => {
+    if (_dogImg) {
+      const imgMaxW = COL_L - 40;
+      const imgMaxH = H - HEADER_H - 40;
+      const scale = Math.min(imgMaxW / _dogImg.width, imgMaxH / _dogImg.height);
+      const dw = _dogImg.width * scale;
+      const dh = _dogImg.height * scale;
+      const dx = DOG_X - dw / 2;
+      const dy = HEADER_H + (H - HEADER_H) / 2 - dh / 2;
+      ctx.save();
+      ctx.globalCompositeOperation = "multiply";
+      ctx.drawImage(_dogImg, dx, dy, dw, dh);
+      ctx.restore();
+    }
+    const dataUrl = cardCanvas.toDataURL("image/png");
+    cardPullImg.src = dataUrl;
+    cardFullImg.src = dataUrl;
+  });
 
   // Reset all states
   envFlap.classList.remove("open");
