@@ -23,12 +23,9 @@ const ctx = cardCanvas.getContext("2d");
 
 // Dog photo — loaded async, drawing deferred until ready
 let _dogImg = null;
-const _dogLoaded = new Promise((resolve) => {
+const _dogLoaded = new Promise(resolve => {
   const img = new Image();
-  img.onload = () => {
-    _dogImg = img;
-    resolve();
-  };
+  img.onload = () => { _dogImg = img; resolve(); };
   img.onerror = () => resolve(); // fallback: draw without dog
   img.src = "assets/fatdog.png";
 });
@@ -63,10 +60,7 @@ function wrapText(ctx, text, x, startY, maxWidth, lineH) {
       line = test;
     }
   }
-  if (line.trim()) {
-    ctx.fillText(line.trim(), x, y);
-    y += lineH;
-  }
+  if (line.trim()) { ctx.fillText(line.trim(), x, y); y += lineH; }
   return y;
 }
 
@@ -117,7 +111,7 @@ const gx = W / HEART_COLS;
 const gy = H / HEART_ROWS;
 for (let row = 0; row < HEART_ROWS + 1; row++) {
   for (let col = 0; col < HEART_COLS + 1; col++) {
-    const ox = row % 2 === 0 ? 0 : gx * 0.5;
+    const ox = (row % 2 === 0) ? 0 : gx * 0.5;
     drawHeart(ctx, col * gx + ox, row * gy, 9, "rgba(240,130,170,0.18)");
   }
 }
@@ -138,12 +132,7 @@ ctx.stroke();
 ctx.restore();
 
 // ── Corner florals ────────────────────────
-for (const [fx, fy] of [
-  [46, 42],
-  [W - 46, 42],
-  [46, H - 42],
-  [W - 46, H - 42],
-]) {
+for (const [fx, fy] of [[46,42],[W-46,42],[46,H-42],[W-46,H-42]]) {
   drawFloral(fx, fy, 24, 5, "rgba(244,143,177,0.6)");
   drawFloral(fx, fy, 16, 5, "rgba(255,200,220,0.75)");
 }
@@ -186,14 +175,14 @@ ctx.fillText("♥  ♡  ♥  ♡  ♥", W / 2, 98);
 // ══════════════════════════════════════════
 //  SECTION 2 — Left column: Dog illustration
 // ══════════════════════════════════════════
-const COL_L = W * 0.38; // left column width
+const COL_L = W * 0.38;   // left column width
 const DOG_X = COL_L / 2;
 const DOG_Y = HEADER_H + (H - HEADER_H) / 2 + 10;
 const DOG_R = 82;
 
-const DOG_TAN = "#c8844a";
+const DOG_TAN   = "#c8844a";
 const DOG_LIGHT = "#e8b07a";
-const DOG_DARK = "#9a6030";
+const DOG_DARK  = "#9a6030";
 const DOG_WHITE = "#fdf5ec";
 const EAR_INNER = "#e09060";
 
@@ -229,7 +218,7 @@ ctx.restore();
 //  SECTION 3 — Name banner (full width, below header)
 //              then right column message
 // ══════════════════════════════════════════
-const NAME_H = 58; // height of the name band below the header
+const NAME_H = 58;  // height of the name band below the header
 const NAME_Y = HEADER_H + NAME_H; // bottom of name band
 
 // Name band — subtle deeper pink strip
@@ -256,7 +245,7 @@ ctx.stroke();
 ctx.restore();
 
 // Heart row on divider
-for (const hx of [W / 2 - 40, W / 2, W / 2 + 40]) {
+for (const hx of [W/2 - 40, W/2, W/2 + 40]) {
   drawHeart(ctx, hx, NAME_Y, 7, "rgba(230,80,140,0.45)");
 }
 
@@ -267,8 +256,7 @@ const RIGHT_W = W - COL_L - 50;
 // Split message at "Happy Birthday, Mishieeee!!"
 const splitMarker = "Happy Birthday, Mishieeee!!";
 const splitIdx = CARD_MESSAGE.indexOf(splitMarker);
-const part1 =
-  splitIdx !== -1 ? CARD_MESSAGE.slice(0, splitIdx).trim() : CARD_MESSAGE;
+const part1 = splitIdx !== -1 ? CARD_MESSAGE.slice(0, splitIdx).trim() : CARD_MESSAGE;
 const part2 = splitIdx !== -1 ? CARD_MESSAGE.slice(splitIdx).trim() : "";
 
 // Measure both parts first to know total height, then center vertically
@@ -280,16 +268,12 @@ ctx.font = font;
 // Count lines for each part to compute heights
 function countLines(text, maxWidth) {
   const words = text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
-  let line = "",
-    count = 1;
+  let line = "", count = 1;
   for (const word of words) {
     const test = line + word + " ";
     if (ctx.measureText(test).width > maxWidth && line !== "") {
-      count++;
-      line = word + " ";
-    } else {
-      line = test;
-    }
+      count++; line = word + " ";
+    } else { line = test; }
   }
   return count;
 }
@@ -316,10 +300,7 @@ ctx.save();
 ctx.strokeStyle = "rgba(240,100,160,0.35)";
 ctx.lineWidth = 1;
 ctx.setLineDash([5, 5]);
-ctx.beginPath();
-ctx.moveTo(COL_L + 20, divY2);
-ctx.lineTo(W - 30, divY2);
-ctx.stroke();
+ctx.beginPath(); ctx.moveTo(COL_L + 20, divY2); ctx.lineTo(W - 30, divY2); ctx.stroke();
 ctx.restore();
 drawHeart(ctx, RX, divY2, 7, "rgba(230,80,140,0.4)");
 
@@ -334,14 +315,7 @@ ctx.font = "17px serif";
 ctx.fillText("✦  ♥  ✦  ♥  ✦", RX, Math.max(p2EndY + 12, H - 34));
 
 // ── Vignette ──────────────────────────────
-const vig = ctx.createRadialGradient(
-  W / 2,
-  H / 2,
-  W * 0.2,
-  W / 2,
-  H / 2,
-  W * 0.65,
-);
+const vig = ctx.createRadialGradient(W/2, H/2, W * 0.2, W/2, H/2, W * 0.65);
 vig.addColorStop(0, "rgba(0,0,0,0)");
 vig.addColorStop(1, "rgba(100,0,40,0.07)");
 ctx.fillStyle = vig;
@@ -502,7 +476,17 @@ export function openEnvelope() {
     cardFullImg.src = dataUrl;
   });
 
-  // Reset all states — move cardInEnv back into envWrap if it was reparented
+  // Clean up flip wrapper if present — move cardInEnv back out first
+  const flipWrapper = document.getElementById("cardFlipWrapper");
+  if (flipWrapper) {
+    flipWrapper.parentElement.removeChild(flipWrapper);
+  }
+  const flipHint = document.querySelector("#envOverlay div[style*='flip']");
+  if (flipHint) flipHint.remove();
+  // Remove all stray flip hints
+  document.querySelectorAll("#envOverlay > div:not(#envScene):not(#cardFullView)").forEach(el => {
+    if (el.id !== "cardInEnv" && el.id !== "cardFlipWrapper") el.remove();
+  });
   if (cardInEnv.parentElement !== envWrap) {
     envWrap.insertBefore(cardInEnv, envWrap.firstChild);
   }
@@ -553,9 +537,7 @@ envWrap.addEventListener("click", (e) => {
 
   // Animate flap open
   envFlap.classList.add("open");
-  setTimeout(() => {
-    document.getElementById("envFlapOuter").classList.add("opened");
-  }, 660);
+  setTimeout(() => { document.getElementById("envFlapOuter").classList.add("opened"); }, 660);
 
   // After flap animation: pop card in INSIDE the envelope
   setTimeout(() => {
@@ -567,10 +549,8 @@ envWrap.addEventListener("click", (e) => {
     // Pop in with spring — card appears inside envelope
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        cardInEnv.style.transition =
-          "transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease";
-        cardInEnv.style.transform =
-          "translateX(-50%) translateY(-50%) scale(0.58)";
+        cardInEnv.style.transition = "transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease";
+        cardInEnv.style.transform = "translateX(-50%) translateY(-50%) scale(0.58)";
         cardInEnv.style.opacity = "1";
         setTimeout(() => {
           cardInEnv.style.transition = "";
@@ -620,8 +600,7 @@ cardInEnv.addEventListener("pointerup", (e) => {
   if (dragLastDelta >= SNAP_THRESHOLD) {
     snapCardOut();
   } else {
-    cardInEnv.style.transition =
-      "transform 0.35s cubic-bezier(0.34,1.56,0.64,1)";
+    cardInEnv.style.transition = "transform 0.35s cubic-bezier(0.34,1.56,0.64,1)";
     cardInEnv.style.transform = "translateX(-50%) translateY(-50%) scale(0.58)";
   }
   e.stopPropagation();
@@ -637,8 +616,7 @@ function snapCardOut() {
   overlayEl.appendChild(cardInEnv);
 
   // Pop to full size at center
-  cardInEnv.style.transition =
-    "transform 0.5s cubic-bezier(0.34,1.56,0.64,1), top 0.5s ease, left 0.5s ease, width 0.5s ease";
+  cardInEnv.style.transition = "transform 0.5s cubic-bezier(0.34,1.56,0.64,1), top 0.5s ease, left 0.5s ease, width 0.5s ease";
   cardInEnv.style.position = "fixed";
   cardInEnv.style.top = "50%";
   cardInEnv.style.left = "50%";
@@ -653,4 +631,150 @@ function snapCardOut() {
     envScene.style.transition = "opacity 0.4s ease";
     envScene.classList.add("hidden");
   }, 300);
+
+  // Enable flip after card is fully out
+  setTimeout(() => {
+    _enableFlip();
+  }, 600);
+}
+
+// ── Flip card feature ─────────────────────
+function _enableFlip() {
+  // Create flip wrapper around cardInEnv
+  const wrapper = document.createElement("div");
+  wrapper.id = "cardFlipWrapper";
+  Object.assign(wrapper.style, {
+    position: "fixed",
+    top: "50%", left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: cardInEnv.style.width,
+    zIndex: "200",
+    perspective: "1200px",
+    cursor: "pointer",
+  });
+
+  // Inner container that actually flips
+  const inner = document.createElement("div");
+  inner.id = "cardFlipInner";
+  Object.assign(inner.style, {
+    position: "relative",
+    width: "100%",
+    transition: "transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)",
+    transformStyle: "preserve-3d",
+  });
+
+  // Front = existing cardInEnv
+  cardInEnv.style.position = "relative";
+  cardInEnv.style.top = "";
+  cardInEnv.style.left = "";
+  cardInEnv.style.transform = "";
+  cardInEnv.style.zIndex = "";
+  cardInEnv.style.backfaceVisibility = "hidden";
+  cardInEnv.style.webkitBackfaceVisibility = "hidden";
+
+  // Back = new canvas with a special back-of-card design
+  const backEl = document.createElement("div");
+  backEl.id = "cardBack";
+  Object.assign(backEl.style, {
+    position: "absolute",
+    inset: "0",
+    borderRadius: "18px",
+    backfaceVisibility: "hidden",
+    webkitBackfaceVisibility: "hidden",
+    transform: "rotateY(180deg)",
+    overflow: "hidden",
+    boxShadow: "0 24px 64px rgba(0,0,0,0.55)",
+  });
+
+  // Draw back canvas
+  const backCanvas = document.createElement("canvas");
+  const bw = 960, bh = 600;
+  backCanvas.width = bw; backCanvas.height = bh;
+  backCanvas.style.width = "100%"; backCanvas.style.height = "auto";
+  backCanvas.style.display = "block";
+  const bctx = backCanvas.getContext("2d");
+
+  // Background — deep rose gradient
+  const bgGrad = bctx.createLinearGradient(0, 0, bw, bh);
+  bgGrad.addColorStop(0, "#e91e8c");
+  bgGrad.addColorStop(1, "#c2185b");
+  bctx.fillStyle = bgGrad;
+  bctx.beginPath();
+  const br = 32;
+  bctx.moveTo(br,0); bctx.lineTo(bw-br,0);
+  bctx.quadraticCurveTo(bw,0,bw,br);
+  bctx.lineTo(bw,bh-br); bctx.quadraticCurveTo(bw,bh,bw-br,bh);
+  bctx.lineTo(br,bh); bctx.quadraticCurveTo(0,bh,0,bh-br);
+  bctx.lineTo(0,br); bctx.quadraticCurveTo(0,0,br,0);
+  bctx.closePath();
+  bctx.fill();
+
+  // Heart pattern
+  function bHeart(cx,cy,size,color) {
+    bctx.save(); bctx.fillStyle=color; bctx.translate(cx,cy);
+    const s=size/14; bctx.scale(s,s);
+    bctx.beginPath(); bctx.moveTo(0,-8);
+    bctx.bezierCurveTo(8,-18,22,-8,22,2); bctx.bezierCurveTo(22,12,10,20,0,28);
+    bctx.bezierCurveTo(-10,20,-22,12,-22,2); bctx.bezierCurveTo(-22,-8,-8,-18,0,-8);
+    bctx.closePath(); bctx.fill(); bctx.restore();
+  }
+  for (let row=0; row<8; row++) for (let col=0; col<13; col++) {
+    const ox = row%2===0?0:37;
+    bHeart(col*74+ox, row*76, 11, "rgba(255,255,255,0.12)");
+  }
+
+  // Dashed border
+  bctx.save();
+  bctx.strokeStyle="rgba(255,255,255,0.35)"; bctx.lineWidth=2; bctx.setLineDash([10,8]);
+  bctx.beginPath();
+  bctx.moveTo(br+14,14); bctx.lineTo(bw-br-14,14);
+  bctx.quadraticCurveTo(bw-14,14,bw-14,br+14);
+  bctx.lineTo(bw-14,bh-br-14); bctx.quadraticCurveTo(bw-14,bh-14,bw-br-14,bh-14);
+  bctx.lineTo(br+14,bh-14); bctx.quadraticCurveTo(14,bh-14,14,bh-br-14);
+  bctx.lineTo(14,br+14); bctx.quadraticCurveTo(14,14,br+14,14);
+  bctx.stroke(); bctx.restore();
+
+  // Big center heart
+  bHeart(bw/2, bh/2 - 60, 120, "rgba(255,255,255,0.18)");
+  bHeart(bw/2, bh/2 - 60, 80, "rgba(255,255,255,0.22)");
+
+  // "With love" text
+  bctx.textAlign="center"; bctx.fillStyle="#fff";
+  bctx.font="italic bold 42px Georgia,'Times New Roman',serif";
+  bctx.fillText("With love 💕", bw/2, bh/2 + 30);
+  bctx.font="22px Georgia,'Times New Roman',serif";
+  bctx.fillStyle="rgba(255,255,255,0.75)";
+  bctx.fillText("— tap to flip back —", bw/2, bh/2 + 76);
+
+  // Corner hearts
+  for (const [cx,cy] of [[54,50],[bw-54,50],[54,bh-50],[bw-54,bh-50]]) {
+    bHeart(cx, cy, 28, "rgba(255,255,255,0.5)");
+  }
+
+  backEl.appendChild(backCanvas);
+
+  // Assemble
+  inner.appendChild(cardInEnv);
+  inner.appendChild(backEl);
+  wrapper.appendChild(inner);
+  document.getElementById("envOverlay").appendChild(wrapper);
+
+  // Flip on click
+  let flipped = false;
+  wrapper.addEventListener("click", () => {
+    flipped = !flipped;
+    inner.style.transform = flipped ? "rotateY(180deg)" : "rotateY(0deg)";
+  });
+
+  // Hint
+  const flipHint = document.createElement("div");
+  flipHint.textContent = "💌 tap card to flip";
+  Object.assign(flipHint.style, {
+    position:"fixed", bottom:"52px", left:"50%",
+    transform:"translateX(-50%)",
+    color:"rgba(255,200,220,0.85)", fontFamily:"monospace",
+    fontSize:"13px", pointerEvents:"none", whiteSpace:"nowrap",
+    zIndex:"201", animation:"pulse 1.6s ease-in-out infinite",
+  });
+  document.getElementById("envOverlay").appendChild(flipHint);
 }
