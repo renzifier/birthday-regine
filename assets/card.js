@@ -499,107 +499,49 @@ envWrap.addEventListener("click", (e) => {
     document.getElementById("envFlapOuter").classList.add("opened");
   }, 660);
 
-  // After flap animation: reveal card peeking
+  // After flap animation: pop card in at center, no sliding
   setTimeout(() => {
     stage = "open";
-    cardInEnv.style.display = "block";
-    cardInEnv.style.transform = "translateX(-50%) translateY(0px)";
 
-    // Slight delay then peek card up
+    // Move card to fixed center immediately (no position change animation)
+    const overlayEl = document.getElementById("envOverlay");
+    overlayEl.appendChild(cardInEnv);
+    cardInEnv.style.position = "fixed";
+    cardInEnv.style.top = "50%";
+    cardInEnv.style.left = "50%";
+    cardInEnv.style.width = "min(560px, 92vw)";
+    cardInEnv.style.borderRadius = "18px";
+    cardInEnv.style.boxShadow = "0 24px 64px rgba(0,0,0,0.55)";
+    cardInEnv.style.zIndex = "200";
+    cardInEnv.style.display = "block";
+    cardInEnv.style.opacity = "0";
+    cardInEnv.style.transform = "translate(-50%, -50%) scale(0.7)";
+
+    // Pop in with spring
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         cardInEnv.style.transition =
-          "transform 0.45s cubic-bezier(0.34,1.56,0.64,1)";
-        cardInEnv.style.transform = "translateX(-50%) translateY(-65px)";
+          "transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease";
+        cardInEnv.style.transform = "translate(-50%, -50%) scale(1)";
+        cardInEnv.style.opacity = "1";
         setTimeout(() => {
           cardInEnv.style.transition = "";
-          envHint.textContent = "drag the card out  ↑";
-          envHint.style.transition = "opacity 0.4s ease";
-          envHint.style.opacity = "1";
+          envHint.style.opacity = "0"; // hide hint once card is shown
         }, 450);
       });
     });
   }, 650);
 });
 
-// ── Stage 2 → 3: drag card out ────────────
-const PEEK_Y = -65; // px card peeks above envelope after open
-const SNAP_THRESHOLD = 110; // additional drag to snap card out
-
-let isDragging = false;
-let dragStartClientY = 0;
-let dragLastDelta = 0;
-
-function getClientY(e) {
-  return e.touches ? e.touches[0].clientY : e.clientY;
-}
-
-cardInEnv.addEventListener("pointerdown", (e) => {
-  if (stage !== "open") return;
-  isDragging = true;
-  dragStartClientY = getClientY(e);
-  dragLastDelta = 0;
-  cardInEnv.style.transition = "none";
-  cardInEnv.setPointerCapture(e.pointerId);
-  e.stopPropagation();
-  e.preventDefault();
-});
-
-cardInEnv.addEventListener("pointermove", (e) => {
-  if (!isDragging) return;
-  const delta = Math.max(0, dragStartClientY - getClientY(e));
-  dragLastDelta = delta;
-  const totalY = PEEK_Y - delta;
-  cardInEnv.style.transform = `translateX(-50%) translateY(${totalY}px)`;
-  e.stopPropagation();
-  e.preventDefault();
-});
-
-cardInEnv.addEventListener("pointerup", (e) => {
-  if (!isDragging) return;
-  isDragging = false;
-
-  if (dragLastDelta >= SNAP_THRESHOLD) {
-    snapCardOut();
-  } else {
-    // Snap back to peek position
-    cardInEnv.style.transition =
-      "transform 0.35s cubic-bezier(0.34,1.56,0.64,1)";
-    cardInEnv.style.transform = `translateX(-50%) translateY(${PEEK_Y}px)`;
-  }
-  e.stopPropagation();
-});
-
-function snapCardOut() {
-  stage = "cardout";
-
-  envHint.style.transition = "opacity 0.2s ease";
-  envHint.style.opacity = "0";
-
-  // 1. Reparent cardInEnv to overlay so it survives envScene fade
-  const overlay = document.getElementById("envOverlay");
-  overlay.appendChild(cardInEnv);
-
-  // 2. Pop card to fixed center with spring bounce
-  cardInEnv.style.transition = [
-    "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
-    "top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
-    "left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
-    "width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
-  ].join(", ");
-  cardInEnv.style.position = "fixed";
-  cardInEnv.style.top = "50%";
-  cardInEnv.style.left = "50%";
-  cardInEnv.style.width = "min(560px, 92vw)";
-  cardInEnv.style.transform = "translate(-50%, -50%) scale(1)";
-  cardInEnv.style.zIndex = "200";
-  cardInEnv.style.borderRadius = "18px";
-  cardInEnv.style.boxShadow = "0 24px 64px rgba(0,0,0,0.55)";
-  cardInEnv.style.cursor = "default";
-
-  // 3. Fade envelope scene out — card is now outside it so it stays visible
-  setTimeout(() => {
-    envScene.style.transition = "opacity 0.4s ease";
+// ── Stage 2: envelope fades out after card pops in ────────────────────────
+// Card is already centered and visible from the reveal above.
+// Just fade the envelope scene out behind it.
+setTimeout(() => {
+  if (stage === "open") {
+    envHint.style.transition = "opacity 0.3s ease";
+    envHint.style.opacity = "0";
+    envScene.style.transition = "opacity 0.5s ease";
     envScene.classList.add("hidden");
-  }, 300);
-}
+    stage = "cardout";
+  }
+}, 1200); // flap(650ms) + pop(450ms) + brief pause
