@@ -11,11 +11,12 @@ import { std } from "./textures.js";
 import { tableGroup } from "./table.js";
 
 // ══════════════════════════════════════════
-//  CARD CANVAS
+//  CARD CANVAS  —  Landscape 960 × 600
+//  Layout: full-width header, then dog left + text right
 // ══════════════════════════════════════════
 export const cardCanvas = document.createElement("canvas");
-const W = 800;
-const H = 960;
+const W = 960;
+const H = 600;
 cardCanvas.width = W;
 cardCanvas.height = H;
 const ctx = cardCanvas.getContext("2d");
@@ -60,29 +61,23 @@ function wrapText(ctx, text, x, startY, maxWidth, lineH) {
   return y;
 }
 
-// ── Background ────────────────────────────
-const bg = ctx.createLinearGradient(0, 0, 0, H);
-bg.addColorStop(0.0, "#fff5f8");
-bg.addColorStop(0.45, "#ffedf4");
-bg.addColorStop(1.0, "#ffd6e8");
-ctx.fillStyle = bg;
-roundRect(ctx, 0, 0, W, H, 32);
-ctx.fill();
+function drawHeart(ctx, cx, cy, size, color) {
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.translate(cx, cy);
+  const s = size / 14;
+  ctx.scale(s, s);
+  ctx.beginPath();
+  ctx.moveTo(0, -8);
+  ctx.bezierCurveTo(8, -18, 22, -8, 22, 2);
+  ctx.bezierCurveTo(22, 12, 10, 20, 0, 28);
+  ctx.bezierCurveTo(-10, 20, -22, 12, -22, 2);
+  ctx.bezierCurveTo(-22, -8, -8, -18, 0, -8);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
 
-ctx.strokeStyle = "#f48fb1";
-ctx.lineWidth = 5;
-roundRect(ctx, 6, 6, W - 12, H - 12, 28);
-ctx.stroke();
-
-ctx.save();
-ctx.strokeStyle = "rgba(244,143,177,0.45)";
-ctx.lineWidth = 1.5;
-ctx.setLineDash([8, 6]);
-roundRect(ctx, 18, 18, W - 36, H - 36, 20);
-ctx.stroke();
-ctx.restore();
-
-// ── Corner florals ────────────────────────
 function drawFloral(cx, cy, r, petals, color) {
   for (let i = 0; i < petals; i++) {
     const a = (i / petals) * Math.PI * 2;
@@ -101,60 +96,91 @@ function drawFloral(cx, cy, r, petals, color) {
   ctx.fill();
 }
 
+// ── Background — soft pink with heart tile pattern ─
+roundRect(ctx, 0, 0, W, H, 32);
+ctx.fillStyle = "#fde8f0";
+ctx.fill();
+
+// Heart tile pattern
+const HEART_COLS = 14;
+const HEART_ROWS = 9;
+const gx = W / HEART_COLS;
+const gy = H / HEART_ROWS;
+for (let row = 0; row < HEART_ROWS + 1; row++) {
+  for (let col = 0; col < HEART_COLS + 1; col++) {
+    const ox = row % 2 === 0 ? 0 : gx * 0.5;
+    drawHeart(ctx, col * gx + ox, row * gy, 9, "rgba(240,130,170,0.18)");
+  }
+}
+
+// Card border
+ctx.strokeStyle = "#f48fb1";
+ctx.lineWidth = 4;
+roundRect(ctx, 0, 0, W, H, 32);
+ctx.stroke();
+
+// Dashed inner border
+ctx.save();
+ctx.strokeStyle = "rgba(244,143,177,0.5)";
+ctx.lineWidth = 1.5;
+ctx.setLineDash([8, 6]);
+roundRect(ctx, 14, 14, W - 28, H - 28, 24);
+ctx.stroke();
+ctx.restore();
+
+// ── Corner florals ────────────────────────
 for (const [fx, fy] of [
-  [52, 52],
-  [W - 52, 52],
-  [52, H - 52],
-  [W - 52, H - 52],
+  [46, 42],
+  [W - 46, 42],
+  [46, H - 42],
+  [W - 46, H - 42],
 ]) {
-  drawFloral(fx, fy, 28, 5, "rgba(244,143,177,0.55)");
-  drawFloral(fx, fy, 19, 5, "rgba(255,200,220,0.7)");
+  drawFloral(fx, fy, 24, 5, "rgba(244,143,177,0.6)");
+  drawFloral(fx, fy, 16, 5, "rgba(255,200,220,0.75)");
 }
 
-// ── Scattered background hearts ───────────
-function drawHeart(ctx, cx, cy, size, color) {
-  ctx.save();
-  ctx.fillStyle = color;
-  ctx.translate(cx, cy);
-  const s = size / 14;
-  ctx.scale(s, s);
-  ctx.beginPath();
-  ctx.moveTo(0, -8);
-  ctx.bezierCurveTo(8, -18, 22, -8, 22, 2);
-  ctx.bezierCurveTo(22, 12, 10, 20, 0, 28);
-  ctx.bezierCurveTo(-10, 20, -22, 12, -22, 2);
-  ctx.bezierCurveTo(-22, -8, -8, -18, 0, -8);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-}
+// ══════════════════════════════════════════
+//  SECTION 1 — Header (full width top band)
+// ══════════════════════════════════════════
+const HEADER_H = 110;
 
-for (const [hx, hy, hs] of [
-  [90, 160, 7],
-  [710, 155, 8],
-  [75, 800, 7],
-  [720, 790, 9],
-  [130, 870, 6],
-  [660, 870, 6],
-  [400, 910, 7],
-]) {
-  drawHeart(ctx, hx, hy, hs, "rgba(240,120,155,0.22)");
-}
+// Header band background
+ctx.save();
+ctx.beginPath();
+roundRect(ctx, 0, 0, W, HEADER_H, 32);
+ctx.fillStyle = "rgba(255,180,210,0.38)";
+ctx.fill();
+ctx.restore();
 
-// ── Header ────────────────────────────────
+// Divider line below header
+ctx.save();
+ctx.strokeStyle = "rgba(244,143,177,0.55)";
+ctx.lineWidth = 1;
+ctx.setLineDash([10, 7]);
+ctx.beginPath();
+ctx.moveTo(60, HEADER_H);
+ctx.lineTo(W - 60, HEADER_H);
+ctx.stroke();
+ctx.restore();
+
+// "Happy Birthday" title
 ctx.textAlign = "center";
 ctx.fillStyle = "#c2185b";
-ctx.font = "bold italic 50px Georgia, 'Times New Roman', serif";
-ctx.fillText("Happy Birthday", W / 2, 74);
+ctx.font = "bold italic 54px Georgia, 'Times New Roman', serif";
+ctx.fillText("Happy Birthday", W / 2, 68);
 
+// Subtitle hearts row
 ctx.fillStyle = "#e91e8c";
-ctx.font = "22px serif";
-ctx.fillText("♥  ♡  ♥  ♡  ♥", W / 2, 104);
+ctx.font = "20px serif";
+ctx.fillText("♥  ♡  ♥  ♡  ♥", W / 2, 96);
 
-// ── Dog illustration ──────────────────────
-const BX = W / 2;
-const BY = 285;
-const BR = 98;
+// ══════════════════════════════════════════
+//  SECTION 2 — Left column: Dog illustration
+// ══════════════════════════════════════════
+const COL_L = W * 0.38; // left column width
+const DOG_X = COL_L / 2;
+const DOG_Y = HEADER_H + (H - HEADER_H) / 2 + 10;
+const DOG_R = 82;
 
 const DOG_TAN = "#c8844a";
 const DOG_LIGHT = "#e8b07a";
@@ -162,30 +188,31 @@ const DOG_DARK = "#9a6030";
 const DOG_WHITE = "#fdf5ec";
 const EAR_INNER = "#e09060";
 
+// Shadow
 const shadow = ctx.createRadialGradient(
-  BX,
-  BY + BR - 5,
+  DOG_X,
+  DOG_Y + DOG_R - 5,
   0,
-  BX,
-  BY + BR - 5,
-  BR * 0.9,
+  DOG_X,
+  DOG_Y + DOG_R - 5,
+  DOG_R * 0.9,
 );
-shadow.addColorStop(0, "rgba(0,0,0,0.12)");
+shadow.addColorStop(0, "rgba(0,0,0,0.10)");
 shadow.addColorStop(1, "rgba(0,0,0,0)");
 ctx.fillStyle = shadow;
 ctx.beginPath();
-ctx.ellipse(BX, BY + BR + 8, BR * 0.88, 20, 0, 0, Math.PI * 2);
+ctx.ellipse(DOG_X, DOG_Y + DOG_R + 6, DOG_R * 0.85, 16, 0, 0, Math.PI * 2);
 ctx.fill();
 
 // Left ear
 ctx.save();
 ctx.fillStyle = DOG_TAN;
 ctx.beginPath();
-ctx.ellipse(BX - 90, BY + 10, 32, 58, -0.38, 0, Math.PI * 2);
+ctx.ellipse(DOG_X - 76, DOG_Y + 8, 28, 50, -0.38, 0, Math.PI * 2);
 ctx.fill();
 ctx.fillStyle = EAR_INNER;
 ctx.beginPath();
-ctx.ellipse(BX - 90, BY + 14, 18, 40, -0.38, 0, Math.PI * 2);
+ctx.ellipse(DOG_X - 76, DOG_Y + 12, 16, 34, -0.38, 0, Math.PI * 2);
 ctx.fill();
 ctx.restore();
 
@@ -193,263 +220,271 @@ ctx.restore();
 ctx.save();
 ctx.fillStyle = DOG_TAN;
 ctx.beginPath();
-ctx.ellipse(BX + 90, BY + 10, 32, 58, 0.38, 0, Math.PI * 2);
+ctx.ellipse(DOG_X + 76, DOG_Y + 8, 28, 50, 0.38, 0, Math.PI * 2);
 ctx.fill();
 ctx.fillStyle = EAR_INNER;
 ctx.beginPath();
-ctx.ellipse(BX + 90, BY + 14, 18, 40, 0.38, 0, Math.PI * 2);
+ctx.ellipse(DOG_X + 76, DOG_Y + 12, 16, 34, 0.38, 0, Math.PI * 2);
 ctx.fill();
 ctx.restore();
 
 // Head
-const bodyGrad = ctx.createRadialGradient(BX - 22, BY - 30, 8, BX, BY, BR);
+const bodyGrad = ctx.createRadialGradient(
+  DOG_X - 20,
+  DOG_Y - 26,
+  8,
+  DOG_X,
+  DOG_Y,
+  DOG_R,
+);
 bodyGrad.addColorStop(0, DOG_LIGHT);
 bodyGrad.addColorStop(0.6, DOG_TAN);
 bodyGrad.addColorStop(1, DOG_DARK);
 ctx.fillStyle = bodyGrad;
 ctx.beginPath();
-ctx.arc(BX, BY, BR, 0, Math.PI * 2);
+ctx.arc(DOG_X, DOG_Y, DOG_R, 0, Math.PI * 2);
 ctx.fill();
 
 // Forehead patch
-ctx.fillStyle = "rgba(140,80,30,0.22)";
+ctx.fillStyle = "rgba(140,80,30,0.20)";
 ctx.beginPath();
-ctx.ellipse(BX - 18, BY - 44, 32, 26, -0.3, 0, Math.PI * 2);
+ctx.ellipse(DOG_X - 16, DOG_Y - 38, 28, 22, -0.3, 0, Math.PI * 2);
 ctx.fill();
 
 // Muzzle
-const muzzleGrad = ctx.createRadialGradient(BX, BY + 30, 4, BX, BY + 30, 58);
+const muzzleGrad = ctx.createRadialGradient(
+  DOG_X,
+  DOG_Y + 26,
+  4,
+  DOG_X,
+  DOG_Y + 26,
+  52,
+);
 muzzleGrad.addColorStop(0, DOG_WHITE);
 muzzleGrad.addColorStop(0.65, "#f0dcc0");
 muzzleGrad.addColorStop(1, "#ddb88a");
 ctx.fillStyle = muzzleGrad;
 ctx.beginPath();
-ctx.ellipse(BX, BY + 30, 58, 44, 0, 0, Math.PI * 2);
+ctx.ellipse(DOG_X, DOG_Y + 26, 52, 40, 0, 0, Math.PI * 2);
 ctx.fill();
 
 // Eyes
 for (const [ex, sign] of [
-  [BX - 30, -1],
-  [BX + 30, 1],
+  [DOG_X - 28, -1],
+  [DOG_X + 28, 1],
 ]) {
   ctx.fillStyle = "#fff";
   ctx.beginPath();
-  ctx.ellipse(ex, BY - 18, 14, 15, sign * 0.1, 0, Math.PI * 2);
+  ctx.ellipse(ex, DOG_Y - 16, 13, 14, sign * 0.1, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = "#2a1200";
   ctx.beginPath();
-  ctx.arc(ex, BY - 16, 11, 0, Math.PI * 2);
+  ctx.arc(ex, DOG_Y - 14, 10, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = "#7a4010";
   ctx.beginPath();
-  ctx.arc(ex, BY - 16, 8, 0, Math.PI * 2);
+  ctx.arc(ex, DOG_Y - 14, 7, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = "#2a1200";
   ctx.beginPath();
-  ctx.arc(ex, BY - 16, 6, 0, Math.PI * 2);
+  ctx.arc(ex, DOG_Y - 14, 5, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = "#fff";
   ctx.beginPath();
-  ctx.arc(ex + 3, BY - 20, 3.5, 0, Math.PI * 2);
+  ctx.arc(ex + 3, DOG_Y - 18, 3, 0, Math.PI * 2);
   ctx.fill();
+  // Eyebrow
+  ctx.fillStyle = "rgba(120,65,20,0.5)";
   ctx.beginPath();
-  ctx.arc(ex - 4, BY - 16, 1.5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "rgba(120,65,20,0.55)";
-  ctx.beginPath();
-  ctx.ellipse(ex, BY - 33, 10, 4, sign * 0.15, 0, Math.PI * 2);
+  ctx.ellipse(ex, DOG_Y - 30, 9, 4, sign * 0.15, 0, Math.PI * 2);
   ctx.fill();
 }
 
 // Nose
-const noseGrad = ctx.createRadialGradient(BX - 4, BY + 8, 0, BX, BY + 12, 20);
+const noseGrad = ctx.createRadialGradient(
+  DOG_X - 3,
+  DOG_Y + 6,
+  0,
+  DOG_X,
+  DOG_Y + 10,
+  18,
+);
 noseGrad.addColorStop(0, "#555");
 noseGrad.addColorStop(0.6, "#111");
 noseGrad.addColorStop(1, "#000");
 ctx.fillStyle = noseGrad;
 ctx.beginPath();
-ctx.moveTo(BX - 20, BY + 10);
-ctx.bezierCurveTo(BX - 20, BY + 2, BX + 20, BY + 2, BX + 20, BY + 10);
-ctx.bezierCurveTo(BX + 20, BY + 20, BX - 20, BY + 20, BX - 20, BY + 10);
+ctx.moveTo(DOG_X - 18, DOG_Y + 8);
+ctx.bezierCurveTo(DOG_X - 18, DOG_Y, DOG_X + 18, DOG_Y, DOG_X + 18, DOG_Y + 8);
+ctx.bezierCurveTo(
+  DOG_X + 18,
+  DOG_Y + 18,
+  DOG_X - 18,
+  DOG_Y + 18,
+  DOG_X - 18,
+  DOG_Y + 8,
+);
 ctx.fill();
-ctx.fillStyle = "rgba(255,255,255,0.35)";
+ctx.fillStyle = "rgba(255,255,255,0.3)";
 ctx.beginPath();
-ctx.ellipse(BX - 5, BY + 7, 7, 4, -0.2, 0, Math.PI * 2);
+ctx.ellipse(DOG_X - 4, DOG_Y + 5, 6, 3.5, -0.2, 0, Math.PI * 2);
 ctx.fill();
 
-// Mouth / smile
+// Mouth
 ctx.strokeStyle = "#7a3010";
-ctx.lineWidth = 2.8;
+ctx.lineWidth = 2.5;
 ctx.lineCap = "round";
 ctx.beginPath();
-ctx.moveTo(BX, BY + 20);
-ctx.lineTo(BX, BY + 30);
+ctx.moveTo(DOG_X, DOG_Y + 18);
+ctx.lineTo(DOG_X, DOG_Y + 26);
 ctx.stroke();
 ctx.beginPath();
-ctx.moveTo(BX, BY + 30);
-ctx.quadraticCurveTo(BX - 18, BY + 42, BX - 30, BY + 36);
+ctx.moveTo(DOG_X, DOG_Y + 26);
+ctx.quadraticCurveTo(DOG_X - 16, DOG_Y + 38, DOG_X - 26, DOG_Y + 32);
 ctx.stroke();
 ctx.beginPath();
-ctx.moveTo(BX, BY + 30);
-ctx.quadraticCurveTo(BX + 18, BY + 42, BX + 30, BY + 36);
+ctx.moveTo(DOG_X, DOG_Y + 26);
+ctx.quadraticCurveTo(DOG_X + 16, DOG_Y + 38, DOG_X + 26, DOG_Y + 32);
 ctx.stroke();
 
 // Tongue
 ctx.fillStyle = "#ff5588";
 ctx.beginPath();
-ctx.ellipse(BX, BY + 48, 16, 12, 0, 0, Math.PI * 2);
+ctx.ellipse(DOG_X, DOG_Y + 44, 14, 11, 0, 0, Math.PI * 2);
 ctx.fill();
 ctx.strokeStyle = "#cc2255";
-ctx.lineWidth = 1.8;
+ctx.lineWidth = 1.6;
 ctx.beginPath();
-ctx.moveTo(BX, BY + 36);
-ctx.lineTo(BX, BY + 58);
+ctx.moveTo(DOG_X, DOG_Y + 33);
+ctx.lineTo(DOG_X, DOG_Y + 54);
 ctx.stroke();
-ctx.fillStyle = "rgba(255,200,220,0.4)";
-ctx.beginPath();
-ctx.ellipse(BX - 5, BY + 44, 7, 5, -0.2, 0, Math.PI * 2);
-ctx.fill();
 
 // Blush
-for (const [cx, ang] of [
-  [BX - 50, -0.3],
-  [BX + 50, 0.3],
+for (const [bx, ang] of [
+  [DOG_X - 46, -0.3],
+  [DOG_X + 46, 0.3],
 ]) {
-  const blush = ctx.createRadialGradient(cx, BY + 22, 0, cx, BY + 22, 28);
-  blush.addColorStop(0, "rgba(255,105,135,0.38)");
+  const blush = ctx.createRadialGradient(bx, DOG_Y + 20, 0, bx, DOG_Y + 20, 26);
+  blush.addColorStop(0, "rgba(255,105,135,0.36)");
   blush.addColorStop(1, "rgba(255,105,135,0)");
   ctx.fillStyle = blush;
   ctx.beginPath();
-  ctx.ellipse(cx, BY + 24, 28, 17, ang, 0, Math.PI * 2);
+  ctx.ellipse(bx, DOG_Y + 22, 26, 16, ang, 0, Math.PI * 2);
   ctx.fill();
 }
 
 // Party hat
-const hatTip = { x: BX + 4, y: BY - BR - 62 };
-const hatBaseY = BY - 68;
+const hatTip = { x: DOG_X + 4, y: DOG_Y - DOG_R - 52 };
+const hatBaseY = DOG_Y - 60;
 ctx.save();
 ctx.beginPath();
 ctx.moveTo(hatTip.x, hatTip.y);
-ctx.lineTo(BX - 52, hatBaseY);
-ctx.lineTo(BX + 52, hatBaseY);
+ctx.lineTo(DOG_X - 46, hatBaseY);
+ctx.lineTo(DOG_X + 46, hatBaseY);
 ctx.closePath();
-const hatGrad = ctx.createLinearGradient(hatTip.x, hatTip.y, BX, hatBaseY);
+const hatGrad = ctx.createLinearGradient(hatTip.x, hatTip.y, DOG_X, hatBaseY);
 hatGrad.addColorStop(0, "#ff4488");
 hatGrad.addColorStop(1, "#cc1166");
 ctx.fillStyle = hatGrad;
 ctx.fill();
+// Hat shine
 ctx.beginPath();
 ctx.moveTo(hatTip.x, hatTip.y);
-ctx.lineTo(hatTip.x + 30, hatBaseY);
-ctx.lineTo(BX + 20, hatBaseY);
+ctx.lineTo(hatTip.x + 26, hatBaseY);
+ctx.lineTo(DOG_X + 18, hatBaseY);
 ctx.closePath();
-ctx.fillStyle = "rgba(255,220,0,0.5)";
+ctx.fillStyle = "rgba(255,220,0,0.45)";
 ctx.fill();
 ctx.restore();
-
+// Hat brim
 ctx.fillStyle = "#ffee44";
-ctx.fillRect(BX - 53, hatBaseY - 4, 106, 13);
-
+ctx.fillRect(DOG_X - 47, hatBaseY - 4, 94, 11);
+// Pom
 const pomGrad = ctx.createRadialGradient(
   hatTip.x,
   hatTip.y,
   0,
   hatTip.x,
   hatTip.y,
-  13,
+  11,
 );
 pomGrad.addColorStop(0, "#fff");
 pomGrad.addColorStop(1, "#ffe0ee");
 ctx.fillStyle = pomGrad;
 ctx.beginPath();
-ctx.arc(hatTip.x, hatTip.y, 11, 0, Math.PI * 2);
+ctx.arc(hatTip.x, hatTip.y, 10, 0, Math.PI * 2);
 ctx.fill();
-
-ctx.fillStyle = "rgba(255,255,255,0.75)";
+// Hat sparkles
+ctx.fillStyle = "rgba(255,255,255,0.8)";
 for (const [sx, sy] of [
-  [BX - 15, BY - 112],
-  [BX + 9, BY - 132],
-  [BX - 3, BY - 158],
+  [DOG_X - 12, DOG_Y - 98],
+  [DOG_X + 8, DOG_Y - 116],
+  [DOG_X - 2, DOG_Y - 138],
 ]) {
   ctx.beginPath();
-  ctx.arc(sx, sy, 2.5, 0, Math.PI * 2);
+  ctx.arc(sx, sy, 2, 0, Math.PI * 2);
   ctx.fill();
 }
 
-// Paws
-for (const [tx, ty, rot] of [
-  [BX - BR + 2, BY + 28, 0.65],
-  [BX + BR - 2, BY + 28, -0.65],
-]) {
-  ctx.save();
-  ctx.translate(tx, ty);
-  ctx.rotate(rot);
-  ctx.fillStyle = DOG_TAN;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 26, 17, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#c07858";
-  for (const [tx2, ty2] of [
-    [-10, -4],
-    [0, -7],
-    [10, -4],
-  ]) {
-    ctx.beginPath();
-    ctx.arc(tx2, ty2, 5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
+// Vertical divider between columns
+ctx.save();
+ctx.strokeStyle = "rgba(244,143,177,0.45)";
+ctx.lineWidth = 1;
+ctx.setLineDash([8, 6]);
+ctx.beginPath();
+ctx.moveTo(COL_L, HEADER_H + 24);
+ctx.lineTo(COL_L, H - 24);
+ctx.stroke();
+ctx.restore();
 
-// ── Recipient name ────────────────────────
-const nameY = BY + BR + 58;
+// ══════════════════════════════════════════
+//  SECTION 3 — Right column: Name + Message
+// ══════════════════════════════════════════
+const RX = COL_L + (W - COL_L) / 2; // center of right column
+const RIGHT_W = W - COL_L - 60; // text max width
 
-const ribbonGrad = ctx.createLinearGradient(W * 0.15, 0, W * 0.85, 0);
-ribbonGrad.addColorStop(0, "rgba(255,182,212,0)");
-ribbonGrad.addColorStop(0.25, "rgba(255,182,212,0.55)");
-ribbonGrad.addColorStop(0.75, "rgba(255,182,212,0.55)");
-ribbonGrad.addColorStop(1, "rgba(255,182,212,0)");
-ctx.fillStyle = ribbonGrad;
-ctx.fillRect(W * 0.1, nameY - 34, W * 0.8, 48);
-
+// Recipient name
+const nameY = HEADER_H + 58;
 ctx.textAlign = "center";
 ctx.fillStyle = "#ad1457";
-ctx.font = "bold 42px Georgia, 'Times New Roman', serif";
-ctx.fillText(CARD_TO, W / 2, nameY);
+ctx.font = "bold italic 38px Georgia, 'Times New Roman', serif";
+ctx.fillText("Happy Birthday, " + CARD_TO + "!", RX, nameY);
 
-const divY = nameY + 26;
-ctx.strokeStyle = "rgba(240,100,160,0.35)";
+// Small heart divider
+const divY = nameY + 22;
+ctx.save();
+ctx.strokeStyle = "rgba(240,100,160,0.4)";
 ctx.lineWidth = 1;
 ctx.setLineDash([6, 5]);
 ctx.beginPath();
-ctx.moveTo(80, divY);
-ctx.lineTo(W - 80, divY);
+ctx.moveTo(COL_L + 30, divY);
+ctx.lineTo(W - 40, divY);
 ctx.stroke();
-ctx.setLineDash([]);
-drawHeart(ctx, W / 2, divY - 2, 10, "rgba(230,80,140,0.5)");
+ctx.restore();
+drawHeart(ctx, RX, divY, 9, "rgba(230,80,140,0.5)");
 
-// ── Message text ──────────────────────────
+// Message text — soft rose
 ctx.textAlign = "center";
-ctx.fillStyle = "#7b3a5a";
-ctx.font = "20px Georgia, 'Times New Roman', serif";
+ctx.fillStyle = "#e88fa8";
+ctx.font = "18px Georgia, 'Times New Roman', serif";
+const msgEndY = wrapText(ctx, CARD_MESSAGE, RX, divY + 36, RIGHT_W, 27);
 
-const endY = wrapText(ctx, CARD_MESSAGE, W / 2, divY + 52, W - 160, 30);
-
+// Footer hearts
 ctx.fillStyle = "#e91e8c";
-ctx.font = "22px serif";
-ctx.fillText("✦  ♥  ✦  ♥  ✦", W / 2, Math.max(endY + 30, H - 60));
+ctx.font = "18px serif";
+ctx.fillText("✦  ♥  ✦  ♥  ✦", RX, Math.max(msgEndY + 16, H - 36));
 
-// Vignette
+// ── Vignette ──────────────────────────────
 const vig = ctx.createRadialGradient(
   W / 2,
   H / 2,
-  H * 0.28,
+  W * 0.2,
   W / 2,
   H / 2,
-  H * 0.72,
+  W * 0.65,
 );
 vig.addColorStop(0, "rgba(0,0,0,0)");
-vig.addColorStop(1, "rgba(100,0,40,0.08)");
+vig.addColorStop(1, "rgba(100,0,40,0.07)");
 ctx.fillStyle = vig;
 roundRect(ctx, 0, 0, W, H, 32);
 ctx.fill();
@@ -651,34 +686,32 @@ envWrap.addEventListener("click", (e) => {
   // Animate flap open
   envFlap.classList.add("open");
 
-  // After flap animation: reveal card scaled down inside envelope
+  // After flap animation: reveal card peeking
   setTimeout(() => {
     stage = "open";
     cardInEnv.style.display = "block";
-    // Card starts small and centered inside envelope
-    cardInEnv.style.transition = "none";
-    cardInEnv.style.transform = "translateX(-50%) translateY(-50%) scale(0.55)";
+    cardInEnv.style.transform = "translateX(-50%) translateY(0px)";
 
-    // Tiny bounce to signal it's draggable
+    // Slight delay then peek card up
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         cardInEnv.style.transition =
-          "transform 0.4s cubic-bezier(0.34,1.56,0.64,1)";
-        cardInEnv.style.transform =
-          "translateX(-50%) translateY(-50%) scale(0.58)";
+          "transform 0.45s cubic-bezier(0.34,1.56,0.64,1)";
+        cardInEnv.style.transform = "translateX(-50%) translateY(-65px)";
         setTimeout(() => {
           cardInEnv.style.transition = "";
           envHint.textContent = "drag the card out  ↑";
           envHint.style.transition = "opacity 0.4s ease";
           envHint.style.opacity = "1";
-        }, 400);
+        }, 450);
       });
     });
   }, 650);
 });
 
 // ── Stage 2 → 3: drag card out ────────────
-const SNAP_THRESHOLD = 60; // drag distance to trigger snap-out
+const PEEK_Y = -65; // px card peeks above envelope after open
+const SNAP_THRESHOLD = 110; // additional drag to snap card out
 
 let isDragging = false;
 let dragStartClientY = 0;
@@ -703,8 +736,8 @@ cardInEnv.addEventListener("pointermove", (e) => {
   if (!isDragging) return;
   const delta = Math.max(0, dragStartClientY - getClientY(e));
   dragLastDelta = delta;
-  // Move card upward, keep scale at 0.55 the whole time
-  cardInEnv.style.transform = `translateX(-50%) translateY(calc(-50% - ${delta * 0.6}px)) scale(0.55)`;
+  const totalY = PEEK_Y - delta;
+  cardInEnv.style.transform = `translateX(-50%) translateY(${totalY}px)`;
   e.stopPropagation();
   e.preventDefault();
 });
@@ -716,10 +749,10 @@ cardInEnv.addEventListener("pointerup", (e) => {
   if (dragLastDelta >= SNAP_THRESHOLD) {
     snapCardOut();
   } else {
-    // Snap back to small centered position
+    // Snap back to peek position
     cardInEnv.style.transition =
       "transform 0.35s cubic-bezier(0.34,1.56,0.64,1)";
-    cardInEnv.style.transform = "translateX(-50%) translateY(-50%) scale(0.55)";
+    cardInEnv.style.transform = `translateX(-50%) translateY(${PEEK_Y}px)`;
   }
   e.stopPropagation();
 });
