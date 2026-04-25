@@ -223,11 +223,16 @@ export const _cardReady = _dogLoaded.then(() => {
       const r = d[i],
         g = d[i + 1],
         b = d[i + 2];
+      // Only remove pixels that are very close to pure black
+      // Check that all channels are low AND the pixel is not a dog color
       const brightness = (r + g + b) / 3;
-      if (brightness < 30) {
-        d[i + 3] = 0; // fully transparent
-      } else if (brightness < 80) {
-        d[i + 3] = Math.round(((brightness - 30) / 50) * 255); // soft edge
+      const isNearBlack = r < 20 && g < 20 && b < 20;
+      const isEdge =
+        brightness < 45 && Math.max(r, g, b) - Math.min(r, g, b) < 15;
+      if (isNearBlack) {
+        d[i + 3] = 0;
+      } else if (isEdge) {
+        d[i + 3] = Math.round((brightness / 45) * 255);
       }
     }
     tctx.putImageData(imgData, 0, 0);
@@ -469,6 +474,7 @@ export function openEnvelope() {
 
   // Reset all states
   envFlap.classList.remove("open");
+  document.getElementById("envFlapOuter").classList.remove("opened");
   cardInEnv.style.cssText = "";
   cardInEnv.style.display = "none";
   cardInEnv.style.position = "";
@@ -517,6 +523,9 @@ envWrap.addEventListener("click", (e) => {
 
   // Animate flap open
   envFlap.classList.add("open");
+  setTimeout(() => {
+    document.getElementById("envFlapOuter").classList.add("opened");
+  }, 660);
 
   // After flap animation: reveal card peeking
   setTimeout(() => {
