@@ -264,16 +264,50 @@ for (const hx of [W / 2 - 40, W / 2, W / 2 + 40]) {
 const RX = COL_L + (W - COL_L) / 2;
 const RIGHT_W = W - COL_L - 50;
 
-// Message text — soft rose, bigger, emojis on
+// Split message at "Happy Birthday, Mishieeee!!"
+const splitMarker = "Happy Birthday, Mishieeee!!";
+const splitIdx = CARD_MESSAGE.indexOf(splitMarker);
+const part1 =
+  splitIdx !== -1 ? CARD_MESSAGE.slice(0, splitIdx).trim() : CARD_MESSAGE;
+const part2 = splitIdx !== -1 ? CARD_MESSAGE.slice(splitIdx).trim() : "";
+
+// Available vertical space in right column
+const colTop = NAME_Y + 24;
+const colBot = H - 44;
+const colH = colBot - colTop;
+const midY = colTop + colH / 2;
+
 ctx.textAlign = "center";
 ctx.fillStyle = "#d6618a";
-ctx.font = "20px Georgia, 'Times New Roman', serif";
-const msgEndY = wrapText(ctx, CARD_MESSAGE, RX, NAME_Y + 32, RIGHT_W, 30);
+ctx.font = "19px Georgia, 'Times New Roman', serif";
+const lineH = 28;
 
-// Footer hearts centered on right column
+// Part 1 — drawn in top half of right column
+const p1EndY = wrapText(ctx, part1, RX, colTop, RIGHT_W, lineH);
+
+// Small divider + heart between parts
+const divMidY = (p1EndY + midY) / 2;
+ctx.save();
+ctx.strokeStyle = "rgba(240,100,160,0.35)";
+ctx.lineWidth = 1;
+ctx.setLineDash([5, 5]);
+ctx.beginPath();
+ctx.moveTo(COL_L + 20, divMidY);
+ctx.lineTo(W - 30, divMidY);
+ctx.stroke();
+ctx.restore();
+drawHeart(ctx, RX, divMidY, 7, "rgba(230,80,140,0.4)");
+
+// Part 2 — starts at midpoint of column
+ctx.fillStyle = "#c2185b";
+ctx.font = "bold 19px Georgia, 'Times New Roman', serif";
+const p2StartY = midY + 4;
+const p2EndY = wrapText(ctx, part2, RX, p2StartY, RIGHT_W, lineH);
+
+// Footer hearts
 ctx.fillStyle = "#e91e8c";
-ctx.font = "18px serif";
-ctx.fillText("✦  ♥  ✦  ♥  ✦", RX, Math.max(msgEndY + 14, H - 34));
+ctx.font = "17px serif";
+ctx.fillText("✦  ♥  ✦  ♥  ✦", RX, Math.max(p2EndY + 10, H - 34));
 
 // ── Vignette ──────────────────────────────
 const vig = ctx.createRadialGradient(
