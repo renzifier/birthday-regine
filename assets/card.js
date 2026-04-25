@@ -204,14 +204,36 @@ export const _cardReady = _dogLoaded.then(() => {
     const imgMaxW = COL_L - 40;
     const imgMaxH = H - HEADER_H - 40;
     const scale = Math.min(imgMaxW / _dogImg.width, imgMaxH / _dogImg.height);
-    const dw = _dogImg.width * scale;
-    const dh = _dogImg.height * scale;
-    const dx = DOG_X - dw / 2;
-    const dy = HEADER_H + (H - HEADER_H) / 2 - dh / 2;
-    ctx.save();
-    ctx.globalCompositeOperation = "screen"; // knocks out black bg
-    ctx.drawImage(_dogImg, dx, dy, dw, dh);
-    ctx.restore();
+    const dw = Math.floor(_dogImg.width * scale);
+    const dh = Math.floor(_dogImg.height * scale);
+    const dx = Math.floor(DOG_X - dw / 2);
+    const dy = Math.floor(HEADER_H + (H - HEADER_H) / 2 - dh / 2);
+
+    // Draw dog to a temp canvas to process pixels (remove black bg)
+    const tmp = document.createElement("canvas");
+    tmp.width = dw;
+    tmp.height = dh;
+    const tctx = tmp.getContext("2d");
+    tctx.drawImage(_dogImg, 0, 0, dw, dh);
+
+    // Remove black background: set alpha=0 for near-black pixels
+    const imgData = tctx.getImageData(0, 0, dw, dh);
+    const d = imgData.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i],
+        g = d[i + 1],
+        b = d[i + 2];
+      const brightness = (r + g + b) / 3;
+      if (brightness < 30) {
+        d[i + 3] = 0; // fully transparent
+      } else if (brightness < 80) {
+        d[i + 3] = Math.round(((brightness - 30) / 50) * 255); // soft edge
+      }
+    }
+    tctx.putImageData(imgData, 0, 0);
+
+    // Draw processed dog onto card canvas
+    ctx.drawImage(tmp, dx, dy);
   }
 });
 

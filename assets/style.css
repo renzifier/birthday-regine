@@ -441,12 +441,10 @@ canvas {
   top: 0;
   left: 0;
   right: 0;
-  /* flap covers top ~52% of envelope */
   height: 52%;
-  overflow: hidden;
+  /* NO overflow:hidden — it clips the flap during rotation */
   z-index: 3;
   pointer-events: none;
-  /* perspective for 3-D fold */
   perspective: 800px;
   perspective-origin: 50% 100%;
 }
@@ -461,7 +459,7 @@ canvas {
   transform-origin: 50% 100%; /* fold from its bottom edge = envelope top crease */
   transform: rotateX(0deg);
   transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
-  backface-visibility: hidden;
+  backface-visibility: visible;
 
   /* Triangle via clip-path */
   clip-path: polygon(0% 0%, 100% 0%, 50% 50%);
@@ -471,7 +469,7 @@ canvas {
 
 /* Flap open: fold back 180° */
 #envFlap.open {
-  transform: rotateX(-180deg);
+  transform: rotateX(180deg);
 }
 
 /* ── Card inside the envelope ──
