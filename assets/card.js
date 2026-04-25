@@ -444,24 +444,24 @@ export function openEnvelope() {
     cardFullImg.src = dataUrl;
   });
 
-  // Reset all states
+  // Reset all states — move cardInEnv back into envWrap if it was reparented
+  if (cardInEnv.parentElement !== envWrap) {
+    envWrap.insertBefore(cardInEnv, envWrap.firstChild);
+  }
   envFlap.classList.remove("open");
   document.getElementById("envFlapOuter").classList.remove("opened");
-  cardInEnv.style.cssText = "";
+  // Clear ALL inline styles completely
+  cardInEnv.removeAttribute("style");
   cardInEnv.style.display = "none";
-  cardInEnv.style.position = "";
-  cardInEnv.style.zIndex = "";
-  cardInEnv.style.width = "";
-  cardInEnv.style.borderRadius = "";
-  cardInEnv.style.boxShadow = "";
-  cardInEnv.style.transition = "";
   envScene.classList.remove("hidden");
+  envScene.style.opacity = "";
   cardFullView.classList.remove("visible");
   envSeal.style.opacity = "1";
   envWrap.style.opacity = "1";
   envWrap.style.transition = "";
   envHint.textContent = "tap to open";
-  envHint.style.opacity = "1";
+  envHint.style.opacity = "";
+  envHint.style.transition = "";
 
   stage = "closed";
   overlay.classList.add("open");
