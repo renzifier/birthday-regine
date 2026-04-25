@@ -667,11 +667,8 @@ function snapCardOut() {
     envScene.classList.add("hidden");
   }, 300);
 
-  // Enable flip only after transition fully completes
-  cardInEnv.addEventListener("transitionend", function onDone() {
-    cardInEnv.removeEventListener("transitionend", onDone);
-    _enableFlip();
-  });
+  // Enable flip after transition completes (0.5s + small buffer)
+  setTimeout(_enableFlip, 600);
 }
 
 // ── Flip card feature ─────────────────────
