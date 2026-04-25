@@ -499,49 +499,100 @@ envWrap.addEventListener("click", (e) => {
     document.getElementById("envFlapOuter").classList.add("opened");
   }, 660);
 
-  // After flap animation: pop card in at center, no sliding
+  // After flap animation: pop card in INSIDE the envelope
   setTimeout(() => {
     stage = "open";
-
-    // Move card to fixed center immediately (no position change animation)
-    const overlayEl = document.getElementById("envOverlay");
-    overlayEl.appendChild(cardInEnv);
-    cardInEnv.style.position = "fixed";
-    cardInEnv.style.top = "50%";
-    cardInEnv.style.left = "50%";
-    cardInEnv.style.width = "min(560px, 92vw)";
-    cardInEnv.style.borderRadius = "18px";
-    cardInEnv.style.boxShadow = "0 24px 64px rgba(0,0,0,0.55)";
-    cardInEnv.style.zIndex = "200";
     cardInEnv.style.display = "block";
     cardInEnv.style.opacity = "0";
-    cardInEnv.style.transform = "translate(-50%, -50%) scale(0.7)";
+    cardInEnv.style.transform = "translateX(-50%) translateY(-50%) scale(0.55)";
 
-    // Pop in with spring
+    // Pop in with spring — card appears inside envelope
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         cardInEnv.style.transition =
           "transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease";
-        cardInEnv.style.transform = "translate(-50%, -50%) scale(1)";
+        cardInEnv.style.transform =
+          "translateX(-50%) translateY(-50%) scale(0.58)";
         cardInEnv.style.opacity = "1";
         setTimeout(() => {
           cardInEnv.style.transition = "";
-          envHint.style.opacity = "0"; // hide hint once card is shown
+          envHint.textContent = "drag the card out  ↑";
+          envHint.style.transition = "opacity 0.4s ease";
+          envHint.style.opacity = "1";
         }, 450);
       });
     });
   }, 650);
 });
 
-// ── Stage 2: envelope fades out after card pops in ────────────────────────
-// Card is already centered and visible from the reveal above.
-// Just fade the envelope scene out behind it.
-setTimeout(() => {
-  if (stage === "open") {
-    envHint.style.transition = "opacity 0.3s ease";
-    envHint.style.opacity = "0";
-    envScene.style.transition = "opacity 0.5s ease";
-    envScene.classList.add("hidden");
-    stage = "cardout";
+// ── Stage 2 → 3: drag card out ────────────
+const SNAP_THRESHOLD = 60;
+
+let isDragging = false;
+let dragStartClientY = 0;
+let dragLastDelta = 0;
+
+function getClientY(e) {
+  return e.touches ? e.touches[0].clientY : e.clientY;
+}
+
+cardInEnv.addEventListener("pointerdown", (e) => {
+  if (stage !== "open") return;
+  isDragging = true;
+  dragStartClientY = getClientY(e);
+  dragLastDelta = 0;
+  cardInEnv.style.transition = "none";
+  cardInEnv.setPointerCapture(e.pointerId);
+  e.stopPropagation();
+  e.preventDefault();
+});
+
+cardInEnv.addEventListener("pointermove", (e) => {
+  if (!isDragging) return;
+  const delta = Math.max(0, dragStartClientY - getClientY(e));
+  dragLastDelta = delta;
+  cardInEnv.style.transform = `translateX(-50%) translateY(calc(-50% - ${delta * 0.6}px)) scale(0.58)`;
+  e.stopPropagation();
+  e.preventDefault();
+});
+
+cardInEnv.addEventListener("pointerup", (e) => {
+  if (!isDragging) return;
+  isDragging = false;
+  if (dragLastDelta >= SNAP_THRESHOLD) {
+    snapCardOut();
+  } else {
+    cardInEnv.style.transition =
+      "transform 0.35s cubic-bezier(0.34,1.56,0.64,1)";
+    cardInEnv.style.transform = "translateX(-50%) translateY(-50%) scale(0.58)";
   }
-}, 1200); // flap(650ms) + pop(450ms) + brief pause
+  e.stopPropagation();
+});
+
+function snapCardOut() {
+  stage = "cardout";
+  envHint.style.transition = "opacity 0.2s ease";
+  envHint.style.opacity = "0";
+
+  // Reparent so card survives envScene fade
+  const overlayEl = document.getElementById("envOverlay");
+  overlayEl.appendChild(cardInEnv);
+
+  // Pop to full size at center
+  cardInEnv.style.transition =
+    "transform 0.5s cubic-bezier(0.34,1.56,0.64,1), top 0.5s ease, left 0.5s ease, width 0.5s ease";
+  cardInEnv.style.position = "fixed";
+  cardInEnv.style.top = "50%";
+  cardInEnv.style.left = "50%";
+  cardInEnv.style.width = "min(560px, 92vw)";
+  cardInEnv.style.transform = "translate(-50%, -50%) scale(1)";
+  cardInEnv.style.zIndex = "200";
+  cardInEnv.style.borderRadius = "18px";
+  cardInEnv.style.boxShadow = "0 24px 64px rgba(0,0,0,0.55)";
+
+  // Fade envelope out behind card
+  setTimeout(() => {
+    envScene.style.transition = "opacity 0.4s ease";
+    envScene.classList.add("hidden");
+  }, 300);
+}
