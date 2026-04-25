@@ -604,7 +604,11 @@ function snapCardOut() {
   envHint.style.transition = "opacity 0.2s ease";
   envHint.style.opacity = "0";
 
-  // 1. Pop card to fixed center — springs out with bounce
+  // 1. Reparent cardInEnv to overlay so it survives envScene fade
+  const overlay = document.getElementById("envOverlay");
+  overlay.appendChild(cardInEnv);
+
+  // 2. Pop card to fixed center with spring bounce
   cardInEnv.style.transition = [
     "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
     "top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -619,8 +623,9 @@ function snapCardOut() {
   cardInEnv.style.zIndex = "200";
   cardInEnv.style.borderRadius = "18px";
   cardInEnv.style.boxShadow = "0 24px 64px rgba(0,0,0,0.55)";
+  cardInEnv.style.cursor = "default";
 
-  // 2. Fade out the whole envOverlay (envelope + flap + all) behind the card
+  // 3. Fade envelope scene out — card is now outside it so it stays visible
   setTimeout(() => {
     envScene.style.transition = "opacity 0.4s ease";
     envScene.classList.add("hidden");
