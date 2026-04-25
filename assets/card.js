@@ -209,36 +209,8 @@ export const _cardReady = _dogLoaded.then(() => {
     const dx = Math.floor(DOG_X - dw / 2);
     const dy = Math.floor(HEADER_H + (H - HEADER_H) / 2 - dh / 2);
 
-    // Draw dog inside a soft rounded-rect frame to hide the black bg cleanly
-    ctx.save();
-    // Clip to rounded rect matching dog area
-    const pad = 8;
-    const rx = 18;
-    ctx.beginPath();
-    ctx.moveTo(dx + pad + rx, dy + pad);
-    ctx.lineTo(dx + dw - pad - rx, dy + pad);
-    ctx.quadraticCurveTo(dx + dw - pad, dy + pad, dx + dw - pad, dy + pad + rx);
-    ctx.lineTo(dx + dw - pad, dy + dh - pad - rx);
-    ctx.quadraticCurveTo(
-      dx + dw - pad,
-      dy + dh - pad,
-      dx + dw - pad - rx,
-      dy + dh - pad,
-    );
-    ctx.lineTo(dx + pad + rx, dy + dh - pad);
-    ctx.quadraticCurveTo(dx + pad, dy + dh - pad, dx + pad, dy + dh - pad - rx);
-    ctx.lineTo(dx + pad, dy + pad + rx);
-    ctx.quadraticCurveTo(dx + pad, dy + pad, dx + pad + rx, dy + pad);
-    ctx.closePath();
-    ctx.clip();
+    // Dog PNG now has transparency (bg removed in preprocessing)
     ctx.drawImage(_dogImg, dx, dy, dw, dh);
-    ctx.restore();
-    // Soft pink overlay on the black area (top of image) to blend with card bg
-    const dogBlend = ctx.createLinearGradient(dx, dy, dx, dy + dh * 0.18);
-    dogBlend.addColorStop(0, "rgba(253,232,240,0.92)");
-    dogBlend.addColorStop(1, "rgba(253,232,240,0)");
-    ctx.fillStyle = dogBlend;
-    ctx.fillRect(dx, dy, dw, dh * 0.18);
   }
 });
 
