@@ -273,7 +273,7 @@ const part2 = splitIdx !== -1 ? CARD_MESSAGE.slice(splitIdx).trim() : "";
 
 // Measure both parts first to know total height, then center vertically
 const colBot = H - 50;
-const font = "17px Georgia, 'Times New Roman', serif";
+const font = "bold 18px Georgia, 'Times New Roman', serif";
 const lineH = 25;
 ctx.font = font;
 
@@ -306,7 +306,7 @@ const blockStartY = colTop + Math.max(0, (colH - totalH) / 2);
 
 // Part 1 — same style as part 2
 ctx.textAlign = "center";
-ctx.fillStyle = "#ad1457";
+ctx.fillStyle = "#c2185b";
 ctx.font = font;
 const p1EndY = wrapText(ctx, part1, RX, blockStartY, RIGHT_W, lineH);
 
@@ -324,7 +324,7 @@ ctx.restore();
 drawHeart(ctx, RX, divY2, 7, "rgba(230,80,140,0.4)");
 
 // Part 2 — same style as part 1
-ctx.fillStyle = "#ad1457";
+ctx.fillStyle = "#c2185b";
 ctx.font = font;
 const p2EndY = wrapText(ctx, part2, RX, divY2 + 14, RIGHT_W, lineH);
 
