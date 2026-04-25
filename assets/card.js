@@ -209,36 +209,36 @@ export const _cardReady = _dogLoaded.then(() => {
     const dx = Math.floor(DOG_X - dw / 2);
     const dy = Math.floor(HEADER_H + (H - HEADER_H) / 2 - dh / 2);
 
-    // Draw dog to a temp canvas to process pixels (remove black bg)
-    const tmp = document.createElement("canvas");
-    tmp.width = dw;
-    tmp.height = dh;
-    const tctx = tmp.getContext("2d");
-    tctx.drawImage(_dogImg, 0, 0, dw, dh);
-
-    // Remove black background: set alpha=0 for near-black pixels
-    const imgData = tctx.getImageData(0, 0, dw, dh);
-    const d = imgData.data;
-    for (let i = 0; i < d.length; i += 4) {
-      const r = d[i],
-        g = d[i + 1],
-        b = d[i + 2];
-      // Only remove pixels that are very close to pure black
-      // Check that all channels are low AND the pixel is not a dog color
-      const brightness = (r + g + b) / 3;
-      const isNearBlack = r < 20 && g < 20 && b < 20;
-      const isEdge =
-        brightness < 45 && Math.max(r, g, b) - Math.min(r, g, b) < 15;
-      if (isNearBlack) {
-        d[i + 3] = 0;
-      } else if (isEdge) {
-        d[i + 3] = Math.round((brightness / 45) * 255);
-      }
-    }
-    tctx.putImageData(imgData, 0, 0);
-
-    // Draw processed dog onto card canvas
-    ctx.drawImage(tmp, dx, dy);
+    // Draw dog inside a soft rounded-rect frame to hide the black bg cleanly
+    ctx.save();
+    // Clip to rounded rect matching dog area
+    const pad = 8;
+    const rx = 18;
+    ctx.beginPath();
+    ctx.moveTo(dx + pad + rx, dy + pad);
+    ctx.lineTo(dx + dw - pad - rx, dy + pad);
+    ctx.quadraticCurveTo(dx + dw - pad, dy + pad, dx + dw - pad, dy + pad + rx);
+    ctx.lineTo(dx + dw - pad, dy + dh - pad - rx);
+    ctx.quadraticCurveTo(
+      dx + dw - pad,
+      dy + dh - pad,
+      dx + dw - pad - rx,
+      dy + dh - pad,
+    );
+    ctx.lineTo(dx + pad + rx, dy + dh - pad);
+    ctx.quadraticCurveTo(dx + pad, dy + dh - pad, dx + pad, dy + dh - pad - rx);
+    ctx.lineTo(dx + pad, dy + pad + rx);
+    ctx.quadraticCurveTo(dx + pad, dy + pad, dx + pad + rx, dy + pad);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(_dogImg, dx, dy, dw, dh);
+    ctx.restore();
+    // Soft pink overlay on the black area (top of image) to blend with card bg
+    const dogBlend = ctx.createLinearGradient(dx, dy, dx, dy + dh * 0.18);
+    dogBlend.addColorStop(0, "rgba(253,232,240,0.92)");
+    dogBlend.addColorStop(1, "rgba(253,232,240,0)");
+    ctx.fillStyle = dogBlend;
+    ctx.fillRect(dx, dy, dw, dh * 0.18);
   }
 });
 
@@ -604,11 +604,13 @@ function snapCardOut() {
   envHint.style.transition = "opacity 0.2s ease";
   envHint.style.opacity = "0";
 
-  // Pop the card in-place: scale it up from its current small size to fill the overlay
-  // Keep envScene visible (envelope stays as backdrop), just animate cardInEnv
-  cardInEnv.style.transition =
-    "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)";
-  // Move card to center of overlay and expand it
+  // 1. Pop card to fixed center — springs out with bounce
+  cardInEnv.style.transition = [
+    "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
+    "top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
+    "left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
+    "width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
+  ].join(", ");
   cardInEnv.style.position = "fixed";
   cardInEnv.style.top = "50%";
   cardInEnv.style.left = "50%";
@@ -617,4 +619,10 @@ function snapCardOut() {
   cardInEnv.style.zIndex = "200";
   cardInEnv.style.borderRadius = "18px";
   cardInEnv.style.boxShadow = "0 24px 64px rgba(0,0,0,0.55)";
+
+  // 2. Fade out the whole envOverlay (envelope + flap + all) behind the card
+  setTimeout(() => {
+    envScene.style.transition = "opacity 0.4s ease";
+    envScene.classList.add("hidden");
+  }, 300);
 }
