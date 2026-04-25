@@ -456,7 +456,7 @@ canvas {
   left: 0;
   right: 0;
   height: 200%; /* tall enough to contain the triangle even after fold */
-  transform-origin: 50% 100%; /* fold from its bottom edge = envelope top crease */
+  transform-origin: 50% 0%; /* fold from TOP edge so it opens upward */
   transform: rotateX(0deg);
   transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
   backface-visibility: visible;
@@ -469,7 +469,7 @@ canvas {
 
 /* Flap open: fold back 180° */
 #envFlap.open {
-  transform: rotateX(180deg);
+  transform: rotateX(-180deg);
 }
 
 /* ── Card inside the envelope ──
