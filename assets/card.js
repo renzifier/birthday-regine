@@ -306,7 +306,7 @@ const blockStartY = colTop + Math.max(0, (colH - totalH) / 2);
 
 // Part 1 — same style as part 2
 ctx.textAlign = "center";
-ctx.fillStyle = "#d6618a";
+ctx.fillStyle = "#ad1457";
 ctx.font = font;
 const p1EndY = wrapText(ctx, part1, RX, blockStartY, RIGHT_W, lineH);
 
@@ -324,7 +324,7 @@ ctx.restore();
 drawHeart(ctx, RX, divY2, 7, "rgba(230,80,140,0.4)");
 
 // Part 2 — same style as part 1
-ctx.fillStyle = "#d6618a";
+ctx.fillStyle = "#ad1457";
 ctx.font = font;
 const p2EndY = wrapText(ctx, part2, RX, divY2 + 14, RIGHT_W, lineH);
 
