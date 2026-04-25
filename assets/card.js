@@ -502,11 +502,12 @@ export function openEnvelope() {
     cardFullImg.src = dataUrl;
   });
 
-  // Clean up flip wrapper if present — move cardInEnv back out first
+  // Clean up flip wrapper
   const flipWrapper = document.getElementById("cardFlipWrapper");
-  if (flipWrapper) {
-    flipWrapper.parentElement.removeChild(flipWrapper);
-  }
+  if (flipWrapper) flipWrapper.remove();
+  const frontFace = document.getElementById("cardFront");
+  if (frontFace) frontFace.remove();
+  cardInEnv.style.visibility = "";
   const flipHint = document.querySelector("#envOverlay div[style*='flip']");
   if (flipHint) flipHint.remove();
   // Remove all stray flip hints
@@ -666,51 +667,63 @@ function snapCardOut() {
     envScene.classList.add("hidden");
   }, 300);
 
-  // Enable flip after card is fully out
-  setTimeout(() => {
+  // Enable flip only after transition fully completes
+  cardInEnv.addEventListener("transitionend", function onDone() {
+    cardInEnv.removeEventListener("transitionend", onDone);
     _enableFlip();
-  }, 600);
+  });
 }
 
 // ── Flip card feature ─────────────────────
 function _enableFlip() {
-  // Create flip wrapper around cardInEnv
-  // Get the actual rendered size of cardInEnv before reparenting
+  // Card is already at full size, fixed centered — read its exact rect
   const cardRect = cardInEnv.getBoundingClientRect();
+  const W = cardRect.width,
+    H = cardRect.height;
+
+  // Build wrapper that sits exactly over the card
   const wrapper = document.createElement("div");
   wrapper.id = "cardFlipWrapper";
   Object.assign(wrapper.style, {
     position: "fixed",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: cardRect.width + "px",
+    top: cardRect.top + "px",
+    left: cardRect.left + "px",
+    width: W + "px",
+    height: H + "px",
     zIndex: "200",
-    perspective: "1200px",
+    perspective: "1400px",
     cursor: "pointer",
   });
 
-  // Inner container that actually flips
+  // Inner that flips
   const inner = document.createElement("div");
   inner.id = "cardFlipInner";
   Object.assign(inner.style, {
     position: "relative",
     width: "100%",
-    height: cardRect.height + "px",
+    height: "100%",
     transition: "transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)",
     transformStyle: "preserve-3d",
   });
 
-  // Front = existing cardInEnv
-  cardInEnv.style.position = "absolute";
-  cardInEnv.style.inset = "0";
-  cardInEnv.style.top = "";
-  cardInEnv.style.left = "";
-  cardInEnv.style.transform = "";
-  cardInEnv.style.zIndex = "";
-  cardInEnv.style.width = "100%";
-  cardInEnv.style.backfaceVisibility = "hidden";
-  cardInEnv.style.webkitBackfaceVisibility = "hidden";
+  // Front — hide original card, draw img into front face
+  cardInEnv.style.visibility = "hidden"; // hide original, front face replaces it
+  const frontEl = document.createElement("div");
+  frontEl.id = "cardFront";
+  Object.assign(frontEl.style, {
+    position: "absolute",
+    inset: "0",
+    borderRadius: "18px",
+    overflow: "hidden",
+    backfaceVisibility: "hidden",
+    webkitBackfaceVisibility: "hidden",
+    boxShadow: "0 24px 64px rgba(0,0,0,0.55)",
+  });
+  const frontImg = document.createElement("img");
+  frontImg.src = document.getElementById("cardPullImg").src;
+  frontImg.style.cssText =
+    "width:100%;height:100%;display:block;object-fit:cover;";
+  frontEl.appendChild(frontImg);
 
   // Back = new canvas with a special back-of-card design
   const backEl = document.createElement("div");
@@ -823,7 +836,7 @@ function _enableFlip() {
   backEl.appendChild(backCanvas);
 
   // Assemble
-  inner.appendChild(cardInEnv);
+  inner.appendChild(frontEl);
   inner.appendChild(backEl);
   wrapper.appendChild(inner);
   document.getElementById("envOverlay").appendChild(wrapper);
