@@ -651,32 +651,34 @@ envWrap.addEventListener("click", (e) => {
   // Animate flap open
   envFlap.classList.add("open");
 
-  // After flap animation: reveal card peeking
+  // After flap animation: reveal card scaled down inside envelope
   setTimeout(() => {
     stage = "open";
     cardInEnv.style.display = "block";
-    cardInEnv.style.transform = "translateX(-50%) translateY(0px)";
+    // Card starts small and centered inside envelope
+    cardInEnv.style.transition = "none";
+    cardInEnv.style.transform = "translateX(-50%) translateY(-50%) scale(0.55)";
 
-    // Slight delay then peek card up
+    // Tiny bounce to signal it's draggable
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         cardInEnv.style.transition =
-          "transform 0.45s cubic-bezier(0.34,1.56,0.64,1)";
-        cardInEnv.style.transform = `translateX(-50%) translateY(${PEEK_Y}px)`;
+          "transform 0.4s cubic-bezier(0.34,1.56,0.64,1)";
+        cardInEnv.style.transform =
+          "translateX(-50%) translateY(-50%) scale(0.58)";
         setTimeout(() => {
           cardInEnv.style.transition = "";
           envHint.textContent = "drag the card out  ↑";
           envHint.style.transition = "opacity 0.4s ease";
           envHint.style.opacity = "1";
-        }, 450);
+        }, 400);
       });
     });
   }, 650);
 });
 
 // ── Stage 2 → 3: drag card out ────────────
-const PEEK_Y = -15; // card peeks just slightly above envelope opening
-const SNAP_THRESHOLD = 110; // additional drag to snap card out
+const SNAP_THRESHOLD = 60; // drag distance to trigger snap-out
 
 let isDragging = false;
 let dragStartClientY = 0;
@@ -701,8 +703,11 @@ cardInEnv.addEventListener("pointermove", (e) => {
   if (!isDragging) return;
   const delta = Math.max(0, dragStartClientY - getClientY(e));
   dragLastDelta = delta;
-  const totalY = PEEK_Y - delta;
-  cardInEnv.style.transform = `translateX(-50%) translateY(${totalY}px)`;
+  // As card is dragged up, scale grows from 0.55 toward 1.0
+  const progress = Math.min(1, delta / SNAP_THRESHOLD);
+  const scale = 0.55 + 0.45 * progress;
+  const translateY = -50 - delta * 0.6; // move upward as % is tricky, use px offset
+  cardInEnv.style.transform = `translateX(-50%) translateY(calc(-50% - ${delta * 0.6}px)) scale(${scale.toFixed(3)})`;
   e.stopPropagation();
   e.preventDefault();
 });
@@ -714,10 +719,10 @@ cardInEnv.addEventListener("pointerup", (e) => {
   if (dragLastDelta >= SNAP_THRESHOLD) {
     snapCardOut();
   } else {
-    // Snap back to peek position
+    // Snap back to small centered position
     cardInEnv.style.transition =
       "transform 0.35s cubic-bezier(0.34,1.56,0.64,1)";
-    cardInEnv.style.transform = `translateX(-50%) translateY(${PEEK_Y}px)`;
+    cardInEnv.style.transform = "translateX(-50%) translateY(-50%) scale(0.55)";
   }
   e.stopPropagation();
 });
