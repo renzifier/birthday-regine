@@ -23,12 +23,9 @@ const ctx = cardCanvas.getContext("2d");
 
 // Dog photo — loaded async, drawing deferred until ready
 let _dogImg = null;
-const _dogLoaded = new Promise((resolve) => {
+const _dogLoaded = new Promise(resolve => {
   const img = new Image();
-  img.onload = () => {
-    _dogImg = img;
-    resolve();
-  };
+  img.onload = () => { _dogImg = img; resolve(); };
   img.onerror = () => resolve(); // fallback: draw without dog
   img.src = "assets/fatdog.png";
 });
@@ -63,10 +60,7 @@ function wrapText(ctx, text, x, startY, maxWidth, lineH) {
       line = test;
     }
   }
-  if (line.trim()) {
-    ctx.fillText(line.trim(), x, y);
-    y += lineH;
-  }
+  if (line.trim()) { ctx.fillText(line.trim(), x, y); y += lineH; }
   return y;
 }
 
@@ -117,7 +111,7 @@ const gx = W / HEART_COLS;
 const gy = H / HEART_ROWS;
 for (let row = 0; row < HEART_ROWS + 1; row++) {
   for (let col = 0; col < HEART_COLS + 1; col++) {
-    const ox = row % 2 === 0 ? 0 : gx * 0.5;
+    const ox = (row % 2 === 0) ? 0 : gx * 0.5;
     drawHeart(ctx, col * gx + ox, row * gy, 9, "rgba(240,130,170,0.18)");
   }
 }
@@ -138,12 +132,7 @@ ctx.stroke();
 ctx.restore();
 
 // ── Corner florals ────────────────────────
-for (const [fx, fy] of [
-  [46, 42],
-  [W - 46, 42],
-  [46, H - 42],
-  [W - 46, H - 42],
-]) {
+for (const [fx, fy] of [[46,42],[W-46,42],[46,H-42],[W-46,H-42]]) {
   drawFloral(fx, fy, 24, 5, "rgba(244,143,177,0.6)");
   drawFloral(fx, fy, 16, 5, "rgba(255,200,220,0.75)");
 }
@@ -186,14 +175,14 @@ ctx.fillText("♥  ♡  ♥  ♡  ♥", W / 2, 98);
 // ══════════════════════════════════════════
 //  SECTION 2 — Left column: Dog illustration
 // ══════════════════════════════════════════
-const COL_L = W * 0.38; // left column width
+const COL_L = W * 0.38;   // left column width
 const DOG_X = COL_L / 2;
 const DOG_Y = HEADER_H + (H - HEADER_H) / 2 + 10;
 const DOG_R = 82;
 
-const DOG_TAN = "#c8844a";
+const DOG_TAN   = "#c8844a";
 const DOG_LIGHT = "#e8b07a";
-const DOG_DARK = "#9a6030";
+const DOG_DARK  = "#9a6030";
 const DOG_WHITE = "#fdf5ec";
 const EAR_INNER = "#e09060";
 
@@ -229,7 +218,7 @@ ctx.restore();
 //  SECTION 3 — Name banner (full width, below header)
 //              then right column message
 // ══════════════════════════════════════════
-const NAME_H = 58; // height of the name band below the header
+const NAME_H = 58;  // height of the name band below the header
 const NAME_Y = HEADER_H + NAME_H; // bottom of name band
 
 // Name band — subtle deeper pink strip
@@ -256,7 +245,7 @@ ctx.stroke();
 ctx.restore();
 
 // Heart row on divider
-for (const hx of [W / 2 - 40, W / 2, W / 2 + 40]) {
+for (const hx of [W/2 - 40, W/2, W/2 + 40]) {
   drawHeart(ctx, hx, NAME_Y, 7, "rgba(230,80,140,0.45)");
 }
 
@@ -276,14 +265,7 @@ ctx.font = "18px serif";
 ctx.fillText("✦  ♥  ✦  ♥  ✦", RX, Math.max(msgEndY + 14, H - 34));
 
 // ── Vignette ──────────────────────────────
-const vig = ctx.createRadialGradient(
-  W / 2,
-  H / 2,
-  W * 0.2,
-  W / 2,
-  H / 2,
-  W * 0.65,
-);
+const vig = ctx.createRadialGradient(W/2, H/2, W * 0.2, W/2, H/2, W * 0.65);
 vig.addColorStop(0, "rgba(0,0,0,0)");
 vig.addColorStop(1, "rgba(100,0,40,0.07)");
 ctx.fillStyle = vig;
@@ -437,21 +419,8 @@ let stage = "";
 
 // ── Open / Close ──────────────────────────
 export function openEnvelope() {
-  // Ensure dog photo drawn before exporting canvas
+  // Dog is drawn once at module load via _dogLoaded. Just export the canvas.
   _dogLoaded.then(() => {
-    if (_dogImg) {
-      const imgMaxW = COL_L - 40;
-      const imgMaxH = H - HEADER_H - 40;
-      const scale = Math.min(imgMaxW / _dogImg.width, imgMaxH / _dogImg.height);
-      const dw = _dogImg.width * scale;
-      const dh = _dogImg.height * scale;
-      const dx = DOG_X - dw / 2;
-      const dy = HEADER_H + (H - HEADER_H) / 2 - dh / 2;
-      ctx.save();
-      ctx.globalCompositeOperation = "multiply";
-      ctx.drawImage(_dogImg, dx, dy, dw, dh);
-      ctx.restore();
-    }
     const dataUrl = cardCanvas.toDataURL("image/png");
     cardPullImg.src = dataUrl;
     cardFullImg.src = dataUrl;
@@ -584,8 +553,14 @@ function snapCardOut() {
   envScene.style.transition = "opacity 0.35s ease";
   envScene.classList.add("hidden");
 
-  // Show full card view
+  // Show full card — re-trigger popIn by cloning the img element
   setTimeout(() => {
+    const oldImg = cardFullView.querySelector("img");
+    if (oldImg) {
+      const newImg = oldImg.cloneNode(true);
+      newImg.src = oldImg.src; // same src, fresh element = animation replays
+      oldImg.replaceWith(newImg);
+    }
     cardFullView.classList.add("visible");
   }, 280);
 }

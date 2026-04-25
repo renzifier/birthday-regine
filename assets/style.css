@@ -447,7 +447,7 @@ canvas {
   z-index: 3;
   pointer-events: none;
   /* perspective for 3-D fold */
-  perspective: 600px;
+  perspective: 800px;
   perspective-origin: 50% 100%;
 }
 
@@ -460,7 +460,7 @@ canvas {
   height: 200%; /* tall enough to contain the triangle even after fold */
   transform-origin: 50% 100%; /* fold from its bottom edge = envelope top crease */
   transform: rotateX(0deg);
-  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
   backface-visibility: hidden;
 
   /* Triangle via clip-path */
@@ -471,7 +471,7 @@ canvas {
 
 /* Flap open: fold back 180° */
 #envFlap.open {
-  transform: rotateX(180deg);
+  transform: rotateX(-180deg);
 }
 
 /* ── Card inside the envelope ──
@@ -518,7 +518,7 @@ canvas {
   gap: 14px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.15s ease;
 }
 #cardFullView.visible {
   opacity: 1;
@@ -534,11 +534,15 @@ canvas {
 }
 
 @keyframes popIn {
-  from {
-    transform: scale(0.75) translateY(20px);
+  0% {
+    transform: scale(0.6) translateY(30px);
     opacity: 0;
   }
-  to {
+  70% {
+    transform: scale(1.04) translateY(-4px);
+    opacity: 1;
+  }
+  100% {
     transform: scale(1) translateY(0px);
     opacity: 1;
   }
