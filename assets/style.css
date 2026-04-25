@@ -306,11 +306,69 @@ canvas {
   border-radius: 10px;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(160deg, #f5789c 0%, #e8186c 100%);
+  background: linear-gradient(160deg, #ffadc8 0%, #f0559a 100%);
   box-shadow:
-    inset 0 -3px 12px rgba(255, 255, 255, 0.1),
-    inset 0 3px 8px rgba(0, 0, 0, 0.1),
+    inset 0 -3px 12px rgba(255, 255, 255, 0.15),
+    inset 0 3px 8px rgba(0, 0, 0, 0.08),
     0 18px 40px rgba(180, 20, 80, 0.35);
+}
+
+/* ── Inner lining — visible when flap opens, sits above envBody (z:0) below card (z:1) ── */
+#envInner {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  z-index: 0;
+  pointer-events: none;
+  /* Deeper pink/magenta interior — contrasts with outer envelope */
+  background: linear-gradient(160deg, #ff4d8f 0%, #c4005a 100%);
+  overflow: hidden;
+}
+
+/* Top triangle interior — the inside face of the flap, revealed when open */
+#envInner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52%;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 52%);
+  background: linear-gradient(175deg, #ff2d78 0%, #a8004a 100%);
+}
+
+/* Side triangles — left and right inner flaps */
+#envInner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(180, 0, 70, 0.45) 0 30%,
+    transparent 30% 70%,
+    rgba(180, 0, 70, 0.45) 70% 100%
+  );
+  clip-path: polygon(
+    0% 0%,
+    30% 50%,
+    0% 100%,
+    /* left flap */ 100% 0%,
+    70% 50%,
+    100% 100% /* right flap */
+  );
+}
+
+/* Heart pattern dots on inner lining */
+#envInnerPattern {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 10px;
+  overflow: hidden;
+  opacity: 0.18;
+  background-image: radial-gradient(circle, #fff 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
 }
 
 /* ── Front pocket — z:2, covers bottom 55%, sits OVER the card ── */
