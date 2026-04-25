@@ -271,43 +271,67 @@ const part1 =
   splitIdx !== -1 ? CARD_MESSAGE.slice(0, splitIdx).trim() : CARD_MESSAGE;
 const part2 = splitIdx !== -1 ? CARD_MESSAGE.slice(splitIdx).trim() : "";
 
-// Available vertical space in right column
-const colTop = NAME_Y + 16;
-const colBot = H - 44;
-const colH = colBot - colTop;
-const midY = colTop + colH * 0.46; // slightly above center so part1 has more room
+// Measure both parts first to know total height, then center vertically
+const colBot = H - 50;
+const font = "17px Georgia, 'Times New Roman', serif";
+const lineH = 25;
+ctx.font = font;
 
+// Count lines for each part to compute heights
+function countLines(text, maxWidth) {
+  const words = text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+  let line = "",
+    count = 1;
+  for (const word of words) {
+    const test = line + word + " ";
+    if (ctx.measureText(test).width > maxWidth && line !== "") {
+      count++;
+      line = word + " ";
+    } else {
+      line = test;
+    }
+  }
+  return count;
+}
+
+const p1Lines = countLines(part1, RIGHT_W);
+const p2Lines = countLines(part2, RIGHT_W);
+const divH = 20; // space for divider
+const totalH = (p1Lines + p2Lines) * lineH + divH + 10;
+
+// Vertically center the whole block in the column
+const colTop = NAME_Y + 16;
+const colH = colBot - colTop;
+const blockStartY = colTop + Math.max(0, (colH - totalH) / 2);
+
+// Part 1 — same style as part 2
 ctx.textAlign = "center";
 ctx.fillStyle = "#d6618a";
-ctx.font = "17px Georgia, 'Times New Roman', serif";
-const lineH = 25;
+ctx.font = font;
+const p1EndY = wrapText(ctx, part1, RX, blockStartY, RIGHT_W, lineH);
 
-// Part 1 — drawn in top half, capped at midY
-const p1EndY = wrapText(ctx, part1, RX, colTop, RIGHT_W, lineH);
-
-// Divider sits just below where part1 ends (or at midY if part1 is short)
-const divMidY = Math.max(p1EndY + 8, midY - 10);
+// Divider
+const divY2 = p1EndY + 6;
 ctx.save();
 ctx.strokeStyle = "rgba(240,100,160,0.35)";
 ctx.lineWidth = 1;
 ctx.setLineDash([5, 5]);
 ctx.beginPath();
-ctx.moveTo(COL_L + 20, divMidY);
-ctx.lineTo(W - 30, divMidY);
+ctx.moveTo(COL_L + 20, divY2);
+ctx.lineTo(W - 30, divY2);
 ctx.stroke();
 ctx.restore();
-drawHeart(ctx, RX, divMidY, 7, "rgba(230,80,140,0.4)");
+drawHeart(ctx, RX, divY2, 7, "rgba(230,80,140,0.4)");
 
-// Part 2 — starts just below divider
-ctx.fillStyle = "#c2185b";
-ctx.font = "bold 17px Georgia, 'Times New Roman', serif";
-const p2StartY = divMidY + 14;
-const p2EndY = wrapText(ctx, part2, RX, p2StartY, RIGHT_W, lineH);
+// Part 2 — same style as part 1
+ctx.fillStyle = "#d6618a";
+ctx.font = font;
+const p2EndY = wrapText(ctx, part2, RX, divY2 + 14, RIGHT_W, lineH);
 
 // Footer hearts
 ctx.fillStyle = "#e91e8c";
 ctx.font = "17px serif";
-ctx.fillText("✦  ♥  ✦  ♥  ✦", RX, Math.max(p2EndY + 10, H - 34));
+ctx.fillText("✦  ♥  ✦  ♥  ✦", RX, Math.max(p2EndY + 12, H - 34));
 
 // ── Vignette ──────────────────────────────
 const vig = ctx.createRadialGradient(
