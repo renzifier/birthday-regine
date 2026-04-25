@@ -61,21 +61,25 @@
       <!-- Stages 1 & 2: the envelope itself -->
       <div id="envScene">
         <div id="envWrap">
-          <!-- Flap — sits above body, folds back on open -->
-          <div id="envFlapOuter">
-            <div id="envFlap"></div>
+          <!-- Card peeks above envelope — sits in envWrap above envVisual -->
+          <div id="cardInEnv" role="img" aria-label="Birthday card">
+            <img id="cardPullImg" alt="Birthday Card" draggable="false" />
           </div>
 
-          <!-- Card — wrapped in clip div so it cannot escape above flap crease -->
-          <div id="cardClip">
-            <div id="cardInEnv" role="img" aria-label="Birthday card">
-              <img id="cardPullImg" alt="Birthday Card" draggable="false" />
+          <!-- envVisual holds all envelope parts at envelope dimensions -->
+          <div id="envVisual">
+            <!-- Flap — folds back on open (z:3) -->
+            <div id="envFlapOuter">
+              <div id="envFlap"></div>
             </div>
-          </div>
 
-          <!-- Envelope body — covers lower portion of card (z:2) -->
-          <div id="envBody">
-            <span id="envSeal" aria-hidden="true">♥</span>
+            <!-- Envelope back body (z:0) -->
+            <div id="envBody">
+              <span id="envSeal" aria-hidden="true">♥</span>
+            </div>
+
+            <!-- Front pocket — covers card bottom half (z:2) -->
+            <div id="envPocket"></div>
           </div>
         </div>
         <p id="envHint" class="env-hint" aria-live="polite">tap to open</p>

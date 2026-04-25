@@ -272,13 +272,12 @@ canvas {
 /* ── envWrap — the whole envelope assembly ── */
 #envWrap {
   position: relative;
-  /* envelope size: matches roughly 3:2 landscape ratio */
   width: min(380px, 88vw);
-  height: min(266px, 61.6vw);
+  /* taller than envelope to allow card to peek above without being clipped */
+  height: min(380px, 88vw);
   cursor: pointer;
   animation: floatIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  /* NOTE: drop-shadow filter removed — it flattens z-index stacking inside,
-     causing the card to appear behind the pocket. Shadow moved to #envBody. */
+  /* NO filter, NO overflow:hidden — both break z-index stacking */
 }
 
 @keyframes floatIn {
@@ -290,6 +289,15 @@ canvas {
     transform: scale(1) translateY(0px);
     opacity: 1;
   }
+}
+
+/* ── envVisual — contains all envelope parts at correct envelope dimensions ── */
+#envVisual {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: min(266px, 61.6vw);
 }
 
 /* ── Envelope back panel — z:0, sits behind card ── */
@@ -312,7 +320,7 @@ canvas {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 58%;
+  height: 50%;
   border-radius: 0 0 10px 10px;
   z-index: 2;
   pointer-events: none;
@@ -397,28 +405,19 @@ canvas {
   transform: rotateX(180deg);
 }
 
-/* ── Card clip wrapper — clips card so it cannot escape above the envelope opening ── */
-#cardClip {
-  position: absolute;
-  /* The flap crease sits at ~42% from top of envWrap.
-     We clip to show only from that crease downward. */
-  top: 42%;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  z-index: 1;
-  pointer-events: none;
-}
-
 /* ── Card inside the envelope ──
-   Positioned relative to #cardClip.
-   z:1 (cardClip) sits below pocket (z:2). */
+   Strategy: card is z:1, sits between envBody (z:0) and envPocket (z:2).
+   envPocket covers bottom 50% of the envelope visual, hiding lower half of card.
+   The card is absolutely positioned relative to #envVisual.
+   It starts with its top ~10% below the flap crease so it looks seated inside.
+   JS translateY moves it upward when dragged.                                    */
 #cardInEnv {
   position: absolute;
   left: 50%;
-  /* start at top of clip area = card top visible at flap crease */
-  top: 0;
+  /* envWrap is taller than envelope to allow card to peek up.
+     Card top = envelope top + ~15% of envelope height.
+     envelope starts at bottom of envWrap; tune top% to sit just inside opening. */
+  top: 40%;
   transform: translateX(-50%) translateY(0px);
   z-index: 1;
   width: 62%;
@@ -427,9 +426,8 @@ canvas {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   cursor: grab;
   touch-action: none;
-  display: none; /* shown by JS after flap opens */
+  display: none;
   user-select: none;
-  pointer-events: auto;
 }
 #cardInEnv:active {
   cursor: grabbing;
