@@ -703,11 +703,8 @@ cardInEnv.addEventListener("pointermove", (e) => {
   if (!isDragging) return;
   const delta = Math.max(0, dragStartClientY - getClientY(e));
   dragLastDelta = delta;
-  // As card is dragged up, scale grows from 0.55 toward 1.0
-  const progress = Math.min(1, delta / SNAP_THRESHOLD);
-  const scale = 0.55 + 0.45 * progress;
-  const translateY = -50 - delta * 0.6; // move upward as % is tricky, use px offset
-  cardInEnv.style.transform = `translateX(-50%) translateY(calc(-50% - ${delta * 0.6}px)) scale(${scale.toFixed(3)})`;
+  // Move card upward, keep scale at 0.55 the whole time
+  cardInEnv.style.transform = `translateX(-50%) translateY(calc(-50% - ${delta * 0.6}px)) scale(0.55)`;
   e.stopPropagation();
   e.preventDefault();
 });
