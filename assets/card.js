@@ -49,10 +49,7 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 function wrapText(ctx, text, x, startY, maxWidth, lineH) {
-  const clean = text
-    .replace(/[\u{1F300}-\u{1FAFF}]/gu, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  const clean = text.replace(/\s+/g, " ").trim(); // emojis kept
   const words = clean.split(" ").filter(Boolean);
   let line = "";
   let y = startY;
@@ -179,12 +176,12 @@ ctx.restore();
 ctx.textAlign = "center";
 ctx.fillStyle = "#c2185b";
 ctx.font = "bold italic 54px Georgia, 'Times New Roman', serif";
-ctx.fillText("Happy Birthday", W / 2, 68);
+ctx.fillText("Birthday Card", W / 2, 68);
 
 // Subtitle hearts row
 ctx.fillStyle = "#e91e8c";
 ctx.font = "20px serif";
-ctx.fillText("♥  ♡  ♥  ♡  ♥", W / 2, 96);
+ctx.fillText("♥  ♡  ♥  ♡  ♥", W / 2, 98);
 
 // ══════════════════════════════════════════
 //  SECTION 2 — Left column: Dog illustration
@@ -229,41 +226,54 @@ ctx.stroke();
 ctx.restore();
 
 // ══════════════════════════════════════════
-//  SECTION 3 — Right column: Name + Message
+//  SECTION 3 — Name banner (full width, below header)
+//              then right column message
 // ══════════════════════════════════════════
-const RX = COL_L + (W - COL_L) / 2; // center of right column
-const RIGHT_W = W - COL_L - 60; // text max width
+const NAME_H = 58; // height of the name band below the header
+const NAME_Y = HEADER_H + NAME_H; // bottom of name band
 
-// Recipient name
-const nameY = HEADER_H + 58;
+// Name band — subtle deeper pink strip
+ctx.save();
+ctx.fillStyle = "rgba(255,160,200,0.28)";
+ctx.fillRect(0, HEADER_H, W, NAME_H);
+ctx.restore();
+
+// Name — centered on full card width
 ctx.textAlign = "center";
 ctx.fillStyle = "#ad1457";
-ctx.font = "bold italic 32px Georgia, 'Times New Roman', serif";
-ctx.fillText(CARD_TO + "!", RX, nameY);
+ctx.font = "bold italic 34px Georgia, 'Times New Roman', serif";
+ctx.fillText(CARD_TO, W / 2, HEADER_H + 38);
 
-// Small heart divider
-const divY = nameY + 22;
+// Dashed divider below name band
 ctx.save();
-ctx.strokeStyle = "rgba(240,100,160,0.4)";
+ctx.strokeStyle = "rgba(240,100,160,0.45)";
 ctx.lineWidth = 1;
-ctx.setLineDash([6, 5]);
+ctx.setLineDash([8, 6]);
 ctx.beginPath();
-ctx.moveTo(COL_L + 30, divY);
-ctx.lineTo(W - 40, divY);
+ctx.moveTo(50, NAME_Y);
+ctx.lineTo(W - 50, NAME_Y);
 ctx.stroke();
 ctx.restore();
-drawHeart(ctx, RX, divY, 9, "rgba(230,80,140,0.5)");
 
-// Message text — soft rose
+// Heart row on divider
+for (const hx of [W / 2 - 40, W / 2, W / 2 + 40]) {
+  drawHeart(ctx, hx, NAME_Y, 7, "rgba(230,80,140,0.45)");
+}
+
+// Right column for message
+const RX = COL_L + (W - COL_L) / 2;
+const RIGHT_W = W - COL_L - 50;
+
+// Message text — soft rose, bigger, emojis on
 ctx.textAlign = "center";
-ctx.fillStyle = "#e88fa8";
-ctx.font = "18px Georgia, 'Times New Roman', serif";
-const msgEndY = wrapText(ctx, CARD_MESSAGE, RX, divY + 36, RIGHT_W, 27);
+ctx.fillStyle = "#d6618a";
+ctx.font = "20px Georgia, 'Times New Roman', serif";
+const msgEndY = wrapText(ctx, CARD_MESSAGE, RX, NAME_Y + 32, RIGHT_W, 30);
 
-// Footer hearts
+// Footer hearts centered on right column
 ctx.fillStyle = "#e91e8c";
 ctx.font = "18px serif";
-ctx.fillText("✦  ♥  ✦  ♥  ✦", RX, Math.max(msgEndY + 16, H - 36));
+ctx.fillText("✦  ♥  ✦  ♥  ✦", RX, Math.max(msgEndY + 14, H - 34));
 
 // ── Vignette ──────────────────────────────
 const vig = ctx.createRadialGradient(
