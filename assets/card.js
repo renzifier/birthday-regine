@@ -841,9 +841,10 @@ function _enableFlip() {
   wrapper.appendChild(inner);
   document.getElementById("envOverlay").appendChild(wrapper);
 
-  // Flip on click
+  // Flip on click — stop propagation so overlay close doesn't fire
   let flipped = false;
-  wrapper.addEventListener("click", () => {
+  wrapper.addEventListener("click", (e) => {
+    e.stopPropagation();
     flipped = !flipped;
     inner.style.transform = flipped ? "rotateY(180deg)" : "rotateY(0deg)";
   });
