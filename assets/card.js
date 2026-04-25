@@ -832,6 +832,24 @@ function _enableFlip() {
 
   backEl.appendChild(backCanvas);
 
+  // ── Static photo on the back ──────────────
+  // Replace "YOUR_PHOTO.jpg" with your actual filename in assets/
+  const photoEl = document.createElement("img");
+  photoEl.src = "assets/YOUR_PHOTO.jpg";
+  Object.assign(photoEl.style, {
+    position: "absolute",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    borderRadius: "18px",
+    zIndex: "3",
+  });
+  photoEl.onload = () => {
+    backCanvas.style.opacity = "0.15"; // dim pattern behind photo
+  };
+  backEl.appendChild(photoEl);
+
   // Assemble
   inner.appendChild(frontEl);
   inner.appendChild(backEl);
