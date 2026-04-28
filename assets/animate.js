@@ -148,8 +148,8 @@ export function startAnimation() {
   const hint = document.getElementById("hint");
   if (hint) {
     hint.innerHTML =
-      '<span class="hint-desktop">You can blow the candle) and open the envelope!' +
-      '<span class="hint-mobile">You can blow the candle=) and open the envelope!</span>';
+      '<span class="hint-desktop">You can blow the candle and open the envelope!</span>' +
+      '<span class="hint-mobile">You can blow the candle and open the envelope!</span>';
   }
 
   let lastT = 0;
