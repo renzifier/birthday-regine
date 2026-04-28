@@ -4,7 +4,7 @@ const _listeners = [];
 export function onBlow(cb) {
   _listeners.push(cb);
 }
-const BLOW_THRESHOLD = 0.018;
+const BLOW_THRESHOLD = 0.18;
 // How many consecutive frames above threshold before we fire the event.
 const BLOW_FRAMES_MIN = 2;
 // Cooldown in ms before another blow can fire.
