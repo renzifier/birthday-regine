@@ -866,7 +866,7 @@ function _enableFlip() {
 
   // Hint
   const flipHint = document.createElement("div");
-  flipHint.textContent = "💌 tap card to flip";
+  flipHint.textContent = "tap to flip!";
   Object.assign(flipHint.style, {
     position: "fixed",
     bottom: "52px",

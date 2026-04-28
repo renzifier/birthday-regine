@@ -1,23 +1,10 @@
-// ─────────────────────────────────────────
-//  blow.js
-//  Microphone-based blow detection.
-//  Exports:
-//    initBlow()     — call once to request mic + start analysis
-//    onBlow(cb)     — register a callback fired when a blow is detected
-//    blowState      — { active: bool, strength: 0-1 } — read every frame
-// ─────────────────────────────────────────
-
 export const blowState = { active: false, strength: 0 };
 const _listeners = [];
 
 export function onBlow(cb) {
   _listeners.push(cb);
 }
-
-// ── Tuning ────────────────────────────────
-// RMS threshold above which we consider it a "blow" vs ambient noise.
-// 0.018 works well in a quiet room; raise to ~0.04 in noisier environments.
-const BLOW_THRESHOLD = 0.013;
+const BLOW_THRESHOLD = 0.018;
 // How many consecutive frames above threshold before we fire the event.
 const BLOW_FRAMES_MIN = 2;
 // Cooldown in ms before another blow can fire.

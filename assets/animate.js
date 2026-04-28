@@ -119,7 +119,7 @@ function _showRelightHint() {
   if (!el) {
     el = document.createElement("div");
     el.id = "relightHint";
-    el.textContent = "🕯️ Click anywhere to relight";
+    el.textContent = "Click anywhere to relight!";
     Object.assign(el.style, {
       position: "fixed",
       bottom: "52px",
@@ -148,8 +148,8 @@ export function startAnimation() {
   const hint = document.getElementById("hint");
   if (hint) {
     hint.innerHTML =
-      '<span class="hint-desktop">🎂 Blow into your mic to extinguish · drag to orbit · click the envelope</span>' +
-      '<span class="hint-mobile">🎂 Blow into your mic · drag to orbit · tap the envelope</span>';
+      '<span class="hint-desktop">You can blow the candle) and open the envelope!' +
+      '<span class="hint-mobile">You can blow the candle=) and open the envelope!</span>';
   }
 
   let lastT = 0;
