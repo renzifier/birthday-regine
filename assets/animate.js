@@ -97,8 +97,6 @@ let flameT = 0;
 const EXTINGUISH_DUR = 0.55;
 const RELIGHT_DUR = 0.7;
 
-initBlow();
-
 onBlow(() => {
   if (flameState === "lit" || flameState === "blowing") {
     flameState = "blowing";
@@ -145,6 +143,7 @@ function _hideRelightHint() {
 const clock = new THREE.Clock();
 
 export function startAnimation() {
+  initBlow(); // after user gesture — mic permission works
   const hint = document.getElementById("hint");
   if (hint) {
     hint.innerHTML =
