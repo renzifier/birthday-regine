@@ -835,7 +835,7 @@ function _enableFlip() {
   // ── Static photo on the back ──────────────
   // Replace "YOUR_PHOTO.jpg" with your actual filename in assets/
   const photoEl = document.createElement("img");
-  photoEl.src = "assets/fatdog.png";
+  photoEl.src = "assets/mang-e.jpg";
   Object.assign(photoEl.style, {
     position: "absolute",
     inset: "0",
