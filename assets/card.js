@@ -1,3 +1,11 @@
+// ─────────────────────────────────────────
+//  card.js  — envelope edition
+//  • Draws the birthday card onto a canvas
+//  • Renders a pink envelope as the 3-D
+//    table object (replaces flat card)
+//  • 3-stage overlay: closed → flap open
+//    → drag card out
+// ─────────────────────────────────────────
 import { CARD_TO, CARD_MESSAGE } from "./config.js";
 import { std } from "./textures.js";
 import { tableGroup } from "./table.js";
@@ -419,14 +427,6 @@ function makeEnvelopeTex() {
   c.fill();
   c.restore();
 
-  // "To:" text at bottom
-  c.fillStyle = "rgba(180, 40, 100, 0.75)";
-  c.font = "italic bold 20px Georgia, serif";
-  c.textAlign = "center";
-  const firstName =
-    CARD_TO.replace(/,.*/, "").replace("Happy Birthday", "").trim() || CARD_TO;
-  c.fillText("To: " + firstName, 256, 318);
-
   // Outer border
   c.strokeStyle = "rgba(220, 80, 140, 0.4)";
   c.lineWidth = 4;
@@ -833,7 +833,7 @@ function _enableFlip() {
     inset: "0",
     width: "100%",
     height: "100%",
-    objectFit: "contain",
+    objectFit: "cover",
     borderRadius: "18px",
     zIndex: "3",
   });

@@ -1,7 +1,7 @@
-export const CARD_TO = "Happy Birthday, Mishie!";
+export const CARD_TO = "Happy Birthday, Ashley!";
 export const CARD_MESSAGE =
-  "Ewan ko if you knew i was making this but sorry ah surprise talaga to bahala ka, pinakita ko naman sa quicksnaps kaya na sabi ko yung ano yung tatanong uli😭😭😭😭 but anyway!! " +
-  "Happy Birthday, Mishieeee!! Di ko alam if sapat nato para as something na nangyare sa birthday mo but yeah im broke saka malayo pa.. this is like the only thing i can do. I wish you the best and always stay healthy ah💕💕💕💕💕💕💕 ";
+  "Eto na te oh, eto na hinahanap mo diba? Pina effort mo talaga ako no.. Sige nalang, once a year lang naman... Anyway!!" +
+  "Happy Birthday, Ashley!! Wag mo naman e dibdib mga ano ano ko sayo ha, stay pretty tita!!🥰🥰🥰🥰🥰";
 
 export const CONFIG = {
   camera: { fov: 62, near: 0.1, far: 200, initialRadius: 16 },
