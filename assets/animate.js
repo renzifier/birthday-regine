@@ -1,11 +1,3 @@
-// ─────────────────────────────────────────
-//  animate.js
-//  Frame loop: candle flicker, flame scale,
-//  smoke drift, orbit controls.
-//  Also owns click / touch → envelope open
-//  via raycasting.
-//  NEW: blow-to-extinguish candles via mic.
-// ─────────────────────────────────────────
 import { renderer, scene, camera, canvas } from "./renderer.js";
 import { CONFIG } from "./config.js";
 import { candleLight } from "./lights.js";
@@ -15,7 +7,6 @@ import { envelopeHit, openEnvelope } from "./card.js";
 import { initBlow, onBlow } from "./blow.js";
 import { launchConfetti, updateConfetti, clearConfetti } from "./confetti.js";
 
-// ── Orbit Controls ────────────────────────
 const controls = new THREE.OrbitControls(camera, canvas);
 controls.target.set(0, 1.5, -4);
 controls.enableDamping = true;
@@ -26,7 +17,6 @@ controls.minPolarAngle = CONFIG.controls.minPhi;
 controls.maxPolarAngle = CONFIG.controls.maxPhi;
 controls.update();
 
-// ── Raycaster — envelope click / tap ──────
 const raycaster = new THREE.Raycaster();
 
 function hitTestEnvelope(clientX, clientY) {
@@ -51,7 +41,7 @@ canvas.addEventListener("click", (e) => {
   const dy = e.clientY - pointerDownY;
   if (Math.hypot(dx, dy) < 5 && hitTestEnvelope(e.clientX, e.clientY))
     openEnvelope();
-  // Relight candles on any click when out
+
   if (flameState === "out") {
     flameState = "relighting";
     flameT = 0;
@@ -90,7 +80,6 @@ canvas.addEventListener("touchend", (e) => {
   }
 });
 
-// ── Flame state machine ───────────────────
 let flameState = "lit";
 let flameT = 0;
 
@@ -111,7 +100,6 @@ onBlow(() => {
   }
 });
 
-// ── Hint helpers ──────────────────────────
 function _showRelightHint() {
   let el = document.getElementById("relightHint");
   if (!el) {
@@ -139,11 +127,10 @@ function _hideRelightHint() {
   if (el) el.style.display = "none";
 }
 
-// ── Animation loop ────────────────────────
 const clock = new THREE.Clock();
 
 export function startAnimation() {
-  initBlow(); // after user gesture — mic permission works
+  initBlow();
   const hint = document.getElementById("hint");
   if (hint) {
     hint.innerHTML =

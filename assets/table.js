@@ -1,6 +1,3 @@
-// ─────────────────────────────────────────
-//  table.js
-// ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 import { std, getClothMat } from "./textures.js";
 
@@ -8,7 +5,6 @@ export const tableGroup = new THREE.Group();
 tableGroup.scale.set(1.8, 1.8, 1.8);
 scene.add(tableGroup);
 
-// ── Top surface ───────────────────────────
 const hiddenFaceMat = new THREE.MeshStandardMaterial({
   color: 0x3a2510,
   roughness: 0.9,
@@ -29,8 +25,7 @@ tabletop.receiveShadow = true;
 tabletop.castShadow = true;
 tableGroup.add(tabletop);
 
-// ── Drapes — double-sided planes (cloth both sides) ──
-const DRAPE_H = 1.05; // shortened so legs are visible below
+const DRAPE_H = 1.05;
 const DRAPE_Y = 0.37 - DRAPE_H / 2;
 
 const drapeConfigs = [
@@ -43,7 +38,7 @@ const drapeConfigs = [
 for (const { w, pos, rotY, repeat } of drapeConfigs) {
   const drape = new THREE.Mesh(
     new THREE.PlaneGeometry(w, DRAPE_H),
-    getClothMat(repeat, true), // true = DoubleSide
+    getClothMat(repeat, true),
   );
   drape.position.set(...pos);
   drape.rotation.y = rotY;
@@ -52,8 +47,6 @@ for (const { w, pos, rotY, repeat } of drapeConfigs) {
   tableGroup.add(drape);
 }
 
-// ── Hem — thin box strip at the bottom of each drape ──
-// Gives the cloth a visible finished edge from any angle.
 const HEM_H = 0.09;
 const HEM_D = 0.05;
 const HEM_Y = 0.37 - DRAPE_H + HEM_H * 0.5;
@@ -67,15 +60,13 @@ const hemConfigs = [
 ];
 
 for (const { w, d, px, pz } of hemConfigs) {
-  // cloth on all visible faces
   const hem = new THREE.Mesh(new THREE.BoxGeometry(w, HEM_H, d), hemCloth);
   hem.position.set(px, HEM_Y, pz);
   hem.receiveShadow = true;
   tableGroup.add(hem);
 }
 
-// ── Legs + cross-bars ─────────────────────
-const legMat = std(0x8a6040, 0.5, 0.02); // warm wood legs
+const legMat = std(0x8a6040, 0.5, 0.02);
 
 for (let i = 0; i < 4; i++) {
   const lx = i < 2 ? -4.5 : 4.5;

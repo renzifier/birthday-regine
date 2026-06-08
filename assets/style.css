@@ -39,7 +39,6 @@ canvas {
   touch-action: none;
 }
 
-/* ── Mobile hint toggle ── */
 .hint-mobile {
   display: none;
 }
@@ -56,7 +55,6 @@ canvas {
   }
 }
 
-/* ── Bottom hint ── */
 #hint {
   position: absolute;
   bottom: 14px;
@@ -69,7 +67,6 @@ canvas {
   pointer-events: none;
 }
 
-/* ── Intro screen ── */
 #introScreen {
   position: fixed;
   inset: 0;
@@ -194,10 +191,6 @@ canvas {
   }
 }
 
-/* ════════════════════════════════════════
-   ENVELOPE OVERLAY
-   ════════════════════════════════════════ */
-
 #envOverlay {
   visibility: hidden;
   opacity: 0;
@@ -218,7 +211,6 @@ canvas {
   opacity: 1;
 }
 
-/* Close button */
 #closeEnv {
   position: absolute;
   top: 18px;
@@ -245,7 +237,6 @@ canvas {
   transform: scale(1.08);
 }
 
-/* Hint text */
 .env-hint {
   text-align: center;
   color: rgba(255, 220, 235, 0.72);
@@ -257,7 +248,6 @@ canvas {
   letter-spacing: 0.04em;
 }
 
-/* ── envScene — fades out when card is pulled ── */
 #envScene {
   display: flex;
   flex-direction: column;
@@ -269,14 +259,12 @@ canvas {
   pointer-events: none;
 }
 
-/* ── envWrap — the whole envelope assembly ── */
 #envWrap {
   position: relative;
   width: min(380px, 88vw);
   height: min(266px, 61.6vw);
   cursor: pointer;
   animation: floatIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  /* NO filter, NO overflow:hidden — both break z-index stacking */
 }
 
 @keyframes floatIn {
@@ -290,7 +278,6 @@ canvas {
   }
 }
 
-/* ── envVisual — contains all envelope parts at correct envelope dimensions ── */
 #envVisual {
   position: absolute;
   bottom: 0;
@@ -299,7 +286,6 @@ canvas {
   height: min(266px, 61.6vw);
 }
 
-/* ── Envelope back panel — z:0, sits behind card ── */
 #envBody {
   position: absolute;
   inset: 0;
@@ -313,19 +299,17 @@ canvas {
     0 18px 40px rgba(180, 20, 80, 0.35);
 }
 
-/* ── Inner lining — visible when flap opens, sits above envBody (z:0) below card (z:1) ── */
 #envInner {
   position: absolute;
   inset: 0;
   border-radius: 10px;
   z-index: 0;
   pointer-events: none;
-  /* Deeper pink/magenta interior — contrasts with outer envelope */
+
   background: linear-gradient(160deg, #ff4d8f 0%, #c4005a 100%);
   overflow: hidden;
 }
 
-/* Top triangle interior — the inside face of the flap, revealed when open */
 #envInner::before {
   content: "";
   position: absolute;
@@ -337,7 +321,6 @@ canvas {
   background: linear-gradient(175deg, #ff2d78 0%, #a8004a 100%);
 }
 
-/* Side triangles — left and right inner flaps */
 #envInner::after {
   content: "";
   position: absolute;
@@ -348,17 +331,9 @@ canvas {
     transparent 30% 70%,
     rgba(180, 0, 70, 0.45) 70% 100%
   );
-  clip-path: polygon(
-    0% 0%,
-    30% 50%,
-    0% 100%,
-    /* left flap */ 100% 0%,
-    70% 50%,
-    100% 100% /* right flap */
-  );
+  clip-path: polygon(0% 0%, 30% 50%, 0% 100%, 100% 0%, 70% 50%, 100% 100%);
 }
 
-/* Heart pattern dots on inner lining */
 #envInnerPattern {
   position: absolute;
   inset: 0;
@@ -371,7 +346,6 @@ canvas {
   background-size: 22px 22px;
 }
 
-/* ── Front pocket — z:2, covers bottom 55%, sits OVER the card ── */
 #envPocket {
   position: absolute;
   bottom: 0;
@@ -388,7 +362,6 @@ canvas {
     inset 0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* V-fold lines on pocket */
 #envPocket::before {
   content: "";
   position: absolute;
@@ -408,14 +381,13 @@ canvas {
   border-radius: 0 0 10px 10px;
 }
 
-/* Heart seal sits on the pocket */
 #envSeal {
   position: absolute;
   left: 50%;
-  /* sit right at the flap/pocket crease line (~50% from top of envBody) */
+
   top: 50%;
   transform: translate(-50%, -50%);
-  z-index: 4; /* above flap (z:3) so it always shows */
+  z-index: 4;
   width: 44px;
   height: 44px;
   background: radial-gradient(circle at 40% 38%, #ff6aac, #c4005a);
@@ -435,7 +407,6 @@ canvas {
   user-select: none;
 }
 
-/* ── Flap container — clips the folding flap ── */
 #envFlapOuter {
   position: absolute;
   top: 0;
@@ -446,39 +417,33 @@ canvas {
   pointer-events: none;
   perspective: 800px;
   perspective-origin: 50% 100%;
-  transition: z-index 0s 0.65s; /* drop z after flap animation completes */
+  transition: z-index 0s 0.65s;
 }
 #envFlapOuter.opened {
   z-index: 0;
 }
 
-/* ── Flap — the triangle that folds back ── */
 #envFlap {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 200%; /* tall enough to contain the triangle even after fold */
-  transform-origin: 50% 0%; /* fold from TOP edge so it opens upward */
+  height: 200%;
+  transform-origin: 50% 0%;
   transform: rotateX(0deg);
   transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
   backface-visibility: visible;
 
-  /* Triangle via clip-path */
   clip-path: polygon(0% 0%, 100% 0%, 50% 50%);
   background: linear-gradient(175deg, #ffd6ea 0%, #ff8fc2 60%, #e8186c 100%);
   box-shadow: 0 4px 12px rgba(180, 0, 60, 0.22);
 }
 
-/* Flap open: fold back 180° */
 #envFlap.open {
   transform: rotateX(-180deg);
-  z-index: 0; /* drop behind card when open */
+  z-index: 0;
 }
 
-/* ── Card inside the envelope ──
-   Sits centered inside envVisual, scaled down to fit.
-   When dragged out, JS animates scale back to 1 and moves to full view. */
 #cardInEnv {
   position: absolute;
   left: 50%;
@@ -494,7 +459,6 @@ canvas {
   touch-action: none;
   display: none;
   user-select: none;
-  /* transition controlled by JS during pop-out */
 }
 #cardInEnv:active {
   cursor: grabbing;
@@ -509,9 +473,8 @@ canvas {
   -webkit-user-drag: none;
 }
 
-/* ── Full card view (stage 3) ── */
 #cardFullView {
-  display: none; /* card pops in-place via cardInEnv, fullView unused */
+  display: none;
 }
 #cardFullView.visible {
   opacity: 1;
@@ -541,7 +504,6 @@ canvas {
   }
 }
 
-/* ── Mobile tweaks ── */
 @media (max-width: 600px) {
   #introTerminal {
     padding: 24px 18px 20px;

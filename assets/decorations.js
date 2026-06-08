@@ -1,14 +1,7 @@
-// ─────────────────────────────────────────
-//  decorations.js
-//  Table scatter: rose petals, photo
-//  frames with placeholder images,
-//  and balloons with strings.
-// ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 import { std, makePhotoPlaceholder } from "./textures.js";
 import { tableGroup } from "./table.js";
 
-// ── Rose petals ───────────────────────────
 const petalMat = std(0xff6688, 0.55, 0.0);
 const PETAL_POSITIONS = [
   [2.0, 0.5],
@@ -29,8 +22,6 @@ for (const [px, pz] of PETAL_POSITIONS) {
   tableGroup.add(petal);
 }
 
-// ── Photo frames ──────────────────────────
-// One shared loader — more efficient than creating a new instance per frame.
 const photoLoader = new THREE.TextureLoader();
 
 function makeFrame(x, z, rotY, lean, photoPath, idx) {
@@ -38,7 +29,6 @@ function makeFrame(x, z, rotY, lean, photoPath, idx) {
   const fw = 2.2;
   const fh = 1.75;
 
-  // Outer frame
   const outer = new THREE.Mesh(
     new THREE.BoxGeometry(fw, fh, 0.14),
     std(0xc9963a, 0.22, 0.6),
@@ -46,7 +36,6 @@ function makeFrame(x, z, rotY, lean, photoPath, idx) {
   outer.castShadow = true;
   grp.add(outer);
 
-  // Inner moulding
   const inner = new THREE.Mesh(
     new THREE.BoxGeometry(fw - 0.22, fh - 0.22, 0.1),
     std(0xa07020, 0.18, 0.52),
@@ -54,7 +43,6 @@ function makeFrame(x, z, rotY, lean, photoPath, idx) {
   inner.position.z = 0.02;
   grp.add(inner);
 
-  // Photo surface — starts with a generated placeholder
   const photoMesh = new THREE.Mesh(
     new THREE.PlaneGeometry(fw - 0.26, fh - 0.26),
     new THREE.MeshStandardMaterial({
@@ -66,7 +54,6 @@ function makeFrame(x, z, rotY, lean, photoPath, idx) {
   photoMesh.position.z = 0.075;
   grp.add(photoMesh);
 
-  // Swap in a real photo if available
   if (photoPath) {
     photoLoader.load(
       photoPath,
@@ -79,7 +66,6 @@ function makeFrame(x, z, rotY, lean, photoPath, idx) {
     );
   }
 
-  // Stand legs
   const standMat = std(0xa07020, 0.3, 0.4);
   for (const sx of [-0.3, 0.3]) {
     const stand = new THREE.Mesh(
@@ -103,7 +89,6 @@ makeFrame(3.3, -1.4, -0.25, -0.02, "assets/photos/kit3.jpg", 1);
 makeFrame(-3.3, 1.4, 0.55, 0.03, "assets/photos/kit1.jpg", 2);
 makeFrame(3.5, 1.6, -0.55, -0.03, "assets/photos/kit4.jpg", 3);
 
-// ── Balloons ──────────────────────────────
 const BALLOON_DATA = [
   { x: -5.5, y: 8.0, z: -2.0, color: 0xff4488, sx: 0.85, sy: 1.0, sz: 0.85 },
   { x: -4.2, y: 9.2, z: -2.5, color: 0xffaacc, sx: 0.75, sy: 0.95, sz: 0.75 },
@@ -113,7 +98,6 @@ const BALLOON_DATA = [
 ];
 
 for (const bd of BALLOON_DATA) {
-  // Balloon body
   const balloon = new THREE.Mesh(
     new THREE.SphereGeometry(0.72, 18, 14),
     new THREE.MeshStandardMaterial({
@@ -129,7 +113,6 @@ for (const bd of BALLOON_DATA) {
   balloon.castShadow = true;
   scene.add(balloon);
 
-  // Specular highlight sphere
   const hilight = new THREE.Mesh(
     new THREE.SphereGeometry(0.18, 8, 8),
     new THREE.MeshBasicMaterial({
@@ -141,7 +124,6 @@ for (const bd of BALLOON_DATA) {
   hilight.position.set(bd.x + 0.22, bd.y + 0.28, bd.z + 0.45);
   scene.add(hilight);
 
-  // String
   const strPts = [
     new THREE.Vector3(bd.x, bd.y - 0.72 * bd.sy, bd.z),
     new THREE.Vector3(bd.x + 0.15, bd.y - 1.5, bd.z + 0.1),

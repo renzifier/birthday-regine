@@ -1,15 +1,7 @@
-// ─────────────────────────────────────────
-//  background.js  — aerial night city view
-//  with skyscraper silhouettes, hero towers,
-//  lit windows, road streaks, and Milky Way
-//  just above the city horizon.
-// ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 import { rng } from "./utils.js";
 
 function makeAerialNight() {
-  // Halve texture resolution on narrow/mobile screens — no visible difference,
-  // saves significant GPU texture memory.
   const isMobile = window.innerWidth < 768;
   const W = isMobile ? 1024 : 2048;
   const H = isMobile ? 512 : 1024;
@@ -18,7 +10,6 @@ function makeAerialNight() {
   gc.height = H;
   const ctx = gc.getContext("2d");
 
-  // ── Deep blue night sky ───────────────────
   const sky = ctx.createLinearGradient(0, 0, 0, H);
   sky.addColorStop(0.0, "#010208");
   sky.addColorStop(0.18, "#020410");
@@ -29,7 +20,6 @@ function makeAerialNight() {
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, W, H);
 
-  // ── Milky Way — sits just above the city horizon ──
   const HORIZON_Y = H * 0.52;
   const mwCX = W * 0.5;
   const mwCY = H * 0.28;
@@ -65,7 +55,6 @@ function makeAerialNight() {
   ctx.fillStyle = core;
   ctx.fillRect(0, 0, W, H);
 
-  // ── Scattered stars ───────────────────────
   for (let i = 0; i < 600; i++) {
     const sx = rng(i * 3.7 + 10) * W;
     const sy = rng(i * 6.1 + 10) * (HORIZON_Y - 30);
@@ -77,7 +66,6 @@ function makeAerialNight() {
     ctx.fill();
   }
 
-  // ── Doorway / centre glow ─────────────────
   const doorCX = W * 0.5;
   const doorCY = H * 0.48;
   const doorGlow = ctx.createRadialGradient(
@@ -95,14 +83,10 @@ function makeAerialNight() {
   ctx.fillStyle = doorGlow;
   ctx.fillRect(0, 0, W, H);
 
-  // ══════════════════════════════════════════
-  //  CITY SKYLINE
-  // ══════════════════════════════════════════
   const CITY_TOP = H * 0.34;
   const CITY_BASE = H * 0.56;
   const CITY_BOTTOM = H * 0.85;
 
-  // ── Horizon haze ──────────────────────────
   const hazeGrad = ctx.createLinearGradient(
     0,
     CITY_TOP - 60,
@@ -115,7 +99,6 @@ function makeAerialNight() {
   ctx.fillStyle = hazeGrad;
   ctx.fillRect(0, CITY_TOP - 60, W, CITY_BASE - CITY_TOP + 100);
 
-  // ── Regular background buildings ──────────
   const buildings = [];
   let bx = 0;
   while (bx < W) {
@@ -128,7 +111,6 @@ function makeAerialNight() {
     bx += bw + rng(bx * 0.019 + 3) * 4;
   }
 
-  // Draw regular silhouettes
   for (const b of buildings) {
     const buildGrad = ctx.createLinearGradient(0, b.y, 0, CITY_BASE);
     buildGrad.addColorStop(0, "rgba(6,12,30,0.88)");
@@ -142,7 +124,6 @@ function makeAerialNight() {
     ctx.fillRect(b.x, b.y, b.w, 1.5);
   }
 
-  // Windows on regular buildings
   for (const b of buildings) {
     const WW = 3,
       WH = 4,
@@ -165,9 +146,7 @@ function makeAerialNight() {
     }
   }
 
-  // ── Hero skyscrapers ──────────────────────
   const heroTowers = [
-    // Centre-left — tallest, tapered spire
     {
       cx: W * 0.44,
       baseY: CITY_BASE,
@@ -182,7 +161,7 @@ function makeAerialNight() {
       glowR: 90,
       antenna: true,
     },
-    // Right of centre — slightly shorter, blocky
+
     {
       cx: W * 0.575,
       baseY: CITY_BASE,
@@ -196,7 +175,7 @@ function makeAerialNight() {
       glowR: 70,
       antenna: false,
     },
-    // Far left — medium
+
     {
       cx: W * 0.25,
       baseY: CITY_BASE,
@@ -209,7 +188,7 @@ function makeAerialNight() {
       glowR: 55,
       antenna: false,
     },
-    // Far right — medium
+
     {
       cx: W * 0.735,
       baseY: CITY_BASE,
@@ -228,7 +207,6 @@ function makeAerialNight() {
     const tallestH = Math.max(...tower.floors.map((f) => f.h));
     const towerTopY = CITY_BASE - tallestH;
 
-    // Atmospheric glow around tower top
     const tg = ctx.createRadialGradient(
       tower.cx,
       towerTopY + 20,
@@ -248,7 +226,6 @@ function makeAerialNight() {
       tower.glowR * 2,
     );
 
-    // Draw floors from widest (first) to narrowest (last)
     for (const floor of tower.floors) {
       const fx = tower.cx - floor.w / 2;
       const fy = CITY_BASE - floor.h;
@@ -260,18 +237,15 @@ function makeAerialNight() {
       ctx.fillStyle = fg;
       ctx.fillRect(fx, fy, floor.w, floor.h);
 
-      // Rim lights on edges
       ctx.fillStyle = "rgba(100,155,240,0.22)";
       ctx.fillRect(fx, fy, 2, floor.h);
       ctx.fillStyle = "rgba(75,125,215,0.13)";
       ctx.fillRect(fx + floor.w - 2, fy, 2, floor.h);
 
-      // Roof edge
       ctx.fillStyle = "rgba(130,180,255,0.28)";
       ctx.fillRect(fx, fy, floor.w, 2.5);
     }
 
-    // Windows on hero tower (main/widest floor)
     const mf = tower.floors[0];
     const mfx = tower.cx - mf.w / 2;
     const mfy = CITY_BASE - mf.h;
@@ -313,7 +287,6 @@ function makeAerialNight() {
       }
     }
 
-    // Antenna / spire on tallest tower
     if (tower.antenna) {
       const spireY = CITY_BASE - tallestH - 8;
       const ag = ctx.createRadialGradient(
@@ -336,7 +309,6 @@ function makeAerialNight() {
     }
   }
 
-  // ── Ground / street level ─────────────────
   const groundGrad = ctx.createLinearGradient(0, CITY_BASE, 0, CITY_BOTTOM);
   groundGrad.addColorStop(0, "rgba(8,18,45,1)");
   groundGrad.addColorStop(0.3, "rgba(5,12,32,1)");
@@ -344,7 +316,6 @@ function makeAerialNight() {
   ctx.fillStyle = groundGrad;
   ctx.fillRect(0, CITY_BASE, W, CITY_BOTTOM - CITY_BASE);
 
-  // Road streaks
   const ROAD_COLOURS = [
     "rgba(200,220,255,0.22)",
     "rgba(255,220,120,0.18)",
@@ -373,7 +344,6 @@ function makeAerialNight() {
     ctx.stroke();
   }
 
-  // Ground glow pool
   const gndPool = ctx.createRadialGradient(
     W * 0.5,
     CITY_BASE + 20,
@@ -388,14 +358,12 @@ function makeAerialNight() {
   ctx.fillStyle = gndPool;
   ctx.fillRect(0, CITY_BASE - 20, W, CITY_BOTTOM - CITY_BASE + 40);
 
-  // ── Lower ground fade ─────────────────────
   const groundFade = ctx.createLinearGradient(0, CITY_BOTTOM - 20, 0, H);
   groundFade.addColorStop(0, "rgba(0,0,0,0)");
   groundFade.addColorStop(1, "rgba(2,4,14,1)");
   ctx.fillStyle = groundFade;
   ctx.fillRect(0, CITY_BOTTOM - 20, W, H - CITY_BOTTOM + 20);
 
-  // ── Vignettes ─────────────────────────────
   const leftVig = ctx.createLinearGradient(0, 0, W * 0.3, 0);
   leftVig.addColorStop(0, "rgba(2,5,16,0.97)");
   leftVig.addColorStop(0.45, "rgba(2,5,16,0.52)");
@@ -428,7 +396,6 @@ function makeAerialNight() {
 const cityTex = makeAerialNight();
 scene.background = cityTex;
 
-// Renamed from sunsetBackLight — this is city/ambient back light, not a sunset
 export const cityBackLight = new THREE.PointLight(0x6688cc, 0.7, 90);
 cityBackLight.position.set(0, 5, -22);
 scene.add(cityBackLight);

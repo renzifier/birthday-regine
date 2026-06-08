@@ -5,9 +5,7 @@ export function onBlow(cb) {
   _listeners.push(cb);
 }
 const BLOW_THRESHOLD = 0.018;
-// How many consecutive frames above threshold before we fire the event.
 const BLOW_FRAMES_MIN = 2;
-// Cooldown in ms before another blow can fire.
 const BLOW_COOLDOWN_MS = 1800;
 
 let _ready = false;
@@ -50,7 +48,6 @@ function _poll() {
   _analyser.getFloatTimeDomainData(_dataArr);
   const rms = _rms(_dataArr);
 
-  // Expose a smoothed strength value for the flame flicker effect
   blowState.strength = Math.min(1, rms / BLOW_THRESHOLD);
 
   if (rms > BLOW_THRESHOLD) {
@@ -61,7 +58,6 @@ function _poll() {
         _lastBlow = now;
         blowState.active = true;
         _listeners.forEach((cb) => cb(rms));
-        // Auto-reset active flag after 400 ms
         setTimeout(() => {
           blowState.active = false;
         }, 400);

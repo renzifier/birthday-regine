@@ -1,16 +1,3 @@
-// ─────────────────────────────────────────
-//  cake.js
-//  Korean-style bento birthday cake:
-//  — white cream body, squat + wide
-//  — scalloped shell rosette borders
-//    top edge AND base edge
-//  — deep-red satin ribbon bows on sides
-//  — "happy birthday" in red cursive on top
-//  — tiny red hearts scattered on top
-//  — one thin white gold-speckle candle
-//  Exports flameMeshes / perFlameLights /
-//  smokeSystems so animate.js can update.
-// ─────────────────────────────────────────
 import { scene } from "./renderer.js";
 import { CONFIG } from "./config.js";
 import { std } from "./textures.js";
@@ -20,7 +7,6 @@ export const flameMeshes = [];
 export const perFlameLights = [];
 export const smokeSystems = [];
 
-// ── Cake group ────────────────────────────
 const cakeGroup = new THREE.Group();
 cakeGroup.position.set(CONFIG.cake.offsetX, CONFIG.cake.tableY, 0);
 tableGroup.add(cakeGroup);
@@ -34,28 +20,24 @@ function addLayer(geo, mat, y) {
   return m;
 }
 
-// ════════════════════════════════════════
-//  MATERIALS
-// ════════════════════════════════════════
-// Warm off-white cream body
 const creamMat = new THREE.MeshStandardMaterial({
   color: 0xfff8ee,
   roughness: 0.6,
   metalness: 0.0,
 });
-// Slightly brighter for piped rosettes so they catch the light
+
 const rosetteMat = new THREE.MeshStandardMaterial({
   color: 0xfffcf5,
   roughness: 0.5,
   metalness: 0.0,
 });
-// White plate
+
 const plateMat = new THREE.MeshStandardMaterial({
   color: 0xf4f4f4,
   roughness: 0.14,
   metalness: 0.04,
 });
-// Deep crimson satin ribbon — slightly metallic for sheen
+
 const ribbonMat = new THREE.MeshStandardMaterial({
   color: 0xaa0018,
   roughness: 0.28,
@@ -69,39 +51,26 @@ const ribbonDarkMat = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
 });
 
-// ════════════════════════════════════════
-//  CAKE DIMENSIONS
-// ════════════════════════════════════════
-const TIER_R = 0.92; // radius — smaller bento cake
-const TIER_H = 0.92; // height — squat & compact like reference
+const TIER_R = 0.92;
+const TIER_H = 0.92;
 const PLATE_Y = 0.04;
-const TIER_Y = PLATE_Y + TIER_H / 2; // = 0.50
-const TOP_Y = PLATE_Y + TIER_H; // = 0.96  (top surface level)
+const TIER_Y = PLATE_Y + TIER_H / 2;
+const TOP_Y = PLATE_Y + TIER_H;
 
-// ════════════════════════════════════════
-//  PLATE
-// ════════════════════════════════════════
 addLayer(new THREE.CylinderGeometry(1.19, 1.19, 0.08, 56), plateMat, PLATE_Y);
 
-// ════════════════════════════════════════
-//  MAIN CAKE BODY
-// ════════════════════════════════════════
 addLayer(
   new THREE.CylinderGeometry(TIER_R, TIER_R, TIER_H, 64),
   creamMat,
   TIER_Y,
 );
 
-// Top flat cap
 addLayer(
   new THREE.CylinderGeometry(TIER_R, TIER_R, 0.035, 64),
   creamMat,
   TOP_Y + 0.018,
 );
 
-// ════════════════════════════════════════
-//  "happy birthday" CANVAS DISC  (top)
-// ════════════════════════════════════════
 (function makeTopDisc() {
   const SIZE = 512;
   const cv = document.createElement("canvas");
@@ -110,21 +79,16 @@ addLayer(
   const ctx = cv.getContext("2d");
   ctx.clearRect(0, 0, SIZE, SIZE);
 
-  // ── "happy birthday" in deep red cursive ──
-  // Two lines centred
   ctx.fillStyle = "#bb0018";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // Line 1 — "happy"
   ctx.font = "bold italic 88px Georgia, 'Times New Roman', serif";
   ctx.fillText("happy", 256, 195);
 
-  // Line 2 — "birthday" slightly larger for reference look
   ctx.font = "bold italic 84px Georgia, 'Times New Roman', serif";
   ctx.fillText("birthday", 256, 298);
 
-  // ── tiny red hearts — rim only, clear of the text ──
   const HEART_POS = [
     [80, 155],
     [432, 150],
@@ -172,18 +136,12 @@ addLayer(
   cakeGroup.add(disc);
 })();
 
-// ════════════════════════════════════════
-//  SHELL / ROSETTE BORDERS
-//  Each shell = layered half-spheres so
-//  they look thick and piped.
-// ════════════════════════════════════════
 function addShellRing(radius, y, count, shellR, tiltX) {
   for (let i = 0; i < count; i++) {
     const a = (i / count) * Math.PI * 2;
     const px = Math.cos(a) * radius;
     const pz = Math.sin(a) * radius;
 
-    // Back layer — larger, slightly lower → gives depth shadow
     const back = new THREE.Mesh(
       new THREE.SphereGeometry(
         shellR * 1.1,
@@ -203,7 +161,6 @@ function addShellRing(radius, y, count, shellR, tiltX) {
     back.castShadow = true;
     cakeGroup.add(back);
 
-    // Front layer — smaller, on top → bright highlight ridge
     const front = new THREE.Mesh(
       new THREE.SphereGeometry(
         shellR * 0.82,
@@ -224,16 +181,12 @@ function addShellRing(radius, y, count, shellR, tiltX) {
   }
 }
 
-// ── Upright rosette ring for the top border ──
-// Each rosette is a standing round blob — like a freshly piped
-// cream puff sitting on the rim, not a flat pancake.
 function addUprightRing(radius, y, count, blobR) {
   for (let i = 0; i < count; i++) {
     const a = (i / count) * Math.PI * 2;
     const px = Math.cos(a) * radius;
     const pz = Math.sin(a) * radius;
 
-    // Base blob — full sphere, slightly oval upward
     const base = new THREE.Mesh(
       new THREE.SphereGeometry(blobR, 12, 10),
       rosetteMat,
@@ -243,7 +196,6 @@ function addUprightRing(radius, y, count, blobR) {
     base.castShadow = true;
     cakeGroup.add(base);
 
-    // Smaller top highlight — gives the piped "peak" look
     const peak = new THREE.Mesh(
       new THREE.SphereGeometry(blobR * 0.55, 9, 8),
       rosetteMat,
@@ -254,18 +206,10 @@ function addUprightRing(radius, y, count, blobR) {
   }
 }
 
-// Top border — upright standing rosettes on the rim
 addUprightRing(TIER_R - 0.02, TOP_Y + 0.065, 22, 0.092);
 
-// Base border — shells flaring outward/upward
 addShellRing(TIER_R - 0.02, PLATE_Y + 0.16, 20, 0.155, 0.26);
 
-// ════════════════════════════════════════
-//  RED RIBBON BOWS  — 6 evenly spaced
-//  Bow knot sits near the top of the cake
-//  so loops rise above the rim, tails fall
-//  in a wide uniform V to the base border.
-// ════════════════════════════════════════
 function addBow(angle, y) {
   const bx = Math.cos(angle) * (TIER_R + 0.005);
   const bz = Math.sin(angle) * (TIER_R + 0.005);
@@ -273,21 +217,18 @@ function addBow(angle, y) {
   const grp = new THREE.Group();
   grp.position.set(bx, y, bz);
   grp.rotation.y = Math.PI / 2 - angle;
-  // Local axes: +X tangential, +Y up, +Z outward (viewer looks along –Z)
 
-  // ── Loops — tall torus ovals that rise above the cake rim ──
   for (const side of [-1, 1]) {
     const loop = new THREE.Mesh(
       new THREE.TorusGeometry(0.118, 0.036, 9, 26),
       ribbonMat,
     );
-    // Tall oval: Y scale ~1.6 so loops are noticeably taller than wide
+
     loop.scale.set(0.82, 2.1, 0.28);
     loop.position.set(side * 0.148, 0.1, 0.0);
     loop.rotation.z = side * 0.18;
     grp.add(loop);
 
-    // Inner highlight ring for satin sheen
     const shine = new THREE.Mesh(
       new THREE.TorusGeometry(0.078, 0.019, 7, 22),
       ribbonMat,
@@ -298,7 +239,6 @@ function addBow(angle, y) {
     grp.add(shine);
   }
 
-  // ── Centre knot ──
   const knot = new THREE.Mesh(
     new THREE.SphereGeometry(0.058, 10, 9),
     ribbonMat,
@@ -306,8 +246,6 @@ function addBow(angle, y) {
   knot.scale.set(0.85, 0.68, 0.5);
   grp.add(knot);
 
-  // ── Tails — wide spreading V, fall to near base border ──
-  // X offset grows steadily so tails fan out uniformly.
   for (const side of [-1, 1]) {
     const tailPts = [
       new THREE.Vector3(side * 0.038, 0.0, 0.0),
@@ -327,7 +265,6 @@ function addBow(angle, y) {
     );
     grp.add(tail);
 
-    // V-notch ribbon end
     for (const notch of [-1, 1]) {
       const tip = new THREE.Mesh(
         new THREE.PlaneGeometry(0.024, 0.058),
@@ -342,18 +279,12 @@ function addBow(angle, y) {
   cakeGroup.add(grp);
 }
 
-// Bows near the top of the cake — loops breach the rim, tails reach the base
 const BOW_Y = PLATE_Y + TIER_H * 0.82;
 for (let i = 0; i < 6; i++) {
   addBow((i / 6) * Math.PI * 2, BOW_Y);
 }
 
-// ════════════════════════════════════════
-//  RED HEART SIDE DECORATIONS
-//  Tiny hearts on the cake sides between bows
-// ════════════════════════════════════════
 (function addSideHearts() {
-  // One canvas texture, reused for all side hearts
   const cv = document.createElement("canvas");
   cv.width = 64;
   cv.height = 64;
@@ -380,7 +311,6 @@ for (let i = 0; i < 6; i++) {
     side: THREE.DoubleSide,
   });
 
-  // 36 hearts at 4 height levels, scattered around the full cake side
   const OFFSETS = [0.14, 0.34, 0.54, 0.72];
   for (let i = 0; i < 36; i++) {
     const a = (i / 36) * Math.PI * 2 + 0.28;
@@ -394,21 +324,15 @@ for (let i = 0; i < 6; i++) {
   }
 })();
 
-// ════════════════════════════════════════
-//  SINGLE WHITE CANDLE  (gold speckles)
-// ════════════════════════════════════════
 (function makeCandle() {
-  // Build candle texture: white with gold metallic speckles
   const cv = document.createElement("canvas");
   cv.width = 64;
   cv.height = 256;
   const ctx = cv.getContext("2d");
 
-  // Base white
   ctx.fillStyle = "#fefefe";
   ctx.fillRect(0, 0, 64, 256);
 
-  // Gold speckles
   for (let i = 0; i < 36; i++) {
     const sx = Math.random() * 64;
     const sy = Math.random() * 256;
@@ -419,7 +343,7 @@ for (let i = 0; i < 6; i++) {
     ctx.arc(sx, sy, sr, 0, Math.PI * 2);
     ctx.fill();
   }
-  // Subtle vertical highlight stripe down the centre
+
   const shine = ctx.createLinearGradient(0, 0, 64, 0);
   shine.addColorStop(0.0, "rgba(255,255,255,0)");
   shine.addColorStop(0.45, "rgba(255,255,255,0.18)");
@@ -434,7 +358,7 @@ for (let i = 0; i < 6; i++) {
   const CANDLE_Z = 0.04;
   const CANDLE_BASE_Y = TOP_Y + 0.055;
   const CANDLE_LEN = 1.1;
-  const TILT_Z = 0.07; // slight lean
+  const TILT_Z = 0.07;
 
   const candle = new THREE.Mesh(
     new THREE.CylinderGeometry(0.036, 0.042, CANDLE_LEN, 14),
@@ -445,7 +369,6 @@ for (let i = 0; i < 6; i++) {
   candle.castShadow = true;
   cakeGroup.add(candle);
 
-  // Wax drip on candle (just two small blobs)
   const waxMat = std(0xfff8ee, 0.55, 0.0);
   for (let wd = 0; wd < 2; wd++) {
     const wdA = wd === 0 ? 0.4 : -0.5;
@@ -463,16 +386,11 @@ for (let i = 0; i < 6; i++) {
     cakeGroup.add(wblob);
   }
 
-  // Flame position — exact tip of the tilted candle
-  // Rotating (0, CANDLE_LEN/2, 0) around Z by TILT_Z gives:
-  //   X offset = -CANDLE_LEN/2 * sin(TILT_Z)   (negative — leans left)
-  //   Y offset =  CANDLE_LEN/2 * cos(TILT_Z)
   const halfLen = CANDLE_LEN * 0.5;
   const flameLX = CANDLE_X - halfLen * Math.sin(TILT_Z);
   const flameLY = CANDLE_BASE_Y + halfLen + halfLen * Math.cos(TILT_Z) + 0.08;
   const flameLZ = CANDLE_Z;
 
-  // Outer flame
   const flOut = new THREE.Mesh(
     new THREE.SphereGeometry(0.07, 10, 10),
     new THREE.MeshBasicMaterial({ color: 0xffcc22 }),
@@ -482,7 +400,6 @@ for (let i = 0; i < 6; i++) {
   cakeGroup.add(flOut);
   flameMeshes.push({ mesh: flOut, offset: 0 });
 
-  // Inner white-hot core
   const flIn = new THREE.Mesh(
     new THREE.SphereGeometry(0.036, 8, 8),
     new THREE.MeshBasicMaterial({ color: 0xffffee }),
@@ -491,13 +408,11 @@ for (let i = 0; i < 6; i++) {
   flIn.position.set(flameLX, flameLY - 0.022, flameLZ);
   cakeGroup.add(flIn);
 
-  // Per-flame point light
   const flameLight = new THREE.PointLight(0xff9933, 0.55, 3.0);
   flameLight.position.set(flameLX, flameLY, flameLZ);
   cakeGroup.add(flameLight);
   perFlameLights.push({ light: flameLight, offset: 0 });
 
-  // Smoke — world-space coords (tableGroup scale = 1.8)
   const tgScale = tableGroup.scale.x;
   const SMOKE_COUNT = 18;
   const smokeGeo = new THREE.BufferGeometry();

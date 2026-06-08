@@ -1,28 +1,17 @@
-// ─────────────────────────────────────────
-//  textures.js
-//  Shared material helper + all procedural
-//  canvas-texture generators.
-//  Heavy textures (tablecloth, roughness,
-//  bump) are generated ONCE and exported as
-//  BASE_CLOTH so callers can clone cheaply.
-// ─────────────────────────────────────────
 import { rng } from "./utils.js";
 
-const THREAD = 6; // weave thread width in pixels
+const THREAD = 6;
 
-// ── Convenience material factory ──────────
 export function std(color, roughness = 0.5, metalness = 0.0) {
   return new THREE.MeshStandardMaterial({ color, roughness, metalness });
 }
 
-// ── Floor ────────────────────────────────
 export function makeFloorTex() {
   const fc = document.createElement("canvas");
   fc.width = 512;
   fc.height = 512;
   const ctx = fc.getContext("2d");
 
-  // Warm dark wood base
   ctx.fillStyle = "#0e0b08";
   ctx.fillRect(0, 0, 512, 512);
 
@@ -36,7 +25,6 @@ export function makeFloorTex() {
     ctx.fillStyle = `rgb(${Math.floor(bright * 1.6)},${Math.floor(bright * 1.0)},${Math.floor(bright * 0.55)})`;
     ctx.fillRect(0, py, 512, PLANK_H - 1);
 
-    // Wood grain
     for (let g = 0; g < 6; g++) {
       const gy = py + rng(row * 7.7 + g) * (PLANK_H - 2);
       const alpha = 0.04 + rng(row * 5.5 + g) * 0.08;
@@ -55,11 +43,9 @@ export function makeFloorTex() {
       ctx.stroke();
     }
 
-    // Plank gap
     ctx.fillStyle = "rgba(0,0,0,0.55)";
     ctx.fillRect(0, py + PLANK_H - 1, 512, 1);
 
-    // Vertical joint
     for (
       let jx = offset;
       jx < 512;
@@ -70,7 +56,6 @@ export function makeFloorTex() {
     }
   }
 
-  // Warm varnish sheen
   const sheen = ctx.createLinearGradient(0, 0, 512, 512);
   sheen.addColorStop(0, "rgba(255,180,80,0.06)");
   sheen.addColorStop(0.5, "rgba(255,160,60,0.03)");
@@ -85,7 +70,6 @@ export function makeFloorTex() {
   return tex;
 }
 
-// ── Tablecloth colour map ─────────────────
 export function makeTableclothTex() {
   const SIZE = 512;
   const GRID = 128;
@@ -164,7 +148,6 @@ export function makeTableclothTex() {
   return tex;
 }
 
-// ── Tablecloth roughness map ──────────────
 export function makeRoughnessMap() {
   const SIZE = 256;
   const rc = document.createElement("canvas");
@@ -206,7 +189,6 @@ export function makeRoughnessMap() {
   return new THREE.CanvasTexture(rc);
 }
 
-// ── Tablecloth bump map ───────────────────
 export function makeBumpMap() {
   const SIZE = 256;
   const bc = document.createElement("canvas");
@@ -246,14 +228,12 @@ export function makeBumpMap() {
   return new THREE.CanvasTexture(bc);
 }
 
-// Generated once, cloned by getClothMat()
 export const BASE_CLOTH = {
   color: makeTableclothTex(),
   rough: makeRoughnessMap(),
   bump: makeBumpMap(),
 };
 
-// ── Cloth material factory ────────────────
 export function getClothMat(repeat, doubleSide) {
   function cloneWith(base) {
     const t = base.clone();
@@ -274,7 +254,6 @@ export function getClothMat(repeat, doubleSide) {
   });
 }
 
-// ── Candle stripe texture ─────────────────
 export function makeCandleTex(c1, c2) {
   const cv = document.createElement("canvas");
   cv.width = 64;
@@ -287,7 +266,6 @@ export function makeCandleTex(c1, c2) {
   return new THREE.CanvasTexture(cv);
 }
 
-// ── Sunset gradient skybox ────────────────
 export function makeSunsetGradient() {
   const gc = document.createElement("canvas");
   gc.width = 1024;
@@ -313,7 +291,6 @@ export function makeSunsetGradient() {
   return new THREE.CanvasTexture(gc);
 }
 
-// ── Photo-frame placeholder ───────────────
 export function makePhotoPlaceholder(idx) {
   const palettes = [
     ["#1a4a6e", "#c8a878", "#e8c898"],
@@ -335,7 +312,6 @@ export function makePhotoPlaceholder(idx) {
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 320, 256);
 
-  // Silhouetted figures
   ctx.fillStyle = "rgba(0,0,0,0.35)";
   ctx.beginPath();
   ctx.arc(110, 130, 28, 0, Math.PI * 2);
