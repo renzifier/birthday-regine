@@ -30,7 +30,7 @@ const _dogLoaded = new Promise((resolve) => {
     resolve();
   };
   img.onerror = () => resolve(); // fallback: draw without dog
-  img.src = "assets/fatdog.png";
+  img.src = "assets/kit.png";
 });
 
 // ── Helpers ───────────────────────────────
@@ -835,7 +835,7 @@ function _enableFlip() {
   // ── Static photo on the back ──────────────
   // Replace "YOUR_PHOTO.jpg" with your actual filename in assets/
   const photoEl = document.createElement("img");
-  photoEl.src = "assets/mang-e.jpg";
+  photoEl.src = "assets/kit2.png";
   Object.assign(photoEl.style, {
     position: "absolute",
     inset: "0",
