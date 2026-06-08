@@ -1,11 +1,3 @@
-// ─────────────────────────────────────────
-//  card.js  — envelope edition
-//  • Draws the birthday card onto a canvas
-//  • Renders a pink envelope as the 3-D
-//    table object (replaces flat card)
-//  • 3-stage overlay: closed → flap open
-//    → drag card out
-// ─────────────────────────────────────────
 import { CARD_TO, CARD_MESSAGE } from "./config.js";
 import { std } from "./textures.js";
 import { tableGroup } from "./table.js";
@@ -841,7 +833,7 @@ function _enableFlip() {
     inset: "0",
     width: "100%",
     height: "100%",
-    objectFit: "cover",
+    objectFit: "contain",
     borderRadius: "18px",
     zIndex: "3",
   });

@@ -1,9 +1,3 @@
-// ─────────────────────────────────────────
-//  config.js  ← edit card text and scene
-//  settings here; nothing else needs to
-//  change for common customisations.
-// ─────────────────────────────────────────
-
 export const CARD_TO = "Happy Birthday, Mishie!";
 export const CARD_MESSAGE =
   "Ewan ko if you knew i was making this but sorry ah surprise talaga to bahala ka, pinakita ko naman sa quicksnaps kaya na sabi ko yung ano yung tatanong uli😭😭😭😭 but anyway!! " +
