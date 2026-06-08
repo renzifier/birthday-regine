@@ -369,13 +369,6 @@ function makeEnvelopeTex() {
   c.fill();
   c.restore();
 
-  c.fillStyle = "rgba(180, 40, 100, 0.75)";
-  c.font = "italic bold 20px Georgia, serif";
-  c.textAlign = "center";
-  const firstName =
-    CARD_TO.replace(/,.*/, "").replace("Happy Birthday", "").trim() || CARD_TO;
-  c.fillText("To: " + firstName, 256, 318);
-
   c.strokeStyle = "rgba(220, 80, 140, 0.4)";
   c.lineWidth = 4;
   c.beginPath();
