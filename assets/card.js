@@ -17,7 +17,7 @@ const _dogLoaded = new Promise((resolve) => {
     resolve();
   };
   img.onerror = () => resolve();
-  img.src = "assets/kit.png";
+  img.src = "assets/regine1.jpg";
 });
 
 function roundRect(ctx, x, y, w, h, r) {

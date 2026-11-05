@@ -1,7 +1,7 @@
-export const CARD_TO = "Happy Birthday, Ashley!";
+export const CARD_TO = "Happy Birthday, Ma'am Regine!!";
 export const CARD_MESSAGE =
-  "Eto na te oh, eto na hinahanap mo diba? Pina effort mo talaga ako no.. Sige nalang, once a year lang naman... Anyway!!" +
-  " Happy Birthday, Ashley!! Wag mo naman e dibdib mga ano ano ko sayo ha, stay pretty tita!!🥰🥰🥰🥰🥰";
+  "Plangga ka gid sang 1A bisan wala ka subject samon," +
+  " stay pretty and kind gid always, be our admirable teacher until the end and amon plus nga grades ikaw na bahala next year ma'am!!";
 
 export const CONFIG = {
   camera: { fov: 62, near: 0.1, far: 200, initialRadius: 16 },
