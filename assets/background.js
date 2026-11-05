@@ -1,8 +1,11 @@
 import { scene, renderer } from "./renderer.js";
 
-const skyTex = new THREE.TextureLoader().load("assets/night-sky.png", (t) => {
-  fitCover();
-});
+const skyTex = new THREE.TextureLoader().load(
+  "assets/photos/night.jpg",
+  (t) => {
+    fitCover();
+  },
+);
 if (THREE.SRGBColorSpace) skyTex.colorSpace = THREE.SRGBColorSpace;
 else skyTex.encoding = THREE.sRGBEncoding;
 skyTex.wrapS = skyTex.wrapT = THREE.ClampToEdgeWrapping;
