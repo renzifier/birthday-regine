@@ -17,7 +17,7 @@ const _dogLoaded = new Promise((resolve) => {
     resolve();
   };
   img.onerror = () => resolve();
-  img.src = "assets/regine1.jpg";
+  img.src = "assets/photos/regine1.jpg";
 });
 
 function roundRect(ctx, x, y, w, h, r) {
@@ -732,7 +732,7 @@ function _enableFlip() {
   backEl.appendChild(backCanvas);
 
   const photoEl = document.createElement("img");
-  photoEl.src = "assets/kit2.png";
+  photoEl.src = "assets/photos/regine1.jpg";
   Object.assign(photoEl.style, {
     position: "absolute",
     inset: "0",
